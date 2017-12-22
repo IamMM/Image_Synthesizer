@@ -9,7 +9,7 @@
       <enabled value="true"/>
       <opaque value="true"/>
     </properties>
-    <border type="line">
+    <border type="none">
       <color color="-16777216"/>
     </border>
     <children>
