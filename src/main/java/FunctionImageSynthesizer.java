@@ -336,7 +336,7 @@ public class FunctionImageSynthesizer extends ImageMath {
                 height = minPreviewSize;
             }
             ImageProcessor ip = imagePlus.getProcessor();
-            ip.setInterpolate(true);
+            ip.setInterpolate(false);
             ImageProcessor resized = ip.resize(width, height);
             imagePlus.setProcessor(resized);
         }
