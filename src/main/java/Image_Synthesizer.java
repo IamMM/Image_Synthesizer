@@ -69,6 +69,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
     // globals
     private boolean doNewImage = true;
+    private boolean isRGB;
 
     /**
      * Main method for debugging.
@@ -149,7 +150,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         typesComboBox.addActionListener(evt -> {
             String newValue = (String) typesComboBox.getSelectedItem();
             assert newValue != null;
-            boolean isRGB = newValue.equals("RGB");
+            isRGB = newValue.equals("RGB");
             if(isRGB) {
                 invertingLUTCheckBox.setSelected(false);
                 f1Label.setText("r=");
@@ -364,6 +365,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         // function
         String function = f1TextField.getText();
+        String[] functions = new String[]{function, f2TextField.getText(), f3TextField.getText()};
 
         // apply
         ImagePlus imagePlus;
@@ -374,7 +376,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
         if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
 
-        Image previewImage = FIS.getPreview(imagePlus, min, max, function, drawAxesCheckBox.isSelected());
+        Image previewImage = isRGB?FIS.getPreview(imagePlus, min, max, functions, drawAxesCheckBox.isSelected()):
+                FIS.getPreview(imagePlus, min, max, function, drawAxesCheckBox.isSelected());
         preview.setIcon(new ImageIcon(previewImage));
     }
 
@@ -415,6 +418,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         // function
         String function = f1TextField.getText();
+        String[] functions = new String[]{function, f2TextField.getText(), f3TextField.getText()};
 
         // apply
         ImagePlus imagePlus;
@@ -425,7 +429,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             imagePlus.setTitle(function);
         }
         if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
-        FIS.functionToImage(imagePlus, min, max, function);
+
+        if(isRGB) FIS.functionToImage(imagePlus, min, max, functions);
+        else FIS.functionToImage(imagePlus, min, max, function);
         IJ.resetMinAndMax(imagePlus);
         imagePlus.show();
     }

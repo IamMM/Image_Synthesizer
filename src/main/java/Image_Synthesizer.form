@@ -462,7 +462,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="sin(d*x)"/>
+                  <text value="255*sin(d + a)"/>
                 </properties>
               </component>
               <vspacer id="69a42">
@@ -477,7 +477,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="cos(x)+cos(y)"/>
+                  <text value="255*sin(d + a + 4.2)"/>
                   <visible value="false"/>
                 </properties>
               </component>
@@ -488,7 +488,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="tan(x)+tan(y)"/>
+                  <text value="255*sin(d + a + 2.1)"/>
                   <visible value="false"/>
                 </properties>
               </component>

@@ -40,15 +40,11 @@ public class FunctionImageSynthesizer extends ImageMath {
     // Constants
     private static final int PREVIEW_SIZE = 256 ;
 
-    /*--- Macro to Image ---*/
+    /*--- function to Image ---*/
 
     public void functionToImage(ImagePlus imagePlus, double[] min, double[] max, String function) {
         // example macro: "code=v=v+50*sin(d/10)"
         String macro = "code=v=" + function;
-        applyMacro(imagePlus, macro, min, max);
-    }
-
-    private void applyMacro(ImagePlus imagePlus, String macro, double[]min, double[]max) {
 
         ImageProcessor ip = imagePlus.getProcessor();
 
@@ -61,8 +57,6 @@ public class FunctionImageSynthesizer extends ImageMath {
         boolean hasGetPixel = pgm.hasWord("getPixel");
         int width = ip.getWidth();
         int height = ip.getHeight();
-        int w2 = width/2;
-        int h2 = height/2;
         String code =
                 "var v,x,y,z,w,h,d,a;\n"+
                         "function dummy() {}\n"+
@@ -107,7 +101,7 @@ public class FunctionImageSynthesizer extends ImageMath {
                         double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
                         if (hasX) interpreter.setVariable("x", dx);
 
-                        if (hasA) interpreter.setVariable("a", getA((height - y - 1) - h2, x - w2));
+                        if (hasA) interpreter.setVariable("a", getA(dy, dx));
                         if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
                         interpreter.run(PCStart);
                         v2 = (int) interpreter.getVariable("v");
@@ -140,7 +134,7 @@ public class FunctionImageSynthesizer extends ImageMath {
                         double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
                         if (hasX) interpreter.setVariable("x", dx);
 
-                        if (hasA) interpreter.setVariable("a", getA((height - y - 1) - h2, x - w2));
+                        if (hasA) interpreter.setVariable("a", getA(dy, dx));
                         if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
                         pos = y * width + x;
                         rgb = pixels1[pos];
@@ -174,7 +168,7 @@ public class FunctionImageSynthesizer extends ImageMath {
                 }
                 if (hasGetPixel) System.arraycopy(pixels2, 0, pixels1, 0, width * height);
             }
-        } else if (false) { // ip.isSignedBit()
+        } else if (imagePlus.getCalibration().isSigned16Bit()) { // ip.isSignedBit()
             for(int z = 0; z < slices; z++) {
                 ip = imagePlus.getImageStack().getProcessor(z + 1);
 
@@ -193,7 +187,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 
                         v = ip.getPixelValue(x, y);
                         interpreter.setVariable("v", v);
-                        if (hasA) interpreter.setVariable("a", getA((height - y - 1) - h2, x - w2));
+                        if (hasA) interpreter.setVariable("a", getA(dy, dx));
                         if (hasD) interpreter.setVariable("d", Math.hypot(dx, dy));
                         interpreter.run(PCStart);
                         ip.putPixelValue(x, y, interpreter.getVariable("v"));
@@ -226,7 +220,7 @@ public class FunctionImageSynthesizer extends ImageMath {
                         v = pixels1[pos] & 65535;
                         interpreter.setVariable("v", v);
 
-                        if (hasA) interpreter.setVariable("a", getA((height - y - 1) - h2, x - w2));
+                        if (hasA) interpreter.setVariable("a", getA(dy, dx));
                         if (hasD) interpreter.setVariable("d",Math.hypot(dx,dy));
                         interpreter.run(PCStart);
                         v2 = (int) interpreter.getVariable("v");
@@ -261,7 +255,7 @@ public class FunctionImageSynthesizer extends ImageMath {
                         double dx = min[0]+((max[0]-min[0])/width)*x; // min..max
                         if (hasX) interpreter.setVariable("x", dx);
 
-                        if (hasA) interpreter.setVariable("a", getA((height - y - 1) - h2, x - w2));
+                        if (hasA) interpreter.setVariable("a", getA(dy, dx));
                         if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
                         interpreter.run(PCStart);
                         pixels2[pos] = (float) interpreter.getVariable("v");
@@ -273,23 +267,130 @@ public class FunctionImageSynthesizer extends ImageMath {
         IJ.showProgress(1.0);
     }
 
-    private double getA(int y, int x) {
+    public void functionToImage(ImagePlus imagePlus, double[] min, double[] max, String[] function) {
+        ImageProcessor ip = imagePlus.getProcessor();
+        if(ip.getBitDepth()!=24) return;
+
+        // example macro: "code=v=v+50*sin(d/10)"
+        String macro1 = "code=r_new=" + function[0];
+        String macro2 = "code=g_new=" + function[1];
+        String macro3 = "code=b_new=" + function[2];
+
+        int PCStart = 23;
+        Program pgm1 = (new Tokenizer()).tokenize(macro1);
+        Program pgm2 = (new Tokenizer()).tokenize(macro2);
+        Program pgm3 = (new Tokenizer()).tokenize(macro3);
+        boolean hasX = pgm1.hasWord("x") | pgm2.hasWord("x") | pgm3.hasWord("x")  ;
+        boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
+        boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
+        boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
+        int width = ip.getWidth();
+        int height = ip.getHeight();
+        String code =
+                "var v,r,g,b,x,y,z,w,h,d,a;\n"+
+                        "function dummy() {}\n"+
+                        macro1+";\n"+
+                        macro2+";\n"+
+                        macro3+";\n"; // code starts at program counter location 'PCStart'
+        Interpreter interpreter = new Interpreter();
+        interpreter.run(code, null);
+        if (interpreter.wasError()) return;
+
+        Prefs.set(MACRO_KEY, macro1);
+        interpreter.setVariable("w", width);
+        interpreter.setVariable("h", height);
+
+        Rectangle r = ip.getRoi();
+        int inc = r.height/50;
+        if (inc<1) inc = 1;
+        int slices = imagePlus.getNSlices();
+        int pos;
+
+        for(int z = 0; z < slices; z++) {
+            ip = imagePlus.getImageStack().getProcessor(z + 1);
+
+            double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
+            if (hasZ) interpreter.setVariable("z", dz);
+
+            int rgb, red, green, blue;
+            int[] pixels = (int[]) ip.getPixels();
+
+            for (int y = r.y; y < (r.y + r.height); y++) {
+                if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
+
+                double dy = min[1]+((max[1]-min[1])/height)*y; // 0..y to min..max
+                interpreter.setVariable("y", dy);
+
+                for (int x = r.x; x < (r.x + r.width); x++) {
+                    double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
+                    if (hasX) interpreter.setVariable("x", dx);
+
+                    if (hasA) interpreter.setVariable("a",getA(dy, dx));
+                    if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
+                    pos = y * width + x;
+                    rgb = pixels[pos];
+
+                    red = (rgb & 0xff0000) >> 16;
+                    green = (rgb & 0xff00) >> 8;
+                    blue = rgb & 0xff;
+                    interpreter.setVariable("r", red);
+                    interpreter.setVariable("g", green);
+                    interpreter.setVariable("b", blue);
+                    interpreter.run(PCStart);
+                    int redNew = (int) interpreter.getVariable("r_new");
+                    if (redNew < 0) redNew = 0;
+                    if (redNew > 255) redNew = 255;
+
+                    int greenNew = (int) interpreter.getVariable("g_new");
+                    if (greenNew < 0) greenNew = 0;
+                    if (greenNew > 255) greenNew = 255;
+
+                    int blueNew = (int) interpreter.getVariable("b_new");
+                    if (blueNew < 0) blueNew = 0;
+                    if (blueNew > 255) blueNew = 255;
+                    rgb = 0xff000000 | ((redNew & 0xff) << 16) | ((greenNew & 0xff) << 8) | blueNew & 0xff;
+
+                    pixels[pos] = rgb;
+                }
+            }
+        }
+        IJ.showProgress(1.0);
+    }
+
+    private double getA(double y, double x) {
         double angle = Math.atan2(y, x);
-        if (angle<0) angle += 2*Math.PI;
+        if (angle < 0) angle += 2 * Math.PI;
         return angle;
     }
 
-    /*--- PREVIEW ---*/
+        /*--- PREVIEW ---*/
 
     public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, String function, boolean drawAxes) {
 
         ImageProcessor resized = downsize(imagePlus);
-
         ImagePlus preview = new ImagePlus();
         preview.setProcessor(resized);
-        String macro = "code=v=" + function;
-        applyMacro(preview, macro, min, max);
+        functionToImage(preview, min, max, function);
+        resized.resetMinAndMax();
 
+        // interpolate if to small
+        enlarge(preview, PREVIEW_SIZE);
+
+
+        ImageProcessor colorProcessor = preview.getProcessor().convertToColorProcessor();
+        if(drawAxes) {
+            drawAxes(colorProcessor, min, max);
+            preview.setProcessor(colorProcessor);
+        }
+        return preview.getImage();
+    }
+
+    public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, String[] function, boolean drawAxes) {
+
+        ImageProcessor resized = downsize(imagePlus);
+        ImagePlus preview = new ImagePlus();
+        preview.setProcessor(resized);
+        functionToImage(preview, min, max, function);
         resized.resetMinAndMax();
 
         // interpolate if to small
