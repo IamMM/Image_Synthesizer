@@ -1,4 +1,6 @@
 import ij.*;
+import ij.io.OpenDialog;
+import ij.io.Opener;
 import ij.plugin.PlugIn;
 
 import javax.swing.*;
@@ -51,6 +53,12 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JButton yEqualZ;
     private JButton xEqualY;
     private JButton zEqualZ;
+    private JButton centerX;
+    private JButton centerY;
+    private JButton centerZ;
+    private JButton inverseX;
+    private JButton inverseY;
+    private JButton inverseZ;
 
     // constants
     private static final String TITLE = "Function Image Synthesizer";
@@ -164,9 +172,19 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             updatePreview();
         });
 
+        openImageButton.addActionListener(evt -> openButtonAction());
+
         invertingLUTCheckBox.addActionListener(e -> updatePreview());
 
         initFocusListener();
+
+        centerX.addActionListener(e -> center(minX, maxX));
+        centerY.addActionListener(e -> center(minY, maxY));
+        centerZ.addActionListener(e -> center(minZ, maxZ));
+
+        inverseX.addActionListener(e -> inverse(minX, maxX));
+        inverseY.addActionListener(e -> inverse(minY, maxY));
+        inverseZ.addActionListener(e -> inverse(minZ, maxZ));
 
         drawAxesCheckBox.addActionListener(e -> updatePreview());
 
@@ -353,7 +371,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             imagePlus = IJ.createImage(function, type, width, height, slices);
         } else {
             imagePlus = WindowManager.getImage((String)imageComboBox.getSelectedItem()).duplicate();
-            imagePlus.setTitle(function);
         }
         if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
 
@@ -430,6 +447,42 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
+    }
+
+    private void openButtonAction() {
+        OpenDialog od = new OpenDialog("Open..", "");
+        String directory = od.getDirectory();
+        String name = od.getFileName();
+        if (name == null) return;
+
+        Opener opener = new Opener();
+        ImagePlus image = opener.openImage(directory, name);
+        image.show();
+        imageComboBox.setSelectedIndex(imageComboBox.getItemCount() - 1);
+    }
+
+    private void center(JTextField textField1, JTextField textField2) {
+        String minFromGUI = textField1.getText().replaceAll("[^-\\d.]", "");
+        double min = minFromGUI.equals("")?0:Double.parseDouble(minFromGUI);
+        String maxFromGUI = textField2.getText().replaceAll("[^-\\d.]", "");
+        double max = maxFromGUI.equals("")?0:Double.parseDouble(maxFromGUI);
+
+        double range = min-max;
+
+        min = range/2;
+        max = -range/2;
+
+        textField1.setText(""+min);
+        textField2.setText(""+max);
+
+        updatePreview();
+    }
+
+    private void inverse(JTextField textField1, JTextField textField2) {
+        String text = textField1.getText();
+        textField1.setText(textField2.getText());
+        textField2.setText(text);
+        updatePreview();
     }
 
     private void close() {

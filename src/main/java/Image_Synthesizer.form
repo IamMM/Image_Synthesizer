@@ -203,14 +203,14 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="cd6d" class="javax.swing.JButton" default-binding="true">
+                      <component id="cd6d" class="javax.swing.JButton" binding="centerX">
                         <constraints/>
                         <properties>
                           <focusable value="false"/>
                           <text value="center"/>
                         </properties>
                       </component>
-                      <component id="2ba2c" class="javax.swing.JButton" default-binding="true">
+                      <component id="2ba2c" class="javax.swing.JButton" binding="inverseX">
                         <constraints/>
                         <properties>
                           <focusable value="false"/>
@@ -235,14 +235,14 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="a0226" class="javax.swing.JButton" default-binding="true">
+                      <component id="a0226" class="javax.swing.JButton" binding="centerY">
                         <constraints/>
                         <properties>
                           <focusable value="false"/>
                           <text value="center"/>
                         </properties>
                       </component>
-                      <component id="5c4f0" class="javax.swing.JButton" default-binding="true">
+                      <component id="5c4f0" class="javax.swing.JButton" binding="inverseY">
                         <constraints/>
                         <properties>
                           <focusable value="false"/>
@@ -267,14 +267,14 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="6944c" class="javax.swing.JButton" default-binding="true">
+                      <component id="6944c" class="javax.swing.JButton" binding="centerZ">
                         <constraints/>
                         <properties>
                           <focusable value="false"/>
                           <text value="center"/>
                         </properties>
                       </component>
-                      <component id="23761" class="javax.swing.JButton" default-binding="true">
+                      <component id="23761" class="javax.swing.JButton" binding="inverseZ">
                         <constraints/>
                         <properties>
                           <focusable value="false"/>
