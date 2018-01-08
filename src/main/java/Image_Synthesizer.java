@@ -8,8 +8,6 @@ import ij.io.Opener;
 import ij.plugin.PlugIn;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -60,9 +58,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JButton previewButton;
     private JButton generateButton;
     private JComboBox comboBox1;
-    private JToggleButton xEqualY;
-    private JToggleButton yEqualZ;
-    private JToggleButton zEqualX;
+    private JButton xEqualY;
+    private JButton yEqualZ;
+    private JButton zEqualX;
     private JButton centerX;
     private JButton centerY;
     private JButton centerZ;
@@ -190,8 +188,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         initFocusListener();
 
-//        initChangeListener();
-
         centerX.addActionListener(e -> center(minX, maxX));
         centerY.addActionListener(e -> center(minY, maxY));
         centerZ.addActionListener(e -> center(minZ, maxZ));
@@ -201,30 +197,18 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         inverseZ.addActionListener(e -> inverse(minZ, maxZ));
 
         xEqualY.addActionListener(e -> {
-            if (xEqualY.isSelected()) {
-//                equal(minX, maxX, minY, maxY);
-                xEqualY.setText("x=y");
-            } else {
-                xEqualY.setText("x≠y");
-            }
+                equal(minX, maxX, minY, maxY);
+                updatePreview();
         });
 
         yEqualZ.addActionListener(e -> {
-            if (yEqualZ.isSelected()) {
-//                equal(minY, maxY, minZ, maxZ);
-                yEqualZ.setText("y=z");
-            } else {
-                yEqualZ.setText("y≠z");
-            }
+                equal(minY, maxY, minZ, maxZ);
+                updatePreview();
         });
 
         zEqualX.addActionListener(e -> {
-            if (zEqualX.isSelected()) {
-//                equal(minZ, maxZ, minX, maxX);
-                zEqualX.setText("z=x");
-            } else {
-                zEqualX.setText("z≠x");
-            }
+                equal(minZ, maxZ, minX, maxX);
+                updatePreview();
         });
 
         drawAxesCheckBox.addActionListener(e -> updatePreview());
@@ -369,129 +353,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             }
         });
     }
-
-//    private void initChangeListener() {
-//        minX.getDocument().addDocumentListener(new DocumentListener() {
-//            @Override
-//            public void insertUpdate(DocumentEvent e) {
-//                equal(xEqualY.isSelected(), minX, minY);
-//                equal(zEqualX.isSelected(), minX, minZ);
-//            }
-//
-//            @Override
-//            public void removeUpdate(DocumentEvent e) {
-//                equal(xEqualY.isSelected(), minX, minY);
-//                equal(zEqualX.isSelected(), minX, minZ);
-//            }
-//
-//            @Override
-//            public void changedUpdate(DocumentEvent e) {
-////                equal(xEqualY.isSelected(), minX, minY);
-////                equal(zEqualX.isSelected(), minX, minZ);
-//            }
-//        });
-//
-//        maxX.getDocument().addDocumentListener(new DocumentListener() {
-//            @Override
-//            public void insertUpdate(DocumentEvent e) {
-//                equal(xEqualY.isSelected(), maxX, maxY);
-//                equal(zEqualX.isSelected(), maxX, maxZ);
-//            }
-//
-//            @Override
-//            public void removeUpdate(DocumentEvent e) {
-//                equal(xEqualY.isSelected(), maxX, maxY);
-//                equal(zEqualX.isSelected(), maxX, maxZ);
-//            }
-//
-//            @Override
-//            public void changedUpdate(DocumentEvent e) {
-////                equal(xEqualY.isSelected(), maxX, maxY);
-////                equal(zEqualX.isSelected(), maxX, maxZ);
-//            }
-//        });
-//
-//        minY.getDocument().addDocumentListener(new DocumentListener() {
-//            @Override
-//            public void insertUpdate(DocumentEvent e) {
-//                equal(xEqualY.isSelected(), minY, minX);
-//                equal(yEqualZ.isSelected(), minY, minZ);
-//            }
-//
-//            @Override
-//            public void removeUpdate(DocumentEvent e) {
-//                equal(xEqualY.isSelected(), minY, minX);
-//                equal(yEqualZ.isSelected(), minY, minZ);
-//            }
-//
-//            @Override
-//            public void changedUpdate(DocumentEvent e) {
-////                equal(xEqualY.isSelected(), minY, minX);
-////                equal(yEqualZ.isSelected(), minY, minZ);
-//            }
-//        });
-//
-//        maxY.getDocument().addDocumentListener(new DocumentListener() {
-//            @Override
-//            public void insertUpdate(DocumentEvent e) {
-//                equal(xEqualY.isSelected(), maxY, maxX);
-//                equal(yEqualZ.isSelected(), maxY, maxZ);
-//            }
-//
-//            @Override
-//            public void removeUpdate(DocumentEvent e) {
-//                equal(xEqualY.isSelected(), maxY, maxX);
-//                equal(yEqualZ.isSelected(), maxY, maxZ);
-//            }
-//
-//            @Override
-//            public void changedUpdate(DocumentEvent e) {
-////                equal(xEqualY.isSelected(), maxY, maxX);
-////                equal(yEqualZ.isSelected(), maxY, maxZ);
-//            }
-//        });
-//
-//        minZ.getDocument().addDocumentListener(new DocumentListener() {
-//            @Override
-//            public void insertUpdate(DocumentEvent e) {
-//                equal(zEqualX.isSelected(), minZ, minX);
-//                equal(yEqualZ.isSelected(), minZ, minY);
-//            }
-//
-//            @Override
-//            public void removeUpdate(DocumentEvent e) {
-//                equal(zEqualX.isSelected(), minZ, minX);
-//                equal(yEqualZ.isSelected(), minZ, minY);
-//            }
-//
-//            @Override
-//            public void changedUpdate(DocumentEvent e) {
-////                equal(zEqualX.isSelected(), minZ, minX);
-////                equal(yEqualZ.isSelected(), minZ, minY);
-//            }
-//        });
-//
-//        maxZ.getDocument().addDocumentListener(new DocumentListener() {
-//            @Override
-//            public void insertUpdate(DocumentEvent e) {
-//                equal(zEqualX.isSelected(), maxZ, maxX);
-//                equal(yEqualZ.isSelected(), maxZ, maxY);
-//            }
-//
-//            @Override
-//            public void removeUpdate(DocumentEvent e) {
-//                equal(zEqualX.isSelected(), maxZ, maxX);
-//                equal(yEqualZ.isSelected(), maxZ, maxY);
-//            }
-//
-//            @Override
-//            public void changedUpdate(DocumentEvent e) {
-////                equal(zEqualX.isSelected(), maxZ, maxX);
-////                equal(yEqualZ.isSelected(), maxZ, maxY);
-//            }
-//        });
-//
-//    }
 
     private void initFunctionPresets() {
 //        String[] functions1 = new String[]{"255*sin(d + a)", "255*sin(d + a + 4.2)", "255*sin(d + a + 2.1)"};
