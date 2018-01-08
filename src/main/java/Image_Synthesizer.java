@@ -1,4 +1,8 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import ij.*;
+import ij.gui.GenericDialog;
 import ij.io.OpenDialog;
 import ij.io.Opener;
 import ij.plugin.PlugIn;
@@ -7,9 +11,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.*;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -39,7 +47,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JTextField minZ;
     private JTextField maxZ;
     private JButton addFunctionPresetButton;
-    private JComboBox functionPresetsComboBox;
+    private JComboBox<String> functionPresetsComboBox;
     private JButton openHelpButton;
     private JLabel f1Label;
     private JLabel f2Label;
@@ -70,6 +78,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     // globals
     private boolean doNewImage = true;
     private boolean isRGB;
+    private Map<String, FunctionPreset> functionPresetMap;
 
     /**
      * Main method for debugging.
@@ -189,6 +198,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         drawAxesCheckBox.addActionListener(e -> updatePreview());
 
+        initFunctionPresets();
+        addFunctionPresetButton.addActionListener(e -> addFunctionPreset());
         openHelpButton.addActionListener(e -> openMacroHelp());
         previewButton.addActionListener(e -> updatePreview());
         generateButton.addActionListener(e -> generateFunction());
@@ -326,6 +337,79 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
                 updatePreview();
             }
         });
+    }
+
+    private void initFunctionPresets() {
+//        String[] functions1 = new String[]{"255*sin(d + a)", "255*sin(d + a + 4.2)", "255*sin(d + a + 2.1)"};
+//        FunctionPreset functionPreset1 = new FunctionPreset("RGB",functions1);
+//
+//        String[] functions2 = new String[]{"255*(sin(log(d)*8 + a) * sin(a*8))",
+//                "255*(sin(log(d)*8 + a - PI/2) * sin(a*8))", "255*(sin(log(d)*8 + a + PI/2) * sin(a*8))"};
+//        FunctionPreset functionPreset2 = new FunctionPreset("RGB",functions2);
+//
+//        String[] functions3 = new String[]{"255*(floor((a * 40.75 + 1) % 2))",
+//                "255*(sin(log(d)*8 + a - PI/2) * sin(a*8))", "255*(sin(log(d)*8 +a + PI/2) * sin(a*8))"};
+//        FunctionPreset functionPreset3 = new FunctionPreset("8-bit",functions3);
+//
+//        functionPresetMap = new HashMap<>();
+//        functionPresetMap.put("Spiral", functionPreset1);
+//        functionPresetMap.put("Fibonacci", functionPreset2);
+//        functionPresetMap.put("Polar Moire", functionPreset3);
+//        try (Writer writer = new FileWriter("FunctionPresets.json")) {
+//            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//            gson.toJson(functionPresetMap, writer);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        functionPresetMap = new HashMap<>();
+        try (Reader reader = new FileReader("FunctionPresets.json")) {
+            Gson gson = new Gson();
+            Type type = new TypeToken<Map<String, FunctionPreset>>(){}.getType();
+            functionPresetMap = gson.fromJson(reader, type);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (String preset : functionPresetMap.keySet()) {
+            functionPresetsComboBox.addItem(preset);
+        }
+
+        functionPresetsComboBox.addActionListener(e -> {
+            FunctionPreset functionPreset = functionPresetMap.get(functionPresetsComboBox.getSelectedItem());
+            f1TextField.setText(functionPreset.getFunctions()[0]);
+            f2TextField.setText(functionPreset.getFunctions()[1]);
+            f3TextField.setText(functionPreset.getFunctions()[2]);
+            typesComboBox.setSelectedItem(functionPreset.getType());
+            updatePreview();
+        });
+    }
+
+    private void addFunctionPreset() {
+        GenericDialog gd = new GenericDialog("Add Function Preset");
+        gd.addStringField("Name: ", "");
+        gd.showDialog();
+        if (gd.wasCanceled()) return;
+        String name = gd.getNextString();
+
+        String[] functions = new String[3];
+        if(isRGB) {
+            functions[0] = f1TextField.getText();
+            functions[1] = f2TextField.getText();
+            functions[2] = f3TextField.getText();
+        } else {
+            functions[0] = functions[1] = functions[2] = f1TextField.getText();
+        }
+        FunctionPreset functionPreset = new FunctionPreset((String) typesComboBox.getSelectedItem(),functions);
+        functionPresetMap.put(name, functionPreset);
+        functionPresetsComboBox.addItem(name);
+        try (Writer writer = new FileWriter("FunctionPresets.json")) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            gson.toJson(functionPresetMap, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void updatePreview() {
