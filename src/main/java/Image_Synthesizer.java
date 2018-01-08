@@ -46,8 +46,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JTextField maxY;
     private JTextField minZ;
     private JTextField maxZ;
-    private JButton addFunctionPresetButton;
     private JComboBox<String> functionPresetsComboBox;
+    private JButton addFunctionPresetButton;
+    private JButton removeFunctionPresetButton;
     private JButton openHelpButton;
     private JLabel f1Label;
     private JLabel f2Label;
@@ -215,6 +216,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         initFunctionPresets();
         addFunctionPresetButton.addActionListener(e -> addFunctionPreset());
+        removeFunctionPresetButton.addActionListener(e -> removeFunctionPreset());
         openHelpButton.addActionListener(e -> openMacroHelp());
         previewButton.addActionListener(e -> updatePreview());
         generateButton.addActionListener(e -> generateFunction());
@@ -401,11 +403,22 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     }
 
     private void addFunctionPreset() {
-        GenericDialog gd = new GenericDialog("Add Function Preset");
-        gd.addStringField("Name: ", "");
-        gd.showDialog();
-        if (gd.wasCanceled()) return;
-        String name = gd.getNextString();
+        GenericDialog genericDialog = new GenericDialog("Add Function Preset");
+        genericDialog.addStringField("Name: ", "", 15);
+        genericDialog.showDialog();
+        if (genericDialog.wasCanceled()) return;
+        String name = genericDialog.getNextString();
+
+        boolean overwrite = false;
+        for (String s : functionPresetMap.keySet()) {
+            if (name.equals(s)) {
+                GenericDialog overwrite_alert = new GenericDialog("Overwrite Alert");
+                overwrite_alert.addMessage("You are about to overwrite an existing preset.");
+                overwrite_alert.showDialog();
+                if (overwrite_alert.wasCanceled()) return;
+                overwrite = true;
+            }
+        }
 
         String[] functions = new String[3];
         if(isRGB) {
@@ -417,14 +430,30 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
         FunctionPreset functionPreset = new FunctionPreset((String) typesComboBox.getSelectedItem(),functions);
         functionPresetMap.put(name, functionPreset);
-        functionPresetsComboBox.addItem(name);
+        if(!overwrite) functionPresetsComboBox.addItem(name);
+        functionPresetsComboBox.setSelectedItem(name);
         try (Writer writer = new FileWriter("FunctionPresets.json")) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(functionPresetMap, writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    private void removeFunctionPreset() {
+        String selectedPreset = (String) functionPresetsComboBox.getSelectedItem();
+        GenericDialog genericDialog = new GenericDialog("Remove Function Preset");
+        genericDialog.addMessage("You are about to remove the following preset: \n" + selectedPreset);
+        genericDialog.showDialog();
+        if (genericDialog.wasCanceled()) return;
+        functionPresetMap.remove(selectedPreset);
+        functionPresetsComboBox.removeItem(selectedPreset);
+        try (Writer writer = new FileWriter("FunctionPresets.json")) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            gson.toJson(functionPresetMap, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updatePreview() {
