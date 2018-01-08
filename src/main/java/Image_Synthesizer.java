@@ -672,6 +672,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         else FIS.functionToImage(imagePlus, min, max, function);
         IJ.resetMinAndMax(imagePlus);
         imagePlus.show();
+        IJ.run("Coordinates...", "left=" + min[0] + " right=" + max[0] + " top=" + min[1] + " bottom=" + max[1]);
     }
 
     private void openMacroHelp() {
