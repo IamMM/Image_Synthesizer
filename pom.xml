@@ -50,6 +50,7 @@
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>ij</artifactId>
+            <version>1.51s</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>

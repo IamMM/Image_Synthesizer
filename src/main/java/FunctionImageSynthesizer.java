@@ -168,7 +168,7 @@ public class FunctionImageSynthesizer extends ImageMath {
                 }
                 if (hasGetPixel) System.arraycopy(pixels2, 0, pixels1, 0, width * height);
             }
-        } else if (imagePlus.getCalibration().isSigned16Bit()) { // ip.isSignedBit()
+        } else if (ip.isSigned16Bit()) {
             for(int z = 0; z < slices; z++) {
                 ip = imagePlus.getImageStack().getProcessor(z + 1);
 
