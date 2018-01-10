@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Scanner;
 
 /**
  * Created on october 2016
@@ -80,6 +81,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private boolean doNewImage = true;
     private boolean isRGB;
     private Map<String, FunctionPreset> functionPresetMap;
+    private Map<String, FunctionPreset> userFunctionPresetMap;
 
     /**
      * Main method for debugging.
@@ -372,7 +374,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 //        functionPresetMap.put("Spiral", functionPreset1);
 //        functionPresetMap.put("Fibonacci", functionPreset2);
 //        functionPresetMap.put("Polar Moire", functionPreset3);
-//        try (Writer writer = new FileWriter("FunctionPresets.json")) {
+//        InputStream url = getClass().getResource("/FunctionPresets.json");
+//        IJ.log(url.toString());
+//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(url.getPath()))) {
 //            Gson gson = new GsonBuilder().setPrettyPrinting().create();
 //            gson.toJson(functionPresetMap, writer);
 //        } catch (IOException e) {
@@ -380,9 +384,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 //        }
 
         functionPresetMap = new HashMap<>();
-        try (Reader reader = new FileReader("FunctionPresets.json")) {
-            Gson gson = new Gson();
-            Type type = new TypeToken<Map<String, FunctionPreset>>(){}.getType();
+        InputStream inputStream = getClass().getResourceAsStream("/FunctionPresets.json");
+        Gson gson = new Gson();
+        Type type = new TypeToken<Map<String, FunctionPreset>>(){}.getType();
+        try (Reader reader = new InputStreamReader(inputStream)) {
             functionPresetMap = gson.fromJson(reader, type);
         } catch (IOException e) {
             e.printStackTrace();
@@ -392,12 +397,29 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             functionPresetsComboBox.addItem(preset);
         }
 
+        // get user function presets from preferences
+        String userPrefs = Prefs.get("fis.FunctionPresets", "");
+        userFunctionPresetMap = gson.fromJson(userPrefs, type);
+
+        if(userFunctionPresetMap!=null) {
+            for (String preset : userFunctionPresetMap.keySet()) {
+                functionPresetsComboBox.addItem(preset);
+            }
+            functionPresetMap.putAll(userFunctionPresetMap);
+        }
+
         functionPresetsComboBox.addActionListener(e -> {
             FunctionPreset functionPreset = functionPresetMap.get(functionPresetsComboBox.getSelectedItem());
-            f1TextField.setText(functionPreset.getFunctions()[0]);
-            f2TextField.setText(functionPreset.getFunctions()[1]);
-            f3TextField.setText(functionPreset.getFunctions()[2]);
             typesComboBox.setSelectedItem(functionPreset.getType());
+            if(functionPreset.getType().equals("RGB")) {
+                f1TextField.setText(functionPreset.getFunctions()[0]);
+                f2TextField.setText(functionPreset.getFunctions()[1]);
+                f3TextField.setText(functionPreset.getFunctions()[2]);
+            } else {
+                f1TextField.setText(functionPreset.getFunction());
+                f2TextField.setText(functionPreset.getFunction());
+                f3TextField.setText(functionPreset.getFunction());
+            }
             updatePreview();
         });
     }
@@ -409,51 +431,66 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         if (genericDialog.wasCanceled()) return;
         String name = genericDialog.getNextString();
 
-        boolean overwrite = false;
-        for (String s : functionPresetMap.keySet()) {
-            if (name.equals(s)) {
-                GenericDialog overwrite_alert = new GenericDialog("Overwrite Alert");
-                overwrite_alert.addMessage("You are about to overwrite an existing preset.");
-                overwrite_alert.showDialog();
-                if (overwrite_alert.wasCanceled()) return;
-                overwrite = true;
-            }
+        if (functionPresetMap.containsKey(name)) {
+            name = checkName(name);
+            if(name.isEmpty()) return;
         }
 
-        String[] functions = new String[3];
+
+        FunctionPreset functionPreset;
         if(isRGB) {
+            String[] functions = new String[3];
             functions[0] = f1TextField.getText();
             functions[1] = f2TextField.getText();
             functions[2] = f3TextField.getText();
+            functionPreset = new FunctionPreset((String) typesComboBox.getSelectedItem(),functions);
         } else {
-            functions[0] = functions[1] = functions[2] = f1TextField.getText();
+            String function = f1TextField.getText();
+            functionPreset = new FunctionPreset((String) typesComboBox.getSelectedItem(),function);
         }
-        FunctionPreset functionPreset = new FunctionPreset((String) typesComboBox.getSelectedItem(),functions);
+
+        if(userFunctionPresetMap==null) userFunctionPresetMap = new HashMap<>();
+        userFunctionPresetMap.put(name, functionPreset);
         functionPresetMap.put(name, functionPreset);
-        if(!overwrite) functionPresetsComboBox.addItem(name);
+        functionPresetsComboBox.addItem(name);
         functionPresetsComboBox.setSelectedItem(name);
-        try (Writer writer = new FileWriter("FunctionPresets.json")) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            gson.toJson(functionPresetMap, writer);
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        updateUserFunctionPresets();
+    }
+
+    private String checkName(String name) {
+        GenericDialog id_alert = new GenericDialog("Identical Name Alert");
+        id_alert.addMessage("Please give you preset an identical name.");
+        id_alert.addMessage(name + " is the name of one of the presets already.");
+        id_alert.addStringField("Better name: ", name + " alternative", 30);
+        id_alert.showDialog();
+        String newName = id_alert.getNextString();
+        if(id_alert.wasOKed()) {
+            if(newName.equals(name)) name = checkName(name);
+            else name = newName;
+            return name;
         }
+        if(id_alert.wasCanceled()) return "";
+        return "";
     }
 
     private void removeFunctionPreset() {
         String selectedPreset = (String) functionPresetsComboBox.getSelectedItem();
         GenericDialog genericDialog = new GenericDialog("Remove Function Preset");
-        genericDialog.addMessage("You are about to remove the following preset: \n" + selectedPreset);
+        genericDialog.addMessage("You are about to remove the following preset: " + selectedPreset);
         genericDialog.showDialog();
+
         if (genericDialog.wasCanceled()) return;
-        functionPresetMap.remove(selectedPreset);
+        userFunctionPresetMap.remove(selectedPreset);
         functionPresetsComboBox.removeItem(selectedPreset);
-        try (Writer writer = new FileWriter("FunctionPresets.json")) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            gson.toJson(functionPresetMap, writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        updateUserFunctionPresets();
+    }
+
+    private void updateUserFunctionPresets(){
+        Gson gsonBuilder = new GsonBuilder().create();
+        String json = gsonBuilder.toJson(userFunctionPresetMap);
+        Prefs.set("fis.FunctionPresets", json);
+        Prefs.savePreferences();
     }
 
     private void updatePreview() {
@@ -569,8 +606,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         URI uri;
         try {
             URL url = getClass().getResource("/functions.html");
-            System.out.println(url);
             uri = url.toURI();
+            IJ.log(url.toString());
+            IJ.log(uri.getPath());
             Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
             if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
                 try {
