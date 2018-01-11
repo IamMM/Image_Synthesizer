@@ -13,13 +13,11 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.*;
 import java.lang.reflect.Type;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Scanner;
 
 /**
  * Created on october 2016
@@ -436,7 +434,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             if(name.isEmpty()) return;
         }
 
-
         FunctionPreset functionPreset;
         if(isRGB) {
             String[] functions = new String[3];
@@ -603,21 +600,22 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     }
 
     private void openMacroHelp() {
-        URI uri;
+        String pathToFile = Prefs.getPrefsDir() + "/ij-fis-functions.html";
         try {
-            URL url = getClass().getResource("/functions.html");
-            uri = url.toURI();
-            IJ.log(url.toString());
-            IJ.log(uri.getPath());
-            Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-            if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-                try {
-                    desktop.browse(uri);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            File file = new File(pathToFile);
+            Path path;
+            if(file.exists() && !file.isDirectory()) {
+                path = file.toPath();
+            } else {
+                InputStream inputStream = getClass().getResourceAsStream("/functions.html");
+                path = new File(pathToFile).toPath();
+                Files.copy(inputStream, path);
             }
-        } catch (URISyntaxException e) {
+
+            Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+            if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE))
+                desktop.browse(path.toUri());
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
