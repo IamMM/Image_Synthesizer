@@ -67,6 +67,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JButton inverseX;
     private JButton inverseY;
     private JButton inverseZ;
+    private JCheckBox normalizeCheckBox;
 
     // constants
     private static final String TITLE = "Function Image Synthesizer";
@@ -592,8 +593,15 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
         if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
 
-        if(isRGB) FIS.functionToImage(imagePlus, min, max, functions);
-        else FIS.functionToImage(imagePlus, min, max, function);
+        if(isRGB) {
+            if(normalizeCheckBox.isSelected()) {
+                FIS.functionToNormalizedImage(imagePlus, min, max, functions);
+            } else {
+                FIS.functionToImage(imagePlus, min, max, functions);
+            }
+        } else {
+            FIS.functionToImage(imagePlus, min, max, function);
+        }
         IJ.resetMinAndMax(imagePlus);
         imagePlus.show();
         IJ.run("Coordinates...", "left=" + min[0] + " right=" + max[0] + " top=" + min[1] + " bottom=" + max[1]);

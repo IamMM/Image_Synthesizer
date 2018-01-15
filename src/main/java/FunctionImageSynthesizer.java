@@ -30,7 +30,13 @@ import ij.Prefs;
 import ij.macro.Interpreter;
 import ij.macro.Program;
 import ij.macro.Tokenizer;
+import ij.plugin.ChannelSplitter;
+import ij.plugin.RGBStackConverter;
+import ij.plugin.RGBStackMerge;
 import ij.plugin.filter.ImageMath;
+import ij.process.ByteProcessor;
+import ij.process.ColorProcessor;
+import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 
 import java.awt.*;
@@ -353,6 +359,122 @@ public class FunctionImageSynthesizer extends ImageMath {
                     pixels[pos] = rgb;
                 }
             }
+        }
+        IJ.showProgress(1.0);
+    }
+
+//    public void functionToNormalizedImage(ImagePlus imagePlus, double[] min, double[] max, String[] functions) {
+//        // output type RGB: 3 x 32-bit --> 1 x RGB
+//        ImagePlus[] split = ChannelSplitter.split(imagePlus);
+//
+//        for (int i= 0; i<split.length ; i++) {
+//            ImagePlus ip = split[i];
+//            ip.setProcessor(ip.getProcessor().convertToFloatProcessor());
+////            IJ.doCommand(ip, "32-bit");
+//            functionToImage(ip, min, max, functions[i]);
+//        }
+//
+//        for (ImagePlus ip : split) {
+//            ip.setProcessor(ip.getProcessor().convertToByteProcessor(true));
+//        }
+//
+//        ImagePlus merge = RGBStackMerge.mergeChannels(split, false);
+//        RGBStackConverter.convertToRGB(merge);
+//        imagePlus.setImage(merge);
+//    }
+
+    public void functionToNormalizedImage(ImagePlus imagePlus, double[] min, double[] max, String[] functions) {
+        ColorProcessor ip = (ColorProcessor) imagePlus.getProcessor();
+        if(ip.getBitDepth()!=24) return;
+
+        // example macro: "code=v=v+50*sin(d/10)"
+        String macro1 = "code=r_new=" + functions[0];
+        String macro2 = "code=g_new=" + functions[1];
+        String macro3 = "code=b_new=" + functions[2];
+
+        int PCStart = 23;
+        Program pgm1 = (new Tokenizer()).tokenize(macro1);
+        Program pgm2 = (new Tokenizer()).tokenize(macro2);
+        Program pgm3 = (new Tokenizer()).tokenize(macro3);
+        boolean hasX = pgm1.hasWord("x") | pgm2.hasWord("x") | pgm3.hasWord("x")  ;
+        boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
+        boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
+        boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
+        int width = ip.getWidth();
+        int height = ip.getHeight();
+        String code =
+                "var v,r,g,b,x,y,z,w,h,d,a;\n"+
+                        "function dummy() {}\n"+
+                        macro1+";\n"+
+                        macro2+";\n"+
+                        macro3+";\n"; // code starts at program counter location 'PCStart'
+        Interpreter interpreter = new Interpreter();
+        interpreter.run(code, null);
+        if (interpreter.wasError()) return;
+
+        Prefs.set(MACRO_KEY, macro1);
+        interpreter.setVariable("w", width);
+        interpreter.setVariable("h", height);
+
+        Rectangle r = ip.getRoi();
+        int inc = r.height/50;
+        if (inc<1) inc = 1;
+        int slices = imagePlus.getNSlices();
+        int pos;
+
+        for(int z = 0; z < slices; z++) {
+            ip = (ColorProcessor) imagePlus.getImageStack().getProcessor(z + 1);
+
+            double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
+            if (hasZ) interpreter.setVariable("z", dz);
+
+            int rgb;
+            double red, green, blue;
+            int[] pixels = (int[]) ip.getPixels();
+            double[] redPixels = new double[pixels.length],
+                    greenPixels = new double[pixels.length],
+                    bluePixels = new double[pixels.length];
+
+            for (int y = r.y; y < (r.y + r.height); y++) {
+                if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
+
+                double dy = min[1]+((max[1]-min[1])/height)*y; // 0..y to min..max
+                interpreter.setVariable("y", dy);
+
+                for (int x = r.x; x < (r.x + r.width); x++) {
+                    double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
+                    if (hasX) interpreter.setVariable("x", dx);
+
+                    if (hasA) interpreter.setVariable("a",getA(dy, dx));
+                    if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
+                    pos = y * width + x;
+                    rgb = pixels[pos];
+
+                    red = (rgb & 0xff0000) >> 16;
+                    green = (rgb & 0xff00) >> 8;
+                    blue = rgb & 0xff;
+                    interpreter.setVariable("r", red);
+                    interpreter.setVariable("g", green);
+                    interpreter.setVariable("b", blue);
+                    interpreter.run(PCStart);
+                    redPixels[pos] = interpreter.getVariable("r_new");
+
+                    greenPixels[pos] = interpreter.getVariable("g_new");
+
+                    bluePixels[pos] = interpreter.getVariable("b_new");
+
+                    pixels[pos] = rgb;
+                }
+            }
+
+            FloatProcessor redImageProcessor = new FloatProcessor(width, height, redPixels);
+            ip.setChannel(1, redImageProcessor.convertToByteProcessor(true));
+
+            FloatProcessor greenImageProcessor = new FloatProcessor(width, height, greenPixels);
+            ip.setChannel(2, greenImageProcessor.convertToByteProcessor(true));
+
+            FloatProcessor blueImageProcessor = new FloatProcessor(width, height, bluePixels);
+            ip.setChannel(3, blueImageProcessor.convertToByteProcessor(true));
         }
         IJ.showProgress(1.0);
     }
