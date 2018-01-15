@@ -539,7 +539,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
         if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
 
-        Image previewImage = isRGB?FIS.getPreview(imagePlus, min, max, functions, drawAxesCheckBox.isSelected()):
+        Image previewImage = isRGB?FIS.getPreview(imagePlus, min, max, functions, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected()):
                 FIS.getPreview(imagePlus, min, max, function, drawAxesCheckBox.isSelected());
         preview.setIcon(new ImageIcon(previewImage));
     }

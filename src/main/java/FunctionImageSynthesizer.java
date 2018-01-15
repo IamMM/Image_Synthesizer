@@ -458,12 +458,8 @@ public class FunctionImageSynthesizer extends ImageMath {
                     interpreter.setVariable("b", blue);
                     interpreter.run(PCStart);
                     redPixels[pos] = interpreter.getVariable("r_new");
-
                     greenPixels[pos] = interpreter.getVariable("g_new");
-
                     bluePixels[pos] = interpreter.getVariable("b_new");
-
-                    pixels[pos] = rgb;
                 }
             }
 
@@ -507,17 +503,17 @@ public class FunctionImageSynthesizer extends ImageMath {
         return preview.getImage();
     }
 
-    public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, String[] function, boolean drawAxes) {
+    public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, String[] functions, boolean drawAxes, boolean normalize) {
 
         ImageProcessor resized = downsize(imagePlus);
         ImagePlus preview = new ImagePlus();
         preview.setProcessor(resized);
-        functionToImage(preview, min, max, function);
+        if(normalize)functionToNormalizedImage(preview, min, max, functions);
+        else functionToImage(preview, min, max, functions);
         resized.resetMinAndMax();
 
         // interpolate if to small
         enlarge(preview, PREVIEW_SIZE);
-
 
         ImageProcessor colorProcessor = preview.getProcessor().convertToColorProcessor();
         if(drawAxes) {
