@@ -168,8 +168,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             } else {
                 f1Label.setText("v=");
             }
-                f2Label.setVisible(isRGB);
-                f3Label.setVisible(isRGB);
+            normalizeCheckBox.setEnabled(isRGB);
+            f2Label.setVisible(isRGB);
+            f3Label.setVisible(isRGB);
             invertingLUTCheckBox.setEnabled(!isRGB);
             f2TextField.setVisible(isRGB);
             f3TextField.setVisible(isRGB);
