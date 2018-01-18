@@ -541,9 +541,18 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
         if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
 
-        Image previewImage = isRGB?FIS.getPreview(imagePlus, min, max, functions, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected()):
-                FIS.getPreview(imagePlus, min, max, function, drawAxesCheckBox.isSelected());
-        preview.setIcon(new ImageIcon(previewImage));
+        Image previewImage;
+
+        try {
+            if (isRGB) {
+                previewImage = FIS.getPreview(imagePlus, min, max, functions, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected());
+            } else {
+                previewImage = FIS.getPreview(imagePlus, min, max, function, drawAxesCheckBox.isSelected());
+            }
+            preview.setIcon(new ImageIcon(previewImage));
+        } catch (RuntimeException e) {
+            // do nothing
+        }
     }
 
     private void generateFunction() {
@@ -595,18 +604,22 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
         if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
 
-        if(isRGB) {
-            if(normalizeCheckBox.isSelected()) {
-                FIS.functionToNormalizedImage(imagePlus, min, max, functions);
+        try {
+            if (isRGB) {
+                if (normalizeCheckBox.isSelected()) {
+                    FIS.functionToNormalizedImage(imagePlus, min, max, functions);
+                } else {
+                    FIS.functionToImage(imagePlus, min, max, functions);
+                }
             } else {
-                FIS.functionToImage(imagePlus, min, max, functions);
+                FIS.functionToImage(imagePlus, min, max, function);
             }
-        } else {
-            FIS.functionToImage(imagePlus, min, max, function);
+            IJ.resetMinAndMax(imagePlus);
+            imagePlus.show();
+            IJ.run("Coordinates...", "left=" + min[0] + " right=" + max[0] + " top=" + min[1] + " bottom=" + max[1]);
+        } catch (RuntimeException e) {
+            // do nothing
         }
-        IJ.resetMinAndMax(imagePlus);
-        imagePlus.show();
-        IJ.run("Coordinates...", "left=" + min[0] + " right=" + max[0] + " top=" + min[1] + " bottom=" + max[1]);
     }
 
     private void openMacroHelp() {

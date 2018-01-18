@@ -48,7 +48,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 
     /*--- function to Image ---*/
 
-    public void functionToImage(ImagePlus imagePlus, double[] min, double[] max, String function) {
+    public void functionToImage(ImagePlus imagePlus, double[] min, double[] max, String function) throws RuntimeException{
         // example macro: "code=v=v+50*sin(d/10)"
         String macro = "code=v=" + function;
 
@@ -383,7 +383,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 //        imagePlus.setImage(merge);
 //    }
 
-    public void functionToNormalizedImage(ImagePlus imagePlus, double[] min, double[] max, String[] functions) {
+    public void functionToNormalizedImage(ImagePlus imagePlus, double[] min, double[] max, String[] functions) throws RuntimeException {
         ColorProcessor ip = (ColorProcessor) imagePlus.getProcessor();
         if(ip.getBitDepth()!=24) return;
 
