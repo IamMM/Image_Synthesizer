@@ -188,6 +188,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         invertingLUTCheckBox.addActionListener(e -> updatePreview());
 
+        normalizeCheckBox.addActionListener(e -> updatePreview());
+
         initFocusListener();
 
         centerX.addActionListener(e -> center(minX, maxX));
