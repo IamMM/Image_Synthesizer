@@ -86,7 +86,7 @@ public class FunctionImageSynthesizer extends ImageMath {
             for(int z = 0; z < slices; z++) {
                 ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-                double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
+                double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
                 if (hasZ) interpreter.setVariable("z", dz);
 
                 byte[] pixels1 = (byte[]) ip.getPixels();
@@ -96,7 +96,7 @@ public class FunctionImageSynthesizer extends ImageMath {
                 for (int y = r.y; y < (r.y + r.height); y++) {
                     if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
 
-                    double dy = min[1]+((max[1]-min[1])/height)*y; // 0..y to min..max
+                    double dy = min[1]+((max[1]-min[1])/(height-1))*y; // 0..y to min..max
                     interpreter.setVariable("y", dy);
 
                     for (int x = r.x; x < (r.x + r.width); x++) {
@@ -104,7 +104,7 @@ public class FunctionImageSynthesizer extends ImageMath {
                         v = pixels1[pos] & 255;
                         interpreter.setVariable("v", v);
 
-                        double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
+                        double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
                         if (hasX) interpreter.setVariable("x", dx);
 
                         if (hasA) interpreter.setVariable("a", getA(dy, dx));
@@ -122,7 +122,7 @@ public class FunctionImageSynthesizer extends ImageMath {
             for(int z = 0; z < slices; z++) {
                 ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-                double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
+                double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
                 if (hasZ) interpreter.setVariable("z", dz);
 
                 int rgb, red, green, blue;
@@ -133,11 +133,11 @@ public class FunctionImageSynthesizer extends ImageMath {
                 for (int y = r.y; y < (r.y + r.height); y++) {
                     if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
 
-                    double dy = min[1]+((max[1]-min[1])/height)*y; // 0..y to min..max
+                    double dy = min[1]+((max[1]-min[1])/(height-1))*y; // 0..y to min..max
                     interpreter.setVariable("y", dy);
 
                     for (int x = r.x; x < (r.x + r.width); x++) {
-                        double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
+                        double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
                         if (hasX) interpreter.setVariable("x", dx);
 
                         if (hasA) interpreter.setVariable("a", getA(dy, dx));
@@ -178,17 +178,17 @@ public class FunctionImageSynthesizer extends ImageMath {
             for(int z = 0; z < slices; z++) {
                 ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-                double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
+                double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
                 if (hasZ) interpreter.setVariable("z", dz);
 
                 for (int y = r.y; y < (r.y + r.height); y++) {
                     if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
 
-                    double dy = min[1]+((max[1]-min[1])/height)*y; // 0..y to min..max
+                    double dy = min[1]+((max[1]-min[1])/(height-1))*y; // 0..y to min..max
                     interpreter.setVariable("y", dy);
 
                     for (int x = r.x; x < (r.x + r.width); x++) {
-                        double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
+                        double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
                         if (hasX) interpreter.setVariable("x", dx);
 
                         v = ip.getPixelValue(x, y);
@@ -204,7 +204,7 @@ public class FunctionImageSynthesizer extends ImageMath {
             for(int z = 0; z < slices; z++) {
                 ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-                double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
+                double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
                 if(hasZ) interpreter.setVariable("z", dz);
 
                 short[] pixels1 = (short[]) ip.getPixels();
@@ -214,12 +214,12 @@ public class FunctionImageSynthesizer extends ImageMath {
                 for (int y = r.y; y < (r.y + r.height); y++) {
                     if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
 
-                    double dy = min[1]+((max[1]-min[1])/height)*y; // 0..y to min..max
+                    double dy = min[1]+((max[1]-min[1])/(height-1))*y; // 0..y to min..max
                     interpreter.setVariable("y", dy);
 
                     for (int x = r.x; x < (r.x + r.width); x++) {
 
-                        double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
+                        double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
                         if (hasX) interpreter.setVariable("x", dx);
 
                         pos = y * width + x;
@@ -240,7 +240,7 @@ public class FunctionImageSynthesizer extends ImageMath {
         } else {  //32-bit
             for(int z = 0; z < slices; z++) {
                 ip = imagePlus.getImageStack().getProcessor(z + 1);
-                double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
+                double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
                 if(hasZ) interpreter.setVariable("z", dz);
 
                 float[] pixels1 = (float[])ip.getPixels();
@@ -250,7 +250,7 @@ public class FunctionImageSynthesizer extends ImageMath {
                 for (int y = r.y; y < (r.y + r.height); y++) {
                     if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
 
-                    double dy = min[1]+((max[1]-min[1])/height)*y; // min..max
+                    double dy = min[1]+((max[1]-min[1])/(height-1))*y; // 0..y to min..max
                     interpreter.setVariable("y", dy);
 
                     for (int x = r.x; x < (r.x + r.width); x++) {
@@ -258,7 +258,7 @@ public class FunctionImageSynthesizer extends ImageMath {
                         v = pixels1[pos];
                         interpreter.setVariable("v", v);
 
-                        double dx = min[0]+((max[0]-min[0])/width)*x; // min..max
+                        double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
                         if (hasX) interpreter.setVariable("x", dx);
 
                         if (hasA) interpreter.setVariable("a", getA(dy, dx));
@@ -315,7 +315,7 @@ public class FunctionImageSynthesizer extends ImageMath {
         for(int z = 0; z < slices; z++) {
             ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-            double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
+            double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
             if (hasZ) interpreter.setVariable("z", dz);
 
             int rgb, red, green, blue;
@@ -324,11 +324,11 @@ public class FunctionImageSynthesizer extends ImageMath {
             for (int y = r.y; y < (r.y + r.height); y++) {
                 if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
 
-                double dy = min[1]+((max[1]-min[1])/height)*y; // 0..y to min..max
+                double dy = min[1]+((max[1]-min[1])/(height-1))*y; // 0..y to min..max
                 interpreter.setVariable("y", dy);
 
                 for (int x = r.x; x < (r.x + r.width); x++) {
-                    double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
+                    double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
                     if (hasX) interpreter.setVariable("x", dx);
 
                     if (hasA) interpreter.setVariable("a",getA(dy, dx));
