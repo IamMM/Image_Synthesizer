@@ -11,6 +11,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -193,6 +195,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         initFocusListener();
 
+        initKeyListener();
+
         centerX.addActionListener(e -> center(minX, maxX));
         centerY.addActionListener(e -> center(minY, maxY));
         centerZ.addActionListener(e -> center(minZ, maxZ));
@@ -263,101 +267,59 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     }
 
     private void initFocusListener() {
-        widthTextField.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
+    	FocusListener focusListener = new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
 
-            }
+			}
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                updatePreview();
-            }
-        });
+			@Override
+			public void focusLost(FocusEvent e) {
+				updatePreview();
+			}
+		};
 
-        heightTextField.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
+        widthTextField.addFocusListener(focusListener);
+        heightTextField.addFocusListener(focusListener);
+        slicesTextField.addFocusListener(focusListener);
+        minX.addFocusListener(focusListener);
+        maxX.addFocusListener(focusListener);
+        minY.addFocusListener(focusListener);
+        maxY.addFocusListener(focusListener);
+        minZ.addFocusListener(focusListener);
+        maxZ.addFocusListener(focusListener);
+    }
 
-            }
+    private void initKeyListener() {
+    	KeyListener keyListener = new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                updatePreview();
-            }
-        });
+			}
 
-        minX.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
+			@Override
+			public void keyPressed(KeyEvent e) {
 
-            }
+			}
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                updatePreview();
-            }
-        });
+			@Override
+			public void keyReleased(KeyEvent e) {
+				int key = e.getKeyCode();
+				if (key == KeyEvent.VK_ENTER) {
+					updatePreview();
+				}
+			}
+		};
 
-        maxX.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                updatePreview();
-            }
-        });
-
-        minY.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                updatePreview();
-            }
-        });
-
-        maxY.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                updatePreview();
-            }
-        });
-
-        minZ.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                updatePreview();
-            }
-        });
-
-        maxZ.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                updatePreview();
-            }
-        });
+    	widthTextField.addKeyListener(keyListener);
+    	heightTextField.addKeyListener(keyListener);
+    	slicesTextField.addKeyListener(keyListener);
+		minX.addKeyListener(keyListener);
+		maxX.addKeyListener(keyListener);
+		minY.addKeyListener(keyListener);
+		maxY.addKeyListener(keyListener);
+		minZ.addKeyListener(keyListener);
+		maxZ.addKeyListener(keyListener);
     }
 
     private void initFunctionPresets() {
