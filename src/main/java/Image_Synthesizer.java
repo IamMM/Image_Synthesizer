@@ -288,6 +288,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         maxY.addFocusListener(focusListener);
         minZ.addFocusListener(focusListener);
         maxZ.addFocusListener(focusListener);
+        f1TextField.addFocusListener(focusListener);
+        f2TextField.addFocusListener(focusListener);
+        f3TextField.addFocusListener(focusListener);
+
     }
 
     private void initKeyListener() {
@@ -320,6 +324,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		maxY.addKeyListener(keyListener);
 		minZ.addKeyListener(keyListener);
 		maxZ.addKeyListener(keyListener);
+		f1TextField.addKeyListener(keyListener);
+		f2TextField.addKeyListener(keyListener);
+		f3TextField.addKeyListener(keyListener);
     }
 
     private void initFunctionPresets() {
