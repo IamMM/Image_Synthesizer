@@ -470,26 +470,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         double[] min = new double[3];
         double[] max = new double[3];
 
-        String x_minFromGUI = minX.getText().replaceAll("[^-\\d.]", "");
-        double x_min = x_minFromGUI.equals("")?0:Double.parseDouble(x_minFromGUI);
-        String x_maxFromGUI = maxX.getText().replaceAll("[^-\\d.]", "");
-        double x_max = x_maxFromGUI.equals("")?width-1:Double.parseDouble(x_maxFromGUI);
-        min[0] = x_min;
-        max[0] = x_max;
+        min[0] = getNumValue(minX);
+        max[0] = getNumValue(maxX);
 
-        String y_minFromGUI = minY.getText().replaceAll("[^-\\d.]", "");
-        double y_min = y_minFromGUI.equals("")?0:Double.parseDouble(y_minFromGUI);
-        String y_maxFromGUI = maxY.getText().replaceAll("[^-\\d.]", "");
-        double y_max = y_maxFromGUI.equals("")?height-1:Double.parseDouble(y_maxFromGUI);
-        min[1] = y_min;
-        max[1] = y_max;
+        min[1] = getNumValue(minY);
+        max[1] = getNumValue(maxY);
 
-        String z_minFromGUI = minZ.getText().replaceAll("[^-\\d.]", "");
-        double z_min = z_minFromGUI.equals("")?0:Double.parseDouble(z_minFromGUI);
-        String z_maxFromGUI = maxZ.getText().replaceAll("[^-\\d.]", "");
-        double z_max = z_maxFromGUI.equals("")?slices-1:Double.parseDouble(z_maxFromGUI);
-        min[2] = z_min;
-        max[2] = z_max;
+        min[2] = getNumValue(minZ);
+        max[2] = getNumValue(maxZ);
 
         // function
         String function = f1TextField.getText();
@@ -518,6 +506,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
     }
 
+    private double getNumValue(JTextField textField) {
+        String x_minFromGUI = textField.getText().replaceAll("[^-\\d.]", "");
+        return x_minFromGUI.equals("")?0:Double.parseDouble(x_minFromGUI);
+    }
+
     private void generateFunction() {
         // meta
         String type = (String) typesComboBox.getSelectedItem();
@@ -532,26 +525,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         double[] min = new double[3];
         double[] max = new double[3];
 
-        String x_minFromGUI = minX.getText().replaceAll("[^-\\d.]", "");
-        double x_min = x_minFromGUI.equals("")?0:Double.parseDouble(x_minFromGUI);
-        String x_maxFromGUI = maxX.getText().replaceAll("[^-\\d.]", "");
-        double x_max = x_maxFromGUI.equals("")?width-1:Double.parseDouble(x_maxFromGUI);
-        min[0] = x_min;
-        max[0] = x_max;
+        min[0] = getNumValue(minX);
+        max[0] = getNumValue(maxX);
 
-        String y_minFromGUI = minY.getText().replaceAll("[^-\\d.]", "");
-        double y_min = y_minFromGUI.equals("")?0:Double.parseDouble(y_minFromGUI);
-        String y_maxFromGUI = maxY.getText().replaceAll("[^-\\d.]", "");
-        double y_max = y_maxFromGUI.equals("")?height-1:Double.parseDouble(y_maxFromGUI);
-        min[1] = y_min;
-        max[1] = y_max;
+        min[1] = getNumValue(minY);
+        max[1] = getNumValue(maxY);
 
-        String z_minFromGUI = minZ.getText().replaceAll("[^-\\d.]", "");
-        double z_min = z_minFromGUI.equals("")?0:Double.parseDouble(z_minFromGUI);
-        String z_maxFromGUI = maxZ.getText().replaceAll("[^-\\d.]", "");
-        double z_max = z_maxFromGUI.equals("")?slices-1:Double.parseDouble(z_maxFromGUI);
-        min[2] = z_min;
-        max[2] = z_max;
+        min[2] = getNumValue(minZ);
+        max[2] = getNumValue(maxZ);
 
         // function
         String function = f1TextField.getText();
