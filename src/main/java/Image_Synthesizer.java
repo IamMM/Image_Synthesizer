@@ -1,3 +1,4 @@
+import Presets.FunctionPreset;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -8,8 +9,6 @@ import ij.io.Opener;
 import ij.plugin.PlugIn;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -37,6 +36,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JCheckBox invertingLUTCheckBox;
     private JLabel preview;
     private JCheckBox drawAxesCheckBox;
+    private JComboBox sizeComboBox;
+    private JComboBox dimensionComboBox;
     private JTextField widthTextField;
     private JTextField heightTextField;
     private JTextField slicesTextField;
@@ -58,7 +59,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JTextField f3TextField;
     private JButton previewButton;
     private JButton generateButton;
-    private JComboBox comboBox1;
     private JCheckBox normalizeCheckBox;
     private JSlider previewZSlider;
 	private JLabel currentSliceLabel;
