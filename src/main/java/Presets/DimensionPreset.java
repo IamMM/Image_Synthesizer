@@ -8,13 +8,13 @@ public class DimensionPreset {
 	private double minZ;
 	private double maxZ;
 
-	public DimensionPreset(double[] dimensions) {
-		this.minX = dimensions[0];
-		this.maxX = dimensions[1];
-		this.minY = dimensions[2];
-		this.maxY = dimensions[3];
-		this.minZ = dimensions[4];
-		this.maxZ = dimensions[5];
+	public DimensionPreset(double minX, double maxX, double minY, double maxY, double minZ, double maxZ) {
+		this.minX = minX;
+		this.maxX = maxX;
+		this.minY = minY;
+		this.maxY = maxY;
+		this.minZ = minZ;
+		this.maxZ = maxZ;
 	}
 
 	public double getMinX() {

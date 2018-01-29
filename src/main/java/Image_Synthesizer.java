@@ -1,4 +1,6 @@
+import Presets.DimensionPreset;
 import Presets.FunctionPreset;
+import Presets.SizePreset;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -36,8 +38,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JCheckBox invertingLUTCheckBox;
     private JLabel preview;
     private JCheckBox drawAxesCheckBox;
-    private JComboBox sizeComboBox;
-    private JComboBox dimensionComboBox;
+    private JComboBox<String> sizeComboBox;
+    private JComboBox<String> dimensionComboBox;
     private JTextField widthTextField;
     private JTextField heightTextField;
     private JTextField slicesTextField;
@@ -74,6 +76,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     // globals
     private boolean doNewImage = true;
     private boolean isRGB;
+    private Map<String, SizePreset> sizePresetMap;
+    private Map<String, DimensionPreset> dimensonPresetMap;
     private Map<String, FunctionPreset> functionPresetMap;
     private Map<String, FunctionPreset> userFunctionPresetMap;
 
@@ -220,7 +224,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         drawAxesCheckBox.addActionListener(e -> updatePreview());
 
-        initFunctionPresets();
+        initPresetMaps();
+
         addFunctionPresetButton.addActionListener(e -> addFunctionPreset());
         removeFunctionPresetButton.addActionListener(e -> removeFunctionPreset());
         openHelpButton.addActionListener(e -> openMacroHelp());
@@ -355,35 +360,73 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		f3TextField.addKeyListener(keyListener);
     }
 
-    private void initFunctionPresets() {
-//        String[] functions1 = new String[]{"255*sin(d + a)", "255*sin(d + a + 4.2)", "255*sin(d + a + 2.1)"};
-//        FunctionPreset functionPreset1 = new FunctionPreset("RGB",functions1);
+    private void initPresetMaps() {
+
+//    	Map<String, DimensionPreset> tempMap = new HashMap<>();
+//    	DimensionPreset dimensionPreset = new DimensionPreset(-10,10,-10,10,0,1);
+//    	tempMap.put("-10..10", dimensionPreset);
 //
-//        String[] functions2 = new String[]{"255*(sin(log(d)*8 + a) * sin(a*8))",
-//                "255*(sin(log(d)*8 + a - PI/2) * sin(a*8))", "255*(sin(log(d)*8 + a + PI/2) * sin(a*8))"};
-//        FunctionPreset functionPreset2 = new FunctionPreset("RGB",functions2);
-//
-//        String[] functions3 = new String[]{"255*(floor((a * 40.75 + 1) % 2))",
-//                "255*(sin(log(d)*8 + a - PI/2) * sin(a*8))", "255*(sin(log(d)*8 +a + PI/2) * sin(a*8))"};
-//        FunctionPreset functionPreset3 = new FunctionPreset("8-bit",functions3);
-//
-//        functionPresetMap = new HashMap<>();
-//        functionPresetMap.put("Spiral", functionPreset1);
-//        functionPresetMap.put("Fibonacci", functionPreset2);
-//        functionPresetMap.put("Polar Moire", functionPreset3);
-//        InputStream url = getClass().getResource("/FunctionPresets.json");
-//        IJ.log(url.toString());
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(url.getPath()))) {
+//        try (BufferedWriter writer = new BufferedWriter(new FileWriter("DimensionPresets.json"))) {
 //            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//            gson.toJson(functionPresetMap, writer);
+//            gson.toJson(tempMap, writer);
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
 
+    	// size
+		sizePresetMap = new HashMap<>();
+		InputStream inputStream = getClass().getResourceAsStream("/SizePresets.json");
+		Gson gson = new Gson();
+		Type type = new TypeToken<Map<String, SizePreset>>(){}.getType();
+		try (Reader reader = new InputStreamReader(inputStream)) {
+			sizePresetMap = gson.fromJson(reader, type);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (String preset : sizePresetMap.keySet()) {
+			sizeComboBox.addItem(preset);
+		}
+
+		sizeComboBox.addActionListener(e -> {
+			SizePreset sizePreset = sizePresetMap.get(sizeComboBox.getSelectedItem());
+			widthTextField.setText(""+sizePreset.getX());
+			heightTextField.setText(""+sizePreset.getY());
+			slicesTextField.setText(""+sizePreset.getZ());
+			updatePreview();
+		});
+
+		// dimension
+		dimensonPresetMap = new HashMap<>();
+		inputStream = getClass().getResourceAsStream("/DimensionPresets.json");
+		gson = new Gson();
+		type = new TypeToken<Map<String, DimensionPreset>>(){}.getType();
+		try (Reader reader = new InputStreamReader(inputStream)) {
+			dimensonPresetMap = gson.fromJson(reader, type);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (String preset : dimensonPresetMap.keySet()) {
+			dimensionComboBox.addItem(preset);
+		}
+
+		dimensionComboBox.addActionListener(e -> {
+			DimensionPreset dimensionPreset = dimensonPresetMap.get(dimensionComboBox.getSelectedItem());
+			minX.setText(""+dimensionPreset.getMinX());
+			maxX.setText(""+dimensionPreset.getMaxX());
+			minY.setText(""+dimensionPreset.getMinY());
+			maxY.setText(""+dimensionPreset.getMaxY());
+			minZ.setText(""+dimensionPreset.getMinZ());
+			maxZ.setText(""+dimensionPreset.getMaxZ());
+			updatePreview();
+		});
+
+		// functions
         functionPresetMap = new HashMap<>();
-        InputStream inputStream = getClass().getResourceAsStream("/FunctionPresets.json");
-        Gson gson = new Gson();
-        Type type = new TypeToken<Map<String, FunctionPreset>>(){}.getType();
+        inputStream = getClass().getResourceAsStream("/FunctionPresets.json");
+        gson = new Gson();
+        type = new TypeToken<Map<String, FunctionPreset>>(){}.getType();
         try (Reader reader = new InputStreamReader(inputStream)) {
             functionPresetMap = gson.fromJson(reader, type);
         } catch (IOException e) {

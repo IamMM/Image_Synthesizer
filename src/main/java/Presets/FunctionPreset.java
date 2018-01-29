@@ -1,8 +1,6 @@
 package Presets;
 
-import java.io.Serializable;
-
-public class FunctionPreset implements Serializable {
+public class FunctionPreset {
     private String type;
     private String function;
     private String[] functions;
