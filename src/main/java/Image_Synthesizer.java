@@ -62,8 +62,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JCheckBox normalizeCheckBox;
     private JSlider previewZSlider;
 	private JLabel currentSliceLabel;
+    private JTextArea primitveTextArea;
 
-	// constants
+    // constants
     private static final String TITLE = "Function Image Synthesizer";
     private static final String VERSION = " v0.1.0";
 
