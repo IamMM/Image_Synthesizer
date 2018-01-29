@@ -531,7 +531,9 @@ public class FunctionImageSynthesizer extends ImageMath {
             height = height* PREVIEW_SIZE /width;
             height = height<1?1:height;
             width = PREVIEW_SIZE;
-        } else if(height> PREVIEW_SIZE) {
+        }
+
+        if(height> PREVIEW_SIZE) {
             width = width* PREVIEW_SIZE /height;
             width = width<1?1:width;
             height = PREVIEW_SIZE;
