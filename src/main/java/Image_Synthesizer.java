@@ -8,11 +8,10 @@ import ij.io.Opener;
 import ij.plugin.PlugIn;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -60,18 +59,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JButton previewButton;
     private JButton generateButton;
     private JComboBox comboBox1;
-    private JButton xEqualY;
-    private JButton yEqualZ;
-    private JButton zEqualX;
-    private JButton centerX;
-    private JButton centerY;
-    private JButton centerZ;
-    private JButton inverseX;
-    private JButton inverseY;
-    private JButton inverseZ;
     private JCheckBox normalizeCheckBox;
+    private JSlider previewZSlider;
+	private JLabel currentSliceLabel;
 
-    // constants
+	// constants
     private static final String TITLE = "Function Image Synthesizer";
     private static final String VERSION = " v0.1.0";
 
@@ -197,28 +189,33 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         initKeyListener();
 
-        centerX.addActionListener(e -> center(minX, maxX));
-        centerY.addActionListener(e -> center(minY, maxY));
-        centerZ.addActionListener(e -> center(minZ, maxZ));
+        previewZSlider.addChangeListener(e -> currentSliceLabel.setText(previewZSlider.getValue() + ""));
 
-        inverseX.addActionListener(e -> inverse(minX, maxX));
-        inverseY.addActionListener(e -> inverse(minY, maxY));
-        inverseZ.addActionListener(e -> inverse(minZ, maxZ));
+        previewZSlider.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+			}
 
-        xEqualY.addActionListener(e -> {
-                equal(minX, maxX, minY, maxY);
-                updatePreview();
-        });
+			@Override
+			public void mousePressed(MouseEvent e) {
+				currentSliceLabel.setVisible(true);
+			}
 
-        yEqualZ.addActionListener(e -> {
-                equal(minY, maxY, minZ, maxZ);
-                updatePreview();
-        });
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				currentSliceLabel.setVisible(false);
+			}
 
-        zEqualX.addActionListener(e -> {
-                equal(minZ, maxZ, minX, maxX);
-                updatePreview();
-        });
+			@Override
+			public void mouseEntered(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+
+			}
+		});
 
         drawAxesCheckBox.addActionListener(e -> updatePreview());
 
@@ -281,7 +278,18 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         widthTextField.addFocusListener(focusListener);
         heightTextField.addFocusListener(focusListener);
-        slicesTextField.addFocusListener(focusListener);
+        slicesTextField.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				updatePreview();
+
+			}
+		});
         minX.addFocusListener(focusListener);
         maxX.addFocusListener(focusListener);
         minY.addFocusListener(focusListener);
@@ -291,7 +299,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         f1TextField.addFocusListener(focusListener);
         f2TextField.addFocusListener(focusListener);
         f3TextField.addFocusListener(focusListener);
-
     }
 
     private void initKeyListener() {
@@ -308,16 +315,34 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				int key = e.getKeyCode();
-				if (key == KeyEvent.VK_ENTER) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					updatePreview();
+					previewZSlider.setMaximum((int) getNumValue(slicesTextField));
 				}
 			}
 		};
 
     	widthTextField.addKeyListener(keyListener);
     	heightTextField.addKeyListener(keyListener);
-    	slicesTextField.addKeyListener(keyListener);
+    	slicesTextField.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					updatePreview();
+					previewZSlider.setMaximum((int) getNumValue(slicesTextField));
+				}
+			}
+		});
 		minX.addKeyListener(keyListener);
 		maxX.addKeyListener(keyListener);
 		minY.addKeyListener(keyListener);
@@ -514,8 +539,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     }
 
     private double getNumValue(JTextField textField) {
-        String x_minFromGUI = textField.getText().replaceAll("[^-\\d.]", "");
-        return x_minFromGUI.equals("")?0:Double.parseDouble(x_minFromGUI);
+        String textFromGUI = textField.getText().replaceAll("[^-\\d.]", "");
+        return textFromGUI.equals("")?0:Double.parseDouble(textFromGUI);
     }
 
     private void generateFunction() {
@@ -604,44 +629,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         ImagePlus image = opener.openImage(directory, name);
         image.show();
         imageComboBox.setSelectedIndex(imageComboBox.getItemCount() - 1);
-    }
-
-    private void center(JTextField textField1, JTextField textField2) {
-        String minFromGUI = textField1.getText().replaceAll("[^-\\d.]", "");
-        double min = minFromGUI.equals("")?0:Double.parseDouble(minFromGUI);
-        String maxFromGUI = textField2.getText().replaceAll("[^-\\d.]", "");
-        double max = maxFromGUI.equals("")?0:Double.parseDouble(maxFromGUI);
-
-        double range = min-max;
-
-        min = range/2;
-        max = -range/2;
-
-        textField1.setText(""+min);
-        textField2.setText(""+max);
-
-        updatePreview();
-    }
-
-    private void inverse(JTextField textField1, JTextField textField2) {
-        String text = textField1.getText();
-        textField1.setText(textField2.getText());
-        textField2.setText(text);
-        updatePreview();
-    }
-
-    private void equal(JTextField in1, JTextField in2, JTextField out1, JTextField out2) {
-        out1.setText(in1.getText());
-        out2.setText(in2.getText());
-    }
-
-    private void equal(boolean todo, JTextField in, JTextField out) {
-        if(todo) out.setText(in.getText());
-    }
-
-    private void close() {
-        WindowManager.removeWindow(this.frame);
-        frame.dispose();
     }
 
     @Override
