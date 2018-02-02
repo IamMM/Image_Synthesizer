@@ -485,9 +485,8 @@ public class FunctionImageSynthesizer extends ImageMath {
 
     public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, String function, boolean drawAxes) {
 
-        ImageProcessor resized = downsize(imagePlus);
-        ImagePlus preview = new ImagePlus();
-        preview.setProcessor(resized);
+        ImageProcessor resized = downsize(imagePlus, PREVIEW_SIZE);
+        ImagePlus preview = new ImagePlus("preview", resized);
         functionToImage(preview, min, max, function);
         resized.resetMinAndMax();
 
@@ -504,9 +503,8 @@ public class FunctionImageSynthesizer extends ImageMath {
 
     public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, String[] functions, boolean drawAxes, boolean normalize) {
 
-        ImageProcessor resized = downsize(imagePlus);
-        ImagePlus preview = new ImagePlus();
-        preview.setProcessor(resized);
+        ImageProcessor resized = downsize(imagePlus, PREVIEW_SIZE);
+        ImagePlus preview = new ImagePlus("preview", resized);
         if(normalize)functionToNormalizedImage(preview, min, max, functions);
         else functionToImage(preview, min, max, functions);
         resized.resetMinAndMax();
@@ -522,38 +520,38 @@ public class FunctionImageSynthesizer extends ImageMath {
         return preview.getImage();
     }
 
-    private ImageProcessor downsize(ImagePlus imagePlus) {
+    private ImageProcessor downsize(ImagePlus imagePlus, int maxSize) {
         int width = imagePlus.getWidth();
         int height = imagePlus.getHeight();
 
         // reduce size if to big
-        if(width> PREVIEW_SIZE) {
-            height = height* PREVIEW_SIZE /width;
+        if(width> maxSize) {
+            height = height* maxSize /width;
             height = height<1?1:height;
-            width = PREVIEW_SIZE;
+            width = maxSize;
         }
 
-        if(height> PREVIEW_SIZE) {
-            width = width* PREVIEW_SIZE /height;
+        if(height> maxSize) {
+            width = width* maxSize /height;
             width = width<1?1:width;
-            height = PREVIEW_SIZE;
+            height = maxSize;
         }
         ImageProcessor ip = imagePlus.getProcessor();
         ip.setInterpolate(true);
         return ip.resize(width, height);
     }
 
-    private void enlarge(ImagePlus imagePlus, int minPreviewSize) {
+    private void enlarge(ImagePlus imagePlus, int minSize) {
         int width = imagePlus.getWidth();
         int height = imagePlus.getHeight();
 
-        if(width<minPreviewSize && height<minPreviewSize) {
-            if(width<minPreviewSize && height<width) {
-                height = height*minPreviewSize/width;
-                width = minPreviewSize;
-            } else if(height<minPreviewSize) {
-                width = width*minPreviewSize/height;
-                height = minPreviewSize;
+        if(width<minSize && height<minSize) {
+            if(width<minSize && height<width) {
+                height = height*minSize/width;
+                width = minSize;
+            } else if(height<minSize) {
+                width = width*minSize/height;
+                height = minSize;
             }
             ImageProcessor ip = imagePlus.getProcessor();
             ip.setInterpolate(false);
