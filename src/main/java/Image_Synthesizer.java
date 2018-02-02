@@ -43,7 +43,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JTextField widthTextField;
     private JTextField heightTextField;
     private JTextField slicesTextField;
-    private JFormattedTextField minX;
+    private JTextField minX;
     private JTextField maxX;
     private JTextField minY;
     private JTextField maxY;
@@ -64,9 +64,13 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JCheckBox normalizeCheckBox;
     private JSlider previewZSlider;
 	private JLabel currentSliceLabel;
-    private JTextArea primitveTextArea;
+    private JTextArea primitiveTextArea;
+	private JButton addSizePresetButton;
+	private JButton removeSizePresetButton;
+	private JButton addDimensionPresetButton;
+	private JButton removeDimensionPresetButton;
 
-    // constants
+	// constants
     private static final String TITLE = "Function Image Synthesizer";
     private static final String VERSION = " v0.1.0";
 
@@ -77,7 +81,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private boolean doNewImage = true;
     private boolean isRGB;
     private Map<String, SizePreset> sizePresetMap;
-    private Map<String, DimensionPreset> dimensonPresetMap;
+    private Map<String, SizePreset> userSizePresetMap;
+    private Map<String, DimensionPreset> dimensionPresetMap;
+    private Map<String, DimensionPreset> userDimensionPresetMap;
     private Map<String, FunctionPreset> functionPresetMap;
     private Map<String, FunctionPreset> userFunctionPresetMap;
 
@@ -226,6 +232,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         initPresetMaps();
 
+        addSizePresetButton.addActionListener(e -> addSizePreset());
+        removeSizePresetButton.addActionListener(e -> removeSizePreset());
+        addDimensionPresetButton.addActionListener(e -> addDimensionPreset());
+        removeDimensionPresetButton.addActionListener(e -> removeDimensionPreset());
         addFunctionPresetButton.addActionListener(e -> addFunctionPreset());
         removeFunctionPresetButton.addActionListener(e -> removeFunctionPreset());
         openHelpButton.addActionListener(e -> openMacroHelp());
@@ -396,23 +406,33 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			updatePreview();
 		});
 
+		// get user size presets from preferences
+		String userSizePrefs = Prefs.get("fis.SizePresets", "");
+		userSizePresetMap = gson.fromJson(userSizePrefs, type);
+		if(userSizePresetMap!=null) {
+			for (String preset : userSizePresetMap.keySet()) {
+				sizeComboBox.addItem(preset);
+			}
+			sizePresetMap.putAll(userSizePresetMap);
+		}
+
 		// dimension
-		dimensonPresetMap = new HashMap<>();
+		dimensionPresetMap = new HashMap<>();
 		inputStream = getClass().getResourceAsStream("/DimensionPresets.json");
 		gson = new Gson();
 		type = new TypeToken<Map<String, DimensionPreset>>(){}.getType();
 		try (Reader reader = new InputStreamReader(inputStream)) {
-			dimensonPresetMap = gson.fromJson(reader, type);
+			dimensionPresetMap = gson.fromJson(reader, type);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		for (String preset : dimensonPresetMap.keySet()) {
+		for (String preset : dimensionPresetMap.keySet()) {
 			dimensionComboBox.addItem(preset);
 		}
 
 		dimensionComboBox.addActionListener(e -> {
-			DimensionPreset dimensionPreset = dimensonPresetMap.get(dimensionComboBox.getSelectedItem());
+			DimensionPreset dimensionPreset = dimensionPresetMap.get(dimensionComboBox.getSelectedItem());
 			minX.setText(""+dimensionPreset.getMinX());
 			maxX.setText(""+dimensionPreset.getMaxX());
 			minY.setText(""+dimensionPreset.getMinY());
@@ -421,6 +441,16 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			maxZ.setText(""+dimensionPreset.getMaxZ());
 			updatePreview();
 		});
+
+		// get user dimension presets from preferences
+		String userDimPrefs = Prefs.get("fis.DimensionPresets", "");
+		userDimensionPresetMap = gson.fromJson(userDimPrefs, type);
+		if(userDimensionPresetMap!=null) {
+			for (String preset : userDimensionPresetMap.keySet()) {
+				dimensionComboBox.addItem(preset);
+			}
+			dimensionPresetMap.putAll(userDimensionPresetMap);
+		}
 
 		// functions
         functionPresetMap = new HashMap<>();
@@ -438,15 +468,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
 
         // get user function presets from preferences
-        String userPrefs = Prefs.get("fis.FunctionPresets", "");
-        userFunctionPresetMap = gson.fromJson(userPrefs, type);
-
+        String userFuncPrefs = Prefs.get("fis.FunctionPresets", "");
+        userFunctionPresetMap = gson.fromJson(userFuncPrefs, type);
         if(userFunctionPresetMap!=null) {
-            for (String preset : userFunctionPresetMap.keySet()) {
-                functionPresetsComboBox.addItem(preset);
-            }
-            functionPresetMap.putAll(userFunctionPresetMap);
-        }
+			for (String preset : userFunctionPresetMap.keySet()) {
+				functionPresetsComboBox.addItem(preset);
+			}
+			functionPresetMap.putAll(userFunctionPresetMap);
+		}
 
         functionPresetsComboBox.addActionListener(e -> {
             FunctionPreset functionPreset = functionPresetMap.get(functionPresetsComboBox.getSelectedItem());
@@ -497,6 +526,105 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         updateUserFunctionPresets();
     }
 
+	private void removeFunctionPreset() {
+		String selectedPreset = (String) functionPresetsComboBox.getSelectedItem();
+		GenericDialog genericDialog = new GenericDialog("Remove Function Preset");
+		genericDialog.addMessage("You are about to remove the following preset: " + selectedPreset);
+		genericDialog.showDialog();
+
+		if (genericDialog.wasCanceled()) return;
+		userFunctionPresetMap.remove(selectedPreset);
+		functionPresetMap.remove(selectedPreset);
+		functionPresetsComboBox.removeItem(selectedPreset);
+
+		updateUserFunctionPresets();
+	}
+
+	private void addSizePreset() {
+		GenericDialog genericDialog = new GenericDialog("Add Size Preset");
+		genericDialog.addStringField("Name: ", "", 15);
+		genericDialog.showDialog();
+		if (genericDialog.wasCanceled()) return;
+		String name = genericDialog.getNextString();
+
+		if (sizePresetMap.containsKey(name)) {
+			name = checkName(name);
+			if(name.isEmpty()) return;
+		}
+
+		int x = (int) getNumValue(widthTextField);
+		int y = (int) getNumValue(heightTextField);
+		int z = (int) getNumValue(slicesTextField);
+
+		SizePreset sizePreset = new SizePreset(x, y, z);
+
+		if(userSizePresetMap==null) userSizePresetMap = new HashMap<>();
+		userSizePresetMap.put(name, sizePreset);
+		sizePresetMap.put(name, sizePreset);
+		sizeComboBox.addItem(name);
+		sizeComboBox.setSelectedItem(name);
+
+		updateUserSizePresets();
+	}
+
+	private void removeSizePreset() {
+		String selectedPreset = (String) sizeComboBox.getSelectedItem();
+		GenericDialog genericDialog = new GenericDialog("Remove Size Preset");
+		genericDialog.addMessage("You are about to remove the following preset: " + selectedPreset);
+		genericDialog.showDialog();
+
+		if (genericDialog.wasCanceled()) return;
+		userSizePresetMap.remove(selectedPreset);
+		sizePresetMap.remove(selectedPreset);
+		sizeComboBox.removeItem(selectedPreset);
+
+		updateUserSizePresets();
+	}
+
+	private void addDimensionPreset() {
+		GenericDialog genericDialog = new GenericDialog("Add Dimension Preset");
+		genericDialog.addStringField("Name: ", "", 15);
+		genericDialog.showDialog();
+		if (genericDialog.wasCanceled()) return;
+		String name = genericDialog.getNextString();
+
+		if (dimensionPresetMap.containsKey(name)) {
+			name = checkName(name);
+			if(name.isEmpty()) return;
+		}
+
+		double min_x = getNumValue(minX);
+		double max_x = getNumValue(maxX);
+		double min_y = getNumValue(minY);
+		double max_y = getNumValue(maxY);
+		double min_z = getNumValue(minZ);
+		double max_z = getNumValue(maxZ);
+
+		DimensionPreset dimensionPreset = new DimensionPreset(min_x, max_x, min_y, max_y, min_z, max_z);
+
+		if(userDimensionPresetMap==null) userDimensionPresetMap = new HashMap<>();
+		userDimensionPresetMap.put(name, dimensionPreset);
+		dimensionPresetMap.put(name, dimensionPreset);
+		dimensionComboBox.addItem(name);
+		dimensionComboBox.setSelectedItem(name);
+
+		updateUserDimensionPresets();
+	}
+
+	private void removeDimensionPreset() {
+		String selectedPreset = (String) dimensionComboBox.getSelectedItem();
+		GenericDialog genericDialog = new GenericDialog("Remove Dimension Preset");
+		genericDialog.addMessage("You are about to remove the following preset: " + selectedPreset);
+		genericDialog.showDialog();
+
+		if (genericDialog.wasCanceled()) return;
+		userDimensionPresetMap.remove(selectedPreset);
+		dimensionPresetMap.remove(selectedPreset);
+		dimensionComboBox.removeItem(selectedPreset);
+
+		updateUserDimensionPresets();
+	}
+
     private String checkName(String name) {
         GenericDialog id_alert = new GenericDialog("Identical Name Alert");
         id_alert.addMessage("Please give you preset an identical name.");
@@ -513,22 +641,25 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         return "";
     }
 
-    private void removeFunctionPreset() {
-        String selectedPreset = (String) functionPresetsComboBox.getSelectedItem();
-        GenericDialog genericDialog = new GenericDialog("Remove Function Preset");
-        genericDialog.addMessage("You are about to remove the following preset: " + selectedPreset);
-        genericDialog.showDialog();
-
-        if (genericDialog.wasCanceled()) return;
-        userFunctionPresetMap.remove(selectedPreset);
-        functionPresetsComboBox.removeItem(selectedPreset);
-        updateUserFunctionPresets();
-    }
-
     private void updateUserFunctionPresets(){
         Gson gsonBuilder = new GsonBuilder().create();
         String json = gsonBuilder.toJson(userFunctionPresetMap);
         Prefs.set("fis.FunctionPresets", json);
+        Prefs.savePreferences();
+    }
+
+    private void updateUserSizePresets(){
+        Gson gsonBuilder = new GsonBuilder().create();
+        String json = gsonBuilder.toJson(userSizePresetMap);
+        Prefs.set("fis.SizePresets", json);
+        Prefs.savePreferences();
+    }
+
+    private void updateUserDimensionPresets(){
+        Gson gsonBuilder = new GsonBuilder().create();
+        String json = gsonBuilder.toJson(userDimensionPresetMap);
+		System.out.println(Prefs.getPrefsDir());
+        Prefs.set("fis.DimensionPresets", json);
         Prefs.savePreferences();
     }
 
