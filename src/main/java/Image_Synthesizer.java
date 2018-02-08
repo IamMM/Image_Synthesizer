@@ -66,7 +66,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JCheckBox normalizeCheckBox;
     private JSlider previewZSlider;
 	private JLabel currentSliceLabel;
-    private JTextArea primitiveTextArea;
+    private JTextPane primitiveTextArea;
 	private JButton addSizePresetButton;
 	private JButton removeSizePresetButton;
 	private JButton addDimensionPresetButton;
