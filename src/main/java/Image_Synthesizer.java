@@ -11,6 +11,8 @@ import ij.io.Opener;
 import ij.plugin.PlugIn;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -80,6 +82,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     // globals
     private boolean doNewImage = true;
     private boolean isRGB;
+    private boolean is32Bit = true;
     private Map<String, SizePreset> sizePresetMap;
     private Map<String, SizePreset> userSizePresetMap;
     private Map<String, DimensionPreset> dimensionPresetMap;
@@ -167,13 +170,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             String newValue = (String) typesComboBox.getSelectedItem();
             assert newValue != null;
             isRGB = newValue.equals("RGB");
+            is32Bit = newValue.equals("32-bit");
+            normalizeCheckBox.setEnabled(!is32Bit);
             if(isRGB) {
                 invertingLUTCheckBox.setSelected(false);
                 f1Label.setText("r=");
             } else {
                 f1Label.setText("v=");
             }
-            normalizeCheckBox.setEnabled(isRGB);
             f2Label.setVisible(isRGB);
             f3Label.setVisible(isRGB);
             invertingLUTCheckBox.setEnabled(!isRGB);
@@ -200,6 +204,24 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         initKeyListener();
 
+        slicesTextField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				previewZSlider.setMinimum(1);
+				previewZSlider.setMaximum((int) getRealNumValue(slicesTextField));
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				previewZSlider.setMinimum(1);
+				previewZSlider.setMaximum((int) getRealNumValue(slicesTextField));
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+			}
+        });
+
         previewZSlider.addChangeListener(e -> currentSliceLabel.setText(previewZSlider.getValue() + ""));
 
         previewZSlider.addMouseListener(new MouseListener() {
@@ -215,6 +237,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				currentSliceLabel.setVisible(false);
+				updatePreview();
 			}
 
 			@Override
@@ -333,32 +356,13 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					updatePreview();
-					previewZSlider.setMaximum((int) getNumValue(slicesTextField));
 				}
 			}
 		};
 
     	widthTextField.addKeyListener(keyListener);
     	heightTextField.addKeyListener(keyListener);
-    	slicesTextField.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					updatePreview();
-					previewZSlider.setMaximum((int) getNumValue(slicesTextField));
-				}
-			}
-		});
+    	slicesTextField.addKeyListener(keyListener);
 		minX.addKeyListener(keyListener);
 		maxX.addKeyListener(keyListener);
 		minY.addKeyListener(keyListener);
@@ -552,9 +556,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			if(name.isEmpty()) return;
 		}
 
-		int x = (int) getNumValue(widthTextField);
-		int y = (int) getNumValue(heightTextField);
-		int z = (int) getNumValue(slicesTextField);
+		int x = (int) getRealNumValue(widthTextField);
+		int y = (int) getRealNumValue(heightTextField);
+		int z = (int) getRealNumValue(slicesTextField);
 
 		SizePreset sizePreset = new SizePreset(x, y, z);
 
@@ -593,12 +597,12 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			if(name.isEmpty()) return;
 		}
 
-		double min_x = getNumValue(minX);
-		double max_x = getNumValue(maxX);
-		double min_y = getNumValue(minY);
-		double max_y = getNumValue(maxY);
-		double min_z = getNumValue(minZ);
-		double max_z = getNumValue(maxZ);
+		double min_x = getRealNumValue(minX);
+		double max_x = getRealNumValue(maxX);
+		double min_y = getRealNumValue(minY);
+		double max_y = getRealNumValue(maxY);
+		double min_z = getRealNumValue(minZ);
+		double max_z = getRealNumValue(maxZ);
 
 		DimensionPreset dimensionPreset = new DimensionPreset(min_x, max_x, min_y, max_y, min_z, max_z);
 
@@ -669,22 +673,22 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         assert type != null;
 
         // size
-        int width = Integer.parseInt(widthTextField.getText().replaceAll("[^\\d.]", ""));
-        int height = Integer.parseInt(heightTextField.getText().replaceAll("[^\\d.]", ""));
-        int slices = Integer.parseInt(slicesTextField.getText().replaceAll("[^\\d.]", ""));
+        int width = getNaturalNumValue(widthTextField);
+        int height = getNaturalNumValue(heightTextField);
+        int slices = getNaturalNumValue(slicesTextField);
 
         // coordinate range
         double[] min = new double[3];
         double[] max = new double[3];
 
-        min[0] = getNumValue(minX);
-        max[0] = getNumValue(maxX);
+        min[0] = getRealNumValue(minX);
+        max[0] = getRealNumValue(maxX);
 
-        min[1] = getNumValue(minY);
-        max[1] = getNumValue(maxY);
+        min[1] = getRealNumValue(minY);
+        max[1] = getRealNumValue(maxY);
 
-        min[2] = getNumValue(minZ);
-        max[2] = getNumValue(maxZ);
+        min[2] = getRealNumValue(minZ);
+        max[2] = getRealNumValue(maxZ);
 
         // function
         String function = f1TextField.getText();
@@ -700,20 +704,28 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
 
         Image previewImage;
+        int frame = slices>1?previewZSlider.getValue():1;
 
         try {
             if (isRGB) {
-                previewImage = FIS.getPreview(imagePlus, min, max, functions, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected());
+                previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected());
+            } else if(!is32Bit){
+                previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected());
             } else {
-                previewImage = FIS.getPreview(imagePlus, min, max, function, drawAxesCheckBox.isSelected());
-            }
+            	previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxesCheckBox.isSelected(), false);
+			}
             preview.setIcon(new ImageIcon(previewImage));
         } catch (RuntimeException e) {
             // do nothing
         }
     }
 
-    private double getNumValue(JTextField textField) {
+	private int getNaturalNumValue(JTextField textField) {
+		String textFromGUI = textField.getText().replaceAll("[^\\d.]", "");
+		return textFromGUI.equals("")?1:Integer.parseInt(textFromGUI);
+	}
+
+    private double getRealNumValue(JTextField textField) {
         String textFromGUI = textField.getText().replaceAll("[^-\\d.]", "");
         return textFromGUI.equals("")?0:Double.parseDouble(textFromGUI);
     }
@@ -724,22 +736,22 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         assert type != null;
 
         // size
-        int width = Integer.parseInt(widthTextField.getText().replaceAll("[^\\d.]", ""));
-        int height = Integer.parseInt(heightTextField.getText().replaceAll("[^\\d.]", ""));
-        int slices = Integer.parseInt(slicesTextField.getText().replaceAll("[^\\d.]", ""));
+		int width = getNaturalNumValue(widthTextField);
+		int height = getNaturalNumValue(heightTextField);
+		int slices = getNaturalNumValue(slicesTextField);
 
-        // coordinate range
+		// coordinate range
         double[] min = new double[3];
         double[] max = new double[3];
 
-        min[0] = getNumValue(minX);
-        max[0] = getNumValue(maxX);
+        min[0] = getRealNumValue(minX);
+        max[0] = getRealNumValue(maxX);
 
-        min[1] = getNumValue(minY);
-        max[1] = getNumValue(maxY);
+        min[1] = getRealNumValue(minY);
+        max[1] = getRealNumValue(maxY);
 
-        min[2] = getNumValue(minZ);
-        max[2] = getNumValue(maxZ);
+        min[2] = getRealNumValue(minZ);
+        max[2] = getRealNumValue(maxZ);
 
         // function
         String function = f1TextField.getText();
@@ -763,7 +775,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
                     FIS.functionToImage(imagePlus, min, max, functions);
                 }
             } else {
-                FIS.functionToImage(imagePlus, min, max, function);
+				if (normalizeCheckBox.isSelected() && !is32Bit) {
+					FIS.functionToNormalizedImage(imagePlus, min, max, function);
+				} else {
+					FIS.functionToImage(imagePlus, min, max, function);
+				}
             }
             IJ.resetMinAndMax(imagePlus);
             imagePlus.show();
