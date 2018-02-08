@@ -921,6 +921,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 			}
 			FloatProcessor floatProcessor = new FloatProcessor(width, height, values);
 			floatProcessor.resetMinAndMax();
+			if(imagePlus.isInvertedLut()) floatProcessor.invert();
 			imagePlus.setProcessor(floatProcessor.convertToByteProcessor(true));
 		} else if (bitDepth==16) {
 
@@ -953,12 +954,13 @@ public class FunctionImageSynthesizer extends ImageMath {
 			}
 			FloatProcessor floatProcessor = new FloatProcessor(width, height, values);
 			floatProcessor.resetMinAndMax();
+			if(imagePlus.isInvertedLut()) floatProcessor.invert();
 			imagePlus.setProcessor(floatProcessor.convertToShortProcessor(true));
 		}
 		IJ.showProgress(1.0);
 	}
 
-	public void functionToNormalizedFrame(ImagePlus imagePlus, double[] min, double[] max, String[] functions) throws RuntimeException {
+	private void functionToNormalizedFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String[] functions) throws RuntimeException {
 		ColorProcessor ip = (ColorProcessor) imagePlus.getProcessor();
 		if(ip.getBitDepth()!=24) return;
 
@@ -994,59 +996,54 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
 		if (inc<1) inc = 1;
-		int slices = imagePlus.getNSlices();
 		int pos;
 
-		for(int z = 0; z < slices; z++) {
-			ip = (ColorProcessor) imagePlus.getImageStack().getProcessor(z + 1);
+		double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
+		if (hasZ) interpreter.setVariable("z", dz);
 
-			double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
-			if (hasZ) interpreter.setVariable("z", dz);
+		int rgb;
+		double red, green, blue;
+		int[] pixels = (int[]) ip.getPixels();
+		double[] redPixels = new double[pixels.length],
+				greenPixels = new double[pixels.length],
+				bluePixels = new double[pixels.length];
 
-			int rgb;
-			double red, green, blue;
-			int[] pixels = (int[]) ip.getPixels();
-			double[] redPixels = new double[pixels.length],
-					greenPixels = new double[pixels.length],
-					bluePixels = new double[pixels.length];
+		for (int y = r.y; y < (r.y + r.height); y++) {
+			if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
 
-			for (int y = r.y; y < (r.y + r.height); y++) {
-				if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
+			double dy = min[1]+((max[1]-min[1])/height)*y; // 0..y to min..max
+			interpreter.setVariable("y", dy);
 
-				double dy = min[1]+((max[1]-min[1])/height)*y; // 0..y to min..max
-				interpreter.setVariable("y", dy);
+			for (int x = r.x; x < (r.x + r.width); x++) {
+				double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
+				if (hasX) interpreter.setVariable("x", dx);
 
-				for (int x = r.x; x < (r.x + r.width); x++) {
-					double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
-					if (hasX) interpreter.setVariable("x", dx);
+				if (hasA) interpreter.setVariable("a",getA(dy, dx));
+				if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
+				pos = y * width + x;
+				rgb = pixels[pos];
 
-					if (hasA) interpreter.setVariable("a",getA(dy, dx));
-					if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
-					pos = y * width + x;
-					rgb = pixels[pos];
-
-					red = (rgb & 0xff0000) >> 16;
-					green = (rgb & 0xff00) >> 8;
-					blue = rgb & 0xff;
-					interpreter.setVariable("r", red);
-					interpreter.setVariable("g", green);
-					interpreter.setVariable("b", blue);
-					interpreter.run(PCStart);
-					redPixels[pos] = interpreter.getVariable("r_new");
-					greenPixels[pos] = interpreter.getVariable("g_new");
-					bluePixels[pos] = interpreter.getVariable("b_new");
-				}
+				red = (rgb & 0xff0000) >> 16;
+				green = (rgb & 0xff00) >> 8;
+				blue = rgb & 0xff;
+				interpreter.setVariable("r", red);
+				interpreter.setVariable("g", green);
+				interpreter.setVariable("b", blue);
+				interpreter.run(PCStart);
+				redPixels[pos] = interpreter.getVariable("r_new");
+				greenPixels[pos] = interpreter.getVariable("g_new");
+				bluePixels[pos] = interpreter.getVariable("b_new");
 			}
-
-			FloatProcessor redImageProcessor = new FloatProcessor(width, height, redPixels);
-			ip.setChannel(1, redImageProcessor.convertToByteProcessor(true));
-
-			FloatProcessor greenImageProcessor = new FloatProcessor(width, height, greenPixels);
-			ip.setChannel(2, greenImageProcessor.convertToByteProcessor(true));
-
-			FloatProcessor blueImageProcessor = new FloatProcessor(width, height, bluePixels);
-			ip.setChannel(3, blueImageProcessor.convertToByteProcessor(true));
 		}
+
+		FloatProcessor redImageProcessor = new FloatProcessor(width, height, redPixels);
+		ip.setChannel(1, redImageProcessor.convertToByteProcessor(true));
+
+		FloatProcessor greenImageProcessor = new FloatProcessor(width, height, greenPixels);
+		ip.setChannel(2, greenImageProcessor.convertToByteProcessor(true));
+
+		FloatProcessor blueImageProcessor = new FloatProcessor(width, height, bluePixels);
+		ip.setChannel(3, blueImageProcessor.convertToByteProcessor(true));
 		IJ.showProgress(1.0);
 	}
 
@@ -1081,7 +1078,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 
 		ImageProcessor resized = downsize(imagePlus, frame, PREVIEW_SIZE);
 		ImagePlus preview = new ImagePlus("preview", resized);
-		if(normalize)functionToNormalizedImage(preview, min, max, functions);
+		if(normalize)functionToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), functions);
 		else functionToFrame(preview, min, max, frame-1, imagePlus.getNSlices(), functions);
 		resized.resetMinAndMax();
 
