@@ -27,6 +27,7 @@
 import ij.IJ;
 import ij.ImagePlus;
 import ij.Prefs;
+import ij.gui.Toolbar;
 import ij.macro.Interpreter;
 import ij.macro.Program;
 import ij.macro.Tokenizer;
