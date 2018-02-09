@@ -1136,7 +1136,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 	private void drawAxes(ImageProcessor colorProcessor, double[] min, double[] max) {
 		int width = colorProcessor.getWidth();
 		int height = colorProcessor.getHeight();
-		colorProcessor.setColor(Color.GREEN);
+		colorProcessor.setColor(Toolbar.getForegroundColor());
 
 		// x axis
 		int xAxisPos = (int) ((-min[0]*(width-1))/(max[0]-min[0]));
