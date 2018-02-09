@@ -560,11 +560,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			for (int y = r.y; y < (r.y + r.height); y++) {
 				if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
 
-				double dy = min[1]+((max[1]-min[1])/height-1)*y; // 0..y to min..max
+				double dy = min[1] + ((max[1] - min[1]) / (height - 1)) * y; // 0..y to min..max
 				interpreter.setVariable("y", dy);
 
 				for (int x = r.x; x < (r.x + r.width); x++) {
-					double dx = min[0]+((max[0]-min[0])/width-1)*x; // 0..x to min..max
+					double dx = min[0] + ((max[0] - min[0]) / (width - 1)) * x; // 0..x to min..max
 					if (hasX) interpreter.setVariable("x", dx);
 
 					if (hasA) interpreter.setVariable("a",getA(dy, dx));
