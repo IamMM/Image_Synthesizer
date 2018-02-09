@@ -559,7 +559,7 @@
                     </properties>
                     <border type="none"/>
                     <children>
-                      <component id="19eba" class="javax.swing.JButton" binding="deleteF1Button">
+                      <component id="19eba" class="javax.swing.JButton" binding="f1ResetButton">
                         <constraints/>
                         <properties>
                           <margin top="0" left="2" bottom="0" right="2"/>
@@ -626,7 +626,7 @@
                     </properties>
                     <border type="none"/>
                     <children>
-                      <component id="a408d" class="javax.swing.JButton" binding="deleteF2Button">
+                      <component id="a408d" class="javax.swing.JButton" binding="f2ResetButton">
                         <constraints/>
                         <properties>
                           <margin top="0" left="2" bottom="0" right="2"/>
@@ -644,7 +644,7 @@
                     </properties>
                     <border type="none"/>
                     <children>
-                      <component id="54670" class="javax.swing.JButton" binding="deleteF3Button">
+                      <component id="54670" class="javax.swing.JButton" binding="f3ResetButton">
                         <constraints/>
                         <properties>
                           <margin top="0" left="2" bottom="0" right="2"/>

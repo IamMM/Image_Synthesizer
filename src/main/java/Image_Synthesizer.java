@@ -63,9 +63,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JTextField f1TextField;
     private JTextField f2TextField;
     private JTextField f3TextField;
-	private JButton deleteF1Button;
-	private JButton deleteF2Button;
-	private JButton deleteF3Button;
+	private JButton f1ResetButton;
+	private JButton f2ResetButton;
+	private JButton f3ResetButton;
     private JButton previewButton;
     private JButton generateButton;
     private JSlider previewZSlider;
@@ -182,11 +182,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             } else {
                 f1Label.setText("v=");
             }
-            f2Label.setVisible(isRGB);
-            f3Label.setVisible(isRGB);
             invertingLUTCheckBox.setEnabled(!isRGB);
+            f2Label.setVisible(isRGB);
             f2TextField.setVisible(isRGB);
+            f2ResetButton.setVisible(isRGB);
+            f3Label.setVisible(isRGB);
             f3TextField.setVisible(isRGB);
+            f3ResetButton.setVisible(isRGB);
+            localToggleButton.setEnabled(isRGB);
 
             if(!doNewImage) {
                 ImagePlus tmp = WindowManager.getImage((String) imageComboBox.getSelectedItem());
@@ -266,9 +269,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         addFunctionPresetButton.addActionListener(e -> addFunctionPreset());
         removeFunctionPresetButton.addActionListener(e -> removeFunctionPreset());
         openHelpButton.addActionListener(e -> openMacroHelp());
-        deleteF1Button.addActionListener(e -> resetTextField(f1TextField));
-        deleteF2Button.addActionListener(e -> resetTextField(f2TextField));
-        deleteF3Button.addActionListener(e -> resetTextField(f3TextField));
+        f1ResetButton.addActionListener(e -> resetTextField(f1TextField));
+        f2ResetButton.addActionListener(e -> resetTextField(f2TextField));
+        f3ResetButton.addActionListener(e -> resetTextField(f3TextField));
         previewButton.addActionListener(e -> updatePreview());
         generateButton.addActionListener(e -> generateFunction());
 
