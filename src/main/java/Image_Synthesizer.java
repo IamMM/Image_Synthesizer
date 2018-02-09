@@ -93,8 +93,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private Map<String, DimensionPreset> userDimensionPresetMap;
     private Map<String, FunctionPreset> functionPresetMap;
     private Map<String, FunctionPreset> userFunctionPresetMap;
+	private boolean previewIsActive = true;
 
-    /**
+	/**
      * Main method for debugging.
      * For debugging, it is convenient to have a method that starts ImageJ, loads an
      * image and calls the plugin, e.g. after setting breakpoints.
@@ -207,27 +208,15 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         normalizeCheckBox.addActionListener(e -> updatePreview());
 
-        initFocusListener();
+        localToggleButton.addActionListener(e -> {
+        	if(localToggleButton.isSelected()) localToggleButton.setText("global");
+        	else localToggleButton.setText("local");
+        	updatePreview();
+		});
+
+        initDocumentListener();
 
         initKeyListener();
-
-        slicesTextField.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				previewZSlider.setMinimum(1);
-				previewZSlider.setMaximum((int) getRealNumValue(slicesTextField));
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				previewZSlider.setMinimum(1);
-				previewZSlider.setMaximum((int) getRealNumValue(slicesTextField));
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-			}
-        });
 
         previewZSlider.addChangeListener(e -> currentSliceLabel.setText(previewZSlider.getValue() + ""));
 
@@ -312,43 +301,63 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
     }
 
-    private void initFocusListener() {
-    	FocusListener focusListener = new FocusListener() {
+    private void initDocumentListener() {
+    	DocumentListener documentListener = new DocumentListener() {
 			@Override
-			public void focusGained(FocusEvent e) {
-
+			public void insertUpdate(DocumentEvent e) {
+				showInactivePreviewOverlay();
 			}
 
 			@Override
-			public void focusLost(FocusEvent e) {
-				updatePreview();
+			public void removeUpdate(DocumentEvent e) {
+				showInactivePreviewOverlay();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
 			}
 		};
 
-        widthTextField.addFocusListener(focusListener);
-        heightTextField.addFocusListener(focusListener);
-        slicesTextField.addFocusListener(new FocusListener() {
+        widthTextField.getDocument().addDocumentListener(documentListener);
+        heightTextField.getDocument().addDocumentListener(documentListener);
+		slicesTextField.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
-			public void focusGained(FocusEvent e) {
-
+			public void insertUpdate(DocumentEvent e) {
+				previewZSlider.setMinimum(1);
+				previewZSlider.setMaximum((int) getRealNumValue(slicesTextField));
 			}
 
 			@Override
-			public void focusLost(FocusEvent e) {
-				updatePreview();
+			public void removeUpdate(DocumentEvent e) {
+				previewZSlider.setMinimum(1);
+				previewZSlider.setMaximum((int) getRealNumValue(slicesTextField));
+			}
 
+			@Override
+			public void changedUpdate(DocumentEvent e) {
 			}
 		});
-        minX.addFocusListener(focusListener);
-        maxX.addFocusListener(focusListener);
-        minY.addFocusListener(focusListener);
-        maxY.addFocusListener(focusListener);
-        minZ.addFocusListener(focusListener);
-        maxZ.addFocusListener(focusListener);
-        f1TextField.addFocusListener(focusListener);
-        f2TextField.addFocusListener(focusListener);
-        f3TextField.addFocusListener(focusListener);
+        minX.getDocument().addDocumentListener(documentListener);
+        maxX.getDocument().addDocumentListener(documentListener);
+        minY.getDocument().addDocumentListener(documentListener);
+        maxY.getDocument().addDocumentListener(documentListener);
+        minZ.getDocument().addDocumentListener(documentListener);
+        maxZ.getDocument().addDocumentListener(documentListener);
+        f1TextField.getDocument().addDocumentListener(documentListener);
+        f2TextField.getDocument().addDocumentListener(documentListener);
+        f3TextField.getDocument().addDocumentListener(documentListener);
     }
+
+    private void showInactivePreviewOverlay() {
+    	if(previewIsActive) {
+			Image currPreview = ((ImageIcon)preview.getIcon()).getImage();
+			ImagePlus previewPlus = new ImagePlus("preview", currPreview);
+			previewPlus.getProcessor().blurGaussian(20);
+			preview.setIcon(new ImageIcon(previewPlus.getImage()));
+    		previewIsActive = false;
+		}
+	}
 
     private void initKeyListener() {
     	KeyListener keyListener = new KeyListener() {
@@ -728,6 +737,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         } catch (RuntimeException e) {
             // do nothing
         }
+        previewIsActive = true;
     }
 
 	private int getNaturalNumValue(JTextField textField) {
