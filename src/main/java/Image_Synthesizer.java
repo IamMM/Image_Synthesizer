@@ -38,6 +38,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JComboBox<String> typesComboBox;
     private JButton openImageButton;
     private JCheckBox invertingLUTCheckBox;
+    private JCheckBox normalizeCheckBox;
+	private JToggleButton localToggleButton;
     private JLabel preview;
     private JCheckBox drawAxesCheckBox;
     private JComboBox<String> sizeComboBox;
@@ -61,9 +63,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JTextField f1TextField;
     private JTextField f2TextField;
     private JTextField f3TextField;
+	private JButton deleteF1Button;
+	private JButton deleteF2Button;
+	private JButton deleteF3Button;
     private JButton previewButton;
     private JButton generateButton;
-    private JCheckBox normalizeCheckBox;
     private JSlider previewZSlider;
 	private JLabel currentSliceLabel;
     private JTextPane primitiveTextArea;
@@ -262,6 +266,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         addFunctionPresetButton.addActionListener(e -> addFunctionPreset());
         removeFunctionPresetButton.addActionListener(e -> removeFunctionPreset());
         openHelpButton.addActionListener(e -> openMacroHelp());
+        deleteF1Button.addActionListener(e -> resetTextField(f1TextField));
+        deleteF2Button.addActionListener(e -> resetTextField(f2TextField));
+        deleteF3Button.addActionListener(e -> resetTextField(f3TextField));
         previewButton.addActionListener(e -> updatePreview());
         generateButton.addActionListener(e -> generateFunction());
 
@@ -690,11 +697,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         min[2] = getRealNumValue(minZ);
         max[2] = getRealNumValue(maxZ);
 
-        // function
-        String function = f1TextField.getText();
-        String[] functions = new String[]{function, f2TextField.getText(), f3TextField.getText()};
+		// function
+		String function = getFunctionText(f1TextField);
+		String[] functions = new String[]{function, getFunctionText(f2TextField), getFunctionText(f3TextField)};
 
-        // apply
+		// apply
         ImagePlus imagePlus;
         if(doNewImage) {
             imagePlus = IJ.createImage(function, type, width, height, slices);
@@ -754,8 +761,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         max[2] = getRealNumValue(maxZ);
 
         // function
-        String function = f1TextField.getText();
-        String[] functions = new String[]{function, f2TextField.getText(), f3TextField.getText()};
+        String function = getFunctionText(f1TextField);
+        String[] functions = new String[]{function, getFunctionText(f2TextField), getFunctionText(f3TextField)};
 
         // apply
         ImagePlus imagePlus;
@@ -821,6 +828,16 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         image.show();
         imageComboBox.setSelectedIndex(imageComboBox.getItemCount() - 1);
     }
+
+    private String getFunctionText(JTextField textField) {
+    	String function = textField.getText();
+    	return function.isEmpty()?"0":function;
+	}
+
+    private void resetTextField(JTextField textField) {
+    	textField.setText("0");
+    	updatePreview();
+	}
 
     @Override
     public void imageOpened(ImagePlus imp) {
