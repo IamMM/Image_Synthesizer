@@ -83,8 +83,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			for(int z = 0; z < slices; z++) {
 				ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-				double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
-				if (hasZ) interpreter.setVariable("z", dz);
+				if (hasZ) {
+					double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+					if (Double.isNaN(dz)) dz = min[2];
+					interpreter.setVariable("z", dz);
+				}
 
 				byte[] pixels1 = (byte[]) ip.getPixels();
 				byte[] pixels2 = pixels1;
@@ -119,8 +122,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			for(int z = 0; z < slices; z++) {
 				ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-				double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
-				if (hasZ) interpreter.setVariable("z", dz);
+				if (hasZ) {
+					double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+					if (Double.isNaN(dz)) dz = min[2];
+					interpreter.setVariable("z", dz);
+				}
 
 				int rgb, red, green, blue;
 				int[] pixels1 = (int[]) ip.getPixels();
@@ -175,8 +181,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			for(int z = 0; z < slices; z++) {
 				ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-				double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
-				if (hasZ) interpreter.setVariable("z", dz);
+				if (hasZ) {
+					double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+					if (Double.isNaN(dz)) dz = min[2];
+					interpreter.setVariable("z", dz);
+				}
 
 				for (int y = r.y; y < (r.y + r.height); y++) {
 					if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
@@ -201,8 +210,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			for(int z = 0; z < slices; z++) {
 				ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-				double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
-				if(hasZ) interpreter.setVariable("z", dz);
+				if (hasZ) {
+					double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+					if (Double.isNaN(dz)) dz = min[2];
+					interpreter.setVariable("z", dz);
+				}
 
 				short[] pixels1 = (short[]) ip.getPixels();
 				short[] pixels2 = pixels1;
@@ -237,8 +249,12 @@ public class FunctionImageSynthesizer extends ImageMath {
 		} else {  //32-bit
 			for(int z = 0; z < slices; z++) {
 				ip = imagePlus.getImageStack().getProcessor(z + 1);
-				double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
-				if(hasZ) interpreter.setVariable("z", dz);
+
+				if (hasZ) {
+					double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+					if (Double.isNaN(dz)) dz = min[2];
+					interpreter.setVariable("z", dz);
+				}
 
 				float[] pixels1 = (float[])ip.getPixels();
 				float[] pixels2 = pixels1;
@@ -270,6 +286,13 @@ public class FunctionImageSynthesizer extends ImageMath {
 		IJ.showProgress(1.0);
 	}
 
+	/**
+	 * 3 functions for RGB image (24 bit)
+	 * @param imagePlus
+	 * @param min
+	 * @param max
+	 * @param functions
+	 */
 	public void functionToImage(ImagePlus imagePlus, double[] min, double[] max, String[] functions) {
 		ImageProcessor ip = imagePlus.getProcessor();
 		if(ip.getBitDepth()!=24) return;
@@ -312,8 +335,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 		for(int z = 0; z < slices; z++) {
 			ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-			double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
-			if (hasZ) interpreter.setVariable("z", dz);
+			if (hasZ) {
+				double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+				if (Double.isNaN(dz)) dz = min[2];
+				interpreter.setVariable("z", dz);
+			}
 
 			int rgb, red, green, blue;
 			int[] pixels = (int[]) ip.getPixels();
@@ -397,8 +423,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			for(int z = 0; z < slices; z++) {
 				ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-				double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
-				if (hasZ) interpreter.setVariable("z", dz);
+				if (hasZ) {
+					double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+					if (Double.isNaN(dz)) dz = min[2];
+					interpreter.setVariable("z", dz);
+				}
 
 				byte[] pixels = (byte[]) ip.getPixels();
 				double[] values = new double[pixels.length];
@@ -433,8 +462,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			for(int z = 0; z < slices; z++) {
 				ip = imagePlus.getImageStack().getProcessor(z + 1);
 
-				double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
-				if(hasZ) interpreter.setVariable("z", dz);
+				if (hasZ) {
+					double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+					if (Double.isNaN(dz)) dz = min[2];
+					interpreter.setVariable("z", dz);
+				}
 
 				short[] pixels = (short[]) ip.getPixels();
 				double[] values = new double[pixels.length];
@@ -512,8 +544,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 		for(int z = 0; z < slices; z++) {
 			ip = (ColorProcessor) imagePlus.getImageStack().getProcessor(z + 1);
 
-			double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
-			if (hasZ) interpreter.setVariable("z", dz);
+			if (hasZ) {
+				double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+				if (Double.isNaN(dz)) dz = min[2];
+				interpreter.setVariable("z", dz);
+			}
 
 			int rgb;
 			double red, green, blue;
@@ -525,11 +560,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			for (int y = r.y; y < (r.y + r.height); y++) {
 				if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
 
-				double dy = min[1]+((max[1]-min[1])/height)*y; // 0..y to min..max
+				double dy = min[1]+((max[1]-min[1])/height-1)*y; // 0..y to min..max
 				interpreter.setVariable("y", dy);
 
 				for (int x = r.x; x < (r.x + r.width); x++) {
-					double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
+					double dx = min[0]+((max[0]-min[0])/width-1)*x; // 0..x to min..max
 					if (hasX) interpreter.setVariable("x", dx);
 
 					if (hasA) interpreter.setVariable("a",getA(dy, dx));
@@ -593,13 +628,15 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
 		if (inc<1) inc = 1;
-		if(slices>1) slices-=1;
 		double v;
 		int pos, v2;
 		if (bitDepth==8) { // 8-Bit
 
-			double dz = min[2]+((max[2]-min[2])/(slices))*z; // 0..z to min..max
-			if (hasZ) interpreter.setVariable("z", dz);
+			if (hasZ) {
+				double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+				if (Double.isNaN(dz)) dz = min[2];
+				interpreter.setVariable("z", dz);
+			}
 
 			byte[] pixels1 = (byte[]) ip.getPixels();
 			byte[] pixels2 = pixels1;
@@ -631,8 +668,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			if (hasGetPixel) System.arraycopy(pixels2, 0, pixels1, 0, width * height);
 		} else if (bitDepth==24) { // RGB
 
-			double dz = min[2]+((max[2]-min[2])/(slices))*z; // 0..z to min..max
-			if (hasZ) interpreter.setVariable("z", dz);
+			if (hasZ) {
+				double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+				if (Double.isNaN(dz)) dz = min[2];
+				interpreter.setVariable("z", dz);
+			}
 
 			int rgb, red, green, blue;
 			int[] pixels1 = (int[]) ip.getPixels();
@@ -684,8 +724,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			if (hasGetPixel) System.arraycopy(pixels2, 0, pixels1, 0, width * height);
 		} else if (ip.isSigned16Bit()) {
 
-			double dz = min[2]+((max[2]-min[2])/(slices))*z; // 0..z to min..max
-			if (hasZ) interpreter.setVariable("z", dz);
+			if (hasZ) {
+				double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+				if (Double.isNaN(dz)) dz = min[2];
+				interpreter.setVariable("z", dz);
+			}
 
 			for (int y = r.y; y < (r.y + r.height); y++) {
 				if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
@@ -707,8 +750,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			}
 		} else if (bitDepth==16) {
 
-			double dz = min[2]+((max[2]-min[2])/(slices))*z; // 0..z to min..max
-			if(hasZ) interpreter.setVariable("z", dz);
+			if (hasZ) {
+				double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+				if (Double.isNaN(dz)) dz = min[2];
+				interpreter.setVariable("z", dz);
+			}
 
 			short[] pixels1 = (short[]) ip.getPixels();
 			short[] pixels2 = pixels1;
@@ -741,8 +787,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			if (hasGetPixel) System.arraycopy(pixels2, 0, pixels1, 0, width * height);
 		} else {  //32-bit
 
-			double dz = min[2]+((max[2]-min[2])/(slices))*z; // 0..z to min..max
-			if(hasZ) interpreter.setVariable("z", dz);
+			if (hasZ) {
+				double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+				if (Double.isNaN(dz)) dz = min[2];
+				interpreter.setVariable("z", dz);
+			}
 
 			float[] pixels1 = (float[])ip.getPixels();
 			float[] pixels2 = pixels1;
@@ -809,11 +858,13 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
 		if (inc<1) inc = 1;
-		if(slices>1) slices-=1;
 		int pos;
 
-		double dz = min[2]+((max[2]-min[2])/(slices))*z; // 0..z to min..max
-		if (hasZ) interpreter.setVariable("z", dz);
+		if (hasZ) {
+			double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+			if (Double.isNaN(dz)) dz = min[2];
+			interpreter.setVariable("z", dz);
+		}
 
 		int rgb, red, green, blue;
 		int[] pixels = (int[]) ip.getPixels();
@@ -893,8 +944,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 
 		if (bitDepth==8) { // 8-Bit
 
-			double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
-			if (hasZ) interpreter.setVariable("z", dz);
+			if (hasZ) {
+				double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+				if (Double.isNaN(dz)) dz = min[2];
+				interpreter.setVariable("z", dz);
+			}
 
 			byte[] pixels = (byte[]) ip.getPixels();
 			double[] values = new double[pixels.length];
@@ -926,8 +980,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			imagePlus.setProcessor(floatProcessor.convertToByteProcessor(true));
 		} else if (bitDepth==16) {
 
-			double dz = min[2]+((max[2]-min[2])/(slices-1))*z; // 0..z to min..max
-			if(hasZ) interpreter.setVariable("z", dz);
+			if (hasZ) {
+				double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+				if (Double.isNaN(dz)) dz = min[2];
+				interpreter.setVariable("z", dz);
+			}
 
 			short[] pixels = (short[]) ip.getPixels();
 			double[] values = new double[pixels.length];
@@ -999,9 +1056,12 @@ public class FunctionImageSynthesizer extends ImageMath {
 		if (inc<1) inc = 1;
 		int pos;
 
-		double dz = min[2]+((max[2]-min[2])/slices)*z; // 0..z to min..max
-		if (hasZ) interpreter.setVariable("z", dz);
-
+		if (hasZ) {
+			double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+			if (Double.isNaN(dz)) dz = min[2];
+			interpreter.setVariable("z", dz);
+		}
+		
 		int rgb;
 		double red, green, blue;
 		int[] pixels = (int[]) ip.getPixels();
