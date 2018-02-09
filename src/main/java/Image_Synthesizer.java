@@ -681,7 +681,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private void updateUserDimensionPresets(){
         Gson gsonBuilder = new GsonBuilder().create();
         String json = gsonBuilder.toJson(userDimensionPresetMap);
-		System.out.println(Prefs.getPrefsDir());
         Prefs.set("fis.DimensionPresets", json);
         Prefs.savePreferences();
     }
