@@ -31,7 +31,7 @@ import java.util.Objects;
  * @author Maximlian Maske
  */
 public class Image_Synthesizer implements PlugIn, ImageListener {
-    // swing components
+    // global swing components
     private JFrame frame;
     private JPanel mainPanel;
     private JComboBox<String> imageComboBox;
@@ -53,6 +53,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JTextField maxY;
     private JTextField minZ;
     private JTextField maxZ;
+	private JButton addSizePresetButton;
+	private JButton removeSizePresetButton;
+	private JButton addDimensionPresetButton;
+	private JButton removeDimensionPresetButton;
+    private JSlider previewZSlider;
+	private JLabel currentSliceLabel;
+
+    // function swing components
     private JComboBox<String> functionPresetsComboBox;
     private JButton addFunctionPresetButton;
     private JButton removeFunctionPresetButton;
@@ -67,21 +75,22 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private JButton f2ResetButton;
 	private JButton f3ResetButton;
     private JButton previewButton;
-    private JButton generateButton;
-    private JSlider previewZSlider;
-	private JLabel currentSliceLabel;
+    private JButton generateFunctionButton;
+
+    // primitive swing components
     private JTextPane primitiveTextArea;
-	private JButton addSizePresetButton;
-	private JButton removeSizePresetButton;
-	private JButton addDimensionPresetButton;
-	private JButton removeDimensionPresetButton;
+	private JButton generatePrimitiveButton;
+	private JComboBox primitivePresetsComboBox;
+	private JButton addPrimitivePresetButton;
+	private JButton removePrimitivePresetButton;
 
 	// constants
     private static final String TITLE = "Function Image Synthesizer";
     private static final String VERSION = " v0.1.0";
 
-    // FIS
-    private FunctionImageSynthesizer FIS = new FunctionImageSynthesizer();
+    // Synthesizer Objects
+    private static FunctionImageSynthesizer FIS = new FunctionImageSynthesizer();
+    private static PrimitiveImageSynthesizer PIS = new PrimitiveImageSynthesizer();
 
     // globals
     private boolean doNewImage = true;
@@ -202,7 +211,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             updatePreview();
         });
 
-        openImageButton.addActionListener(evt -> openButtonAction());
+        openImageButton.addActionListener(evt -> showOpenImageDialog());
 
         invertingLUTCheckBox.addActionListener(e -> updatePreview());
 
@@ -262,7 +271,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         f2ResetButton.addActionListener(e -> resetTextField(f2TextField));
         f3ResetButton.addActionListener(e -> resetTextField(f3TextField));
         previewButton.addActionListener(e -> updatePreview());
-        generateButton.addActionListener(e -> generateFunction());
+        generateFunctionButton.addActionListener(e -> generateFunction());
+        generatePrimitiveButton.addActionListener(e -> generatePrimitive());
 
         updatePreview();
     }
@@ -292,6 +302,18 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             e.printStackTrace();
         }
     }
+
+	private void showOpenImageDialog() {
+		OpenDialog od = new OpenDialog("Open..", "");
+		String directory = od.getDirectory();
+		String name = od.getFileName();
+		if (name == null) return;
+
+		Opener opener = new Opener();
+		ImagePlus image = opener.openImage(directory, name);
+		image.show();
+		imageComboBox.setSelectedIndex(imageComboBox.getItemCount() - 1);
+	}
 
     private void initImageList() {
         String[] titles = WindowManager.getImageTitles();
@@ -349,16 +371,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         f3TextField.getDocument().addDocumentListener(documentListener);
     }
 
-    private void showInactivePreviewOverlay() {
-    	if(previewIsActive) {
-			Image currPreview = ((ImageIcon)preview.getIcon()).getImage();
-			ImagePlus previewPlus = new ImagePlus("preview", currPreview);
-			previewPlus.getProcessor().blurGaussian(20);
-			preview.setIcon(new ImageIcon(previewPlus.getImage()));
-    		previewIsActive = false;
-		}
-	}
-
     private void initKeyListener() {
     	KeyListener keyListener = new KeyListener() {
 			@Override
@@ -392,6 +404,32 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		f2TextField.addKeyListener(keyListener);
 		f3TextField.addKeyListener(keyListener);
     }
+
+	private int getNaturalNumValue(JTextField textField) {
+		String textFromGUI = textField.getText().replaceAll("[^\\d.]", "");
+		return textFromGUI.equals("")?1:Integer.parseInt(textFromGUI);
+	}
+
+	private double getRealNumValue(JTextField textField) {
+		String textFromGUI = textField.getText().replaceAll("[^-\\d.]", "");
+		return textFromGUI.equals("")?0:Double.parseDouble(textFromGUI);
+	}
+
+	private void showInactivePreviewOverlay() {
+		if(previewIsActive) {
+			Image currPreview = ((ImageIcon)preview.getIcon()).getImage();
+			ImagePlus previewPlus = new ImagePlus("preview", currPreview);
+			previewPlus.getProcessor().blurGaussian(20);
+			preview.setIcon(new ImageIcon(previewPlus.getImage()));
+			previewIsActive = false;
+		}
+	}
+
+	/********************************************************
+	 * 														*
+	 *					Preset-METHODS						*
+	 *														*
+	 ********************************************************/
 
     private void initPresetMaps() {
 
@@ -685,69 +723,65 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         Prefs.savePreferences();
     }
 
-    private void updatePreview() {
-        // meta
-        String type = (String) typesComboBox.getSelectedItem();
-        assert type != null;
+	/********************************************************
+	 * 														*
+	 *						FIS-METHODS						*
+	 *														*
+	 ********************************************************/
 
-        // size
-        int width = getNaturalNumValue(widthTextField);
-        int height = getNaturalNumValue(heightTextField);
-        int slices = getNaturalNumValue(slicesTextField);
+	private void updatePreview() {
+		// meta
+		String type = (String) typesComboBox.getSelectedItem();
+		assert type != null;
 
-        // coordinate range
-        double[] min = new double[3];
-        double[] max = new double[3];
+		// size
+		int width = getNaturalNumValue(widthTextField);
+		int height = getNaturalNumValue(heightTextField);
+		int slices = getNaturalNumValue(slicesTextField);
 
-        min[0] = getRealNumValue(minX);
-        max[0] = getRealNumValue(maxX);
+		// coordinate range
+		double[] min = new double[3];
+		double[] max = new double[3];
 
-        min[1] = getRealNumValue(minY);
-        max[1] = getRealNumValue(maxY);
+		min[0] = getRealNumValue(minX);
+		max[0] = getRealNumValue(maxX);
 
-        min[2] = getRealNumValue(minZ);
-        max[2] = getRealNumValue(maxZ);
+		min[1] = getRealNumValue(minY);
+		max[1] = getRealNumValue(maxY);
+
+		min[2] = getRealNumValue(minZ);
+		max[2] = getRealNumValue(maxZ);
 
 		// function
 		String function = getFunctionText(f1TextField);
 		String[] functions = new String[]{function, getFunctionText(f2TextField), getFunctionText(f3TextField)};
 
 		// apply
-        ImagePlus imagePlus;
-        if(doNewImage) {
-            imagePlus = IJ.createImage(function, type, width, height, slices);
-        } else {
-            imagePlus = WindowManager.getImage((String)imageComboBox.getSelectedItem()).duplicate();
-        }
-        if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
+		ImagePlus imagePlus;
+		if(doNewImage) {
+			imagePlus = IJ.createImage(function, type, width, height, slices);
+		} else {
+			imagePlus = WindowManager.getImage((String)imageComboBox.getSelectedItem()).duplicate();
+		}
+		if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
 
-        Image previewImage;
-        int frame = slices>1?previewZSlider.getValue():1;
+		Image previewImage;
+		int frame = slices>1?previewZSlider.getValue():1;
 
-        try {
-            if (isRGB) {
-                previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected());
-            } else if(!is32Bit){
-                previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected());
-            } else {
-            	previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxesCheckBox.isSelected(), false);
+		try {
+			if (isRGB) {
+				previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected());
+			} else if(!is32Bit){
+				previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected());
+			} else {
+				previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxesCheckBox.isSelected(), false);
 			}
-            preview.setIcon(new ImageIcon(previewImage));
-        } catch (RuntimeException e) {
-            // do nothing
-        }
-        previewIsActive = true;
-    }
-
-	private int getNaturalNumValue(JTextField textField) {
-		String textFromGUI = textField.getText().replaceAll("[^\\d.]", "");
-		return textFromGUI.equals("")?1:Integer.parseInt(textFromGUI);
+			preview.setIcon(new ImageIcon(previewImage));
+		} catch (RuntimeException e) {
+			// do nothing
+		}
+		previewIsActive = true;
 	}
-
-    private double getRealNumValue(JTextField textField) {
-        String textFromGUI = textField.getText().replaceAll("[^-\\d.]", "");
-        return textFromGUI.equals("")?0:Double.parseDouble(textFromGUI);
-    }
 
     private void generateFunction() {
         // meta
@@ -789,7 +823,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         try {
             if (isRGB) {
                 if (normalizeCheckBox.isSelected()) {
-                    FIS.functionToNormalizedImage(imagePlus, min, max, functions);
+                    FIS.functionToNormalizedImage(imagePlus, min, max, functions, localToggleButton.isSelected());
                 } else {
                     FIS.functionToImage(imagePlus, min, max, functions);
                 }
@@ -829,18 +863,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
     }
 
-    private void openButtonAction() {
-        OpenDialog od = new OpenDialog("Open..", "");
-        String directory = od.getDirectory();
-        String name = od.getFileName();
-        if (name == null) return;
-
-        Opener opener = new Opener();
-        ImagePlus image = opener.openImage(directory, name);
-        image.show();
-        imageComboBox.setSelectedIndex(imageComboBox.getItemCount() - 1);
-    }
-
     private String getFunctionText(JTextField textField) {
     	String function = textField.getText();
     	return function.isEmpty()?"0":function;
@@ -850,6 +872,65 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     	textField.setText("0");
     	updatePreview();
 	}
+
+	/********************************************************
+	 * 														*
+	 *						PIS-METHODS						*
+	 *														*
+	 ********************************************************/
+
+	private void generatePrimitive() {
+		// meta
+		String type = (String) typesComboBox.getSelectedItem();
+		assert type != null;
+
+		// size
+		int width = getNaturalNumValue(widthTextField);
+		int height = getNaturalNumValue(heightTextField);
+		int slices = getNaturalNumValue(slicesTextField);
+
+		// coordinate range
+		double[] min = new double[3];
+		double[] max = new double[3];
+
+		min[0] = getRealNumValue(minX);
+		max[0] = getRealNumValue(maxX);
+
+		min[1] = getRealNumValue(minY);
+		max[1] = getRealNumValue(maxY);
+
+		min[2] = getRealNumValue(minZ);
+		max[2] = getRealNumValue(maxZ);
+
+		// function
+		String macro = primitiveTextArea.getText();
+
+		// apply
+		ImagePlus imagePlus;
+		if(doNewImage) {
+			imagePlus = IJ.createImage("", type, width, height, slices);
+		} else {
+			imagePlus = WindowManager.getImage((String)imageComboBox.getSelectedItem()).duplicate();
+			imagePlus.setTitle("");
+		}
+		if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
+
+		try {
+			PIS.primitiveToImage(imagePlus, min, max, macro);
+			IJ.resetMinAndMax(imagePlus);
+			imagePlus.show();
+			IJ.run("Coordinates...", "left=" + min[0] + " right=" + max[0] + " top=" + min[1] + " bottom=" + max[1]);
+		} catch (RuntimeException e) {
+			// do nothing
+			e.printStackTrace();
+		}
+	}
+
+	/********************************************************
+	 * 														*
+	 *				Image Listener-METHODS					*
+	 *														*
+	 ********************************************************/
 
     @Override
     public void imageOpened(ImagePlus imp) {
@@ -868,7 +949,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             widthTextField.setText(""+imp.getWidth());
             heightTextField.setText(""+imp.getHeight());
             slicesTextField.setText(""+imp.getNSlices());
-            updatePreview();
+            showInactivePreviewOverlay();
         }
     }
 }
