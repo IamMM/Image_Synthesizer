@@ -1,5 +1,6 @@
 import Presets.DimensionPreset;
 import Presets.FunctionPreset;
+import Presets.PrimitivePreset;
 import Presets.SizePreset;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -80,7 +81,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     // primitive swing components
     private JTextPane primitiveTextArea;
 	private JButton generatePrimitiveButton;
-	private JComboBox primitivePresetsComboBox;
+	private JComboBox<String> primitivePresetsComboBox;
 	private JButton addPrimitivePresetButton;
 	private JButton removePrimitivePresetButton;
 
@@ -102,6 +103,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private Map<String, DimensionPreset> userDimensionPresetMap;
     private Map<String, FunctionPreset> functionPresetMap;
     private Map<String, FunctionPreset> userFunctionPresetMap;
+    private Map<String, PrimitivePreset> primitivePresetMap;
+    private Map<String, PrimitivePreset> userPrimitivePresetMap;
 	private boolean previewIsActive = true;
 
 	/**
@@ -266,6 +269,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         removeDimensionPresetButton.addActionListener(e -> removeDimensionPreset());
         addFunctionPresetButton.addActionListener(e -> addFunctionPreset());
         removeFunctionPresetButton.addActionListener(e -> removeFunctionPreset());
+        addPrimitivePresetButton.addActionListener(e -> addPrimitivePreset());
+        removePrimitivePresetButton.addActionListener(e -> removePrimitivePreset());
         openHelpButton.addActionListener(e -> openMacroHelp());
         f1ResetButton.addActionListener(e -> resetTextField(f1TextField));
         f2ResetButton.addActionListener(e -> resetTextField(f2TextField));
@@ -433,11 +438,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
     private void initPresetMaps() {
 
-//    	Map<String, DimensionPreset> tempMap = new HashMap<>();
-//    	DimensionPreset dimensionPreset = new DimensionPreset(-10,10,-10,10,0,1);
-//    	tempMap.put("-10..10", dimensionPreset);
+//    	Map<String, PrimitivePreset> tempMap = new HashMap<>();
+//    	PrimitivePreset primitivePreset = new PrimitivePreset("if(x>0) v=sin(x);", "32-Bit");
+//    	tempMap.put("Quadrant", primitivePreset);
 //
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter("DimensionPresets.json"))) {
+//        try (BufferedWriter writer = new BufferedWriter(new FileWriter("PrimitivePresets.json"))) {
 //            Gson gson = new GsonBuilder().setPrettyPrinting().create();
 //            gson.toJson(tempMap, writer);
 //        } catch (IOException e) {
@@ -552,6 +557,39 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             }
             updatePreview();
         });
+
+        // primitives
+		primitivePresetMap = new HashMap<>();
+		inputStream = getClass().getResourceAsStream("/PrimitivePresets.json");
+		gson = new Gson();
+		type = new TypeToken<Map<String, PrimitivePreset>>(){}.getType();
+		try (Reader reader = new InputStreamReader(inputStream)) {
+			primitivePresetMap = gson.fromJson(reader, type);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (String preset : primitivePresetMap.keySet()) {
+			primitivePresetsComboBox.addItem(preset);
+		}
+
+		// get user function presets from preferences
+		String userPrimitivePrefs = Prefs.get("fis.PrimitivePresets", "");
+		userPrimitivePresetMap = gson.fromJson(userPrimitivePrefs, type);
+		if(userPrimitivePresetMap!=null) {
+			for (String preset : userPrimitivePresetMap.keySet()) {
+				primitivePresetsComboBox.addItem(preset);
+			}
+			primitivePresetMap.putAll(userPrimitivePresetMap);
+		}
+
+		primitivePresetsComboBox.addActionListener(e -> {
+			PrimitivePreset primitivePreset = primitivePresetMap.get(primitivePresetsComboBox.getSelectedItem());
+			typesComboBox.setSelectedItem(primitivePreset.getType());
+			primitiveTextArea.setText(primitivePreset.getPrimitive());
+			typesComboBox.setSelectedItem(primitivePreset.getType());
+			updatePreview();
+		});
     }
 
     private void addFunctionPreset() {
@@ -686,6 +724,46 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		updateUserDimensionPresets();
 	}
 
+	private void addPrimitivePreset() {
+		GenericDialog genericDialog = new GenericDialog("Add Primitive Preset");
+		genericDialog.addStringField("Name: ", "", 15);
+		genericDialog.showDialog();
+		if (genericDialog.wasCanceled()) return;
+		String name = genericDialog.getNextString();
+
+		if (primitivePresetMap.containsKey(name)) {
+			name = checkName(name);
+			if(name.isEmpty()) return;
+		}
+
+		String type = (String) typesComboBox.getSelectedItem();
+		String primitive = primitiveTextArea.getText();
+
+		PrimitivePreset primitivePreset = new PrimitivePreset(primitive, type);
+
+		if(userPrimitivePresetMap==null) userPrimitivePresetMap = new HashMap<>();
+		userPrimitivePresetMap.put(name, primitivePreset);
+		primitivePresetMap.put(name, primitivePreset);
+		primitivePresetsComboBox.addItem(name);
+		primitivePresetsComboBox.setSelectedItem(name);
+
+		updateUserPrimitivePresets();
+	}
+
+	private void removePrimitivePreset() {
+		String selectedPreset = (String) primitivePresetsComboBox.getSelectedItem();
+		GenericDialog genericDialog = new GenericDialog("Remove Primitive Preset");
+		genericDialog.addMessage("You are about to remove the following preset: " + selectedPreset);
+		genericDialog.showDialog();
+
+		if (genericDialog.wasCanceled()) return;
+		userPrimitivePresetMap.remove(selectedPreset);
+		primitivePresetMap.remove(selectedPreset);
+		primitivePresetsComboBox.removeItem(selectedPreset);
+
+		updateUserPrimitivePresets();
+	}
+
     private String checkName(String name) {
         GenericDialog id_alert = new GenericDialog("Identical Name Alert");
         id_alert.addMessage("Please give you preset an identical name.");
@@ -722,6 +800,13 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         Prefs.set("fis.DimensionPresets", json);
         Prefs.savePreferences();
     }
+
+	private void updateUserPrimitivePresets(){
+		Gson gsonBuilder = new GsonBuilder().disableHtmlEscaping().create();
+		String json = gsonBuilder.toJson(userPrimitivePresetMap);
+		Prefs.set("fis.PrimitivePresets", json);
+		Prefs.savePreferences();
+	}
 
 	/********************************************************
 	 * 														*
@@ -922,7 +1007,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			IJ.run("Coordinates...", "left=" + min[0] + " right=" + max[0] + " top=" + min[1] + " bottom=" + max[1]);
 		} catch (RuntimeException e) {
 			// do nothing
-			e.printStackTrace();
 		}
 	}
 
