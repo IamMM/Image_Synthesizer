@@ -446,7 +446,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 						if (hasA) interpreter.setVariable("a", getA(dy, dx));
 						if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 						interpreter.run(PCStart);
-						values[pos] = (int) interpreter.getVariable("v");
+						values[pos] = interpreter.getVariable("v");
 					}
 				}
 				FloatProcessor floatProcessor = new FloatProcessor(width, height, values);
@@ -485,7 +485,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 						if (hasA) interpreter.setVariable("a", getA(dy, dx));
 						if (hasD) interpreter.setVariable("d",Math.hypot(dx,dy));
 						interpreter.run(PCStart);
-						values[pos] = (int) interpreter.getVariable("v");
+						values[pos] = interpreter.getVariable("v");
 					}
 				}
 				FloatProcessor floatProcessor = new FloatProcessor(width, height, values);
@@ -967,7 +967,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 					if (hasA) interpreter.setVariable("a", getA(dy, dx));
 					if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 					interpreter.run(PCStart);
-					values[pos] = (int) interpreter.getVariable("v");
+					values[pos] = interpreter.getVariable("v");
 				}
 			}
 			FloatProcessor floatProcessor = new FloatProcessor(width, height, values);
@@ -1003,7 +1003,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 					if (hasA) interpreter.setVariable("a", getA(dy, dx));
 					if (hasD) interpreter.setVariable("d",Math.hypot(dx,dy));
 					interpreter.run(PCStart);
-					values[pos] = (int) interpreter.getVariable("v");
+					values[pos] = interpreter.getVariable("v");
 				}
 			}
 			FloatProcessor floatProcessor = new FloatProcessor(width, height, values);
