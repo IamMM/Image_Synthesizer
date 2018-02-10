@@ -509,7 +509,7 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="5654f" class="javax.swing.JButton" binding="generateButton" default-binding="true">
+                  <component id="5654f" class="javax.swing.JButton" binding="generateFunctionButton" default-binding="true">
                     <constraints>
                       <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -673,7 +673,7 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="6d286" class="javax.swing.JButton" default-binding="true">
+                  <component id="6d286" class="javax.swing.JButton" binding="generatePrimitiveButton">
                     <constraints>
                       <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -724,20 +724,20 @@
                       <text value="Presets"/>
                     </properties>
                   </component>
-                  <component id="b74e0" class="javax.swing.JComboBox">
+                  <component id="b74e0" class="javax.swing.JComboBox" binding="primitivePresetsComboBox">
                     <constraints/>
                     <properties>
                       <minimumSize width="150" height="26"/>
                     </properties>
                   </component>
-                  <component id="1cf3a" class="javax.swing.JButton">
+                  <component id="1cf3a" class="javax.swing.JButton" binding="addPrimitivePresetButton">
                     <constraints/>
                     <properties>
                       <focusable value="false"/>
                       <text value="+"/>
                     </properties>
                   </component>
-                  <component id="c0aa1" class="javax.swing.JButton">
+                  <component id="c0aa1" class="javax.swing.JButton" binding="removePrimitivePresetButton">
                     <constraints/>
                     <properties>
                       <text value="-"/>
