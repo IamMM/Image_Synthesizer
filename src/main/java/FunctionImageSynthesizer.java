@@ -288,10 +288,6 @@ public class FunctionImageSynthesizer extends ImageMath {
 
 	/**
 	 * 3 functions for RGB image (24 bit)
-	 * @param imagePlus
-	 * @param min
-	 * @param max
-	 * @param functions
 	 */
 	public void functionToImage(ImagePlus imagePlus, double[] min, double[] max, String[] functions) {
 		ImageProcessor ip = imagePlus.getProcessor();
@@ -306,7 +302,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Program pgm1 = (new Tokenizer()).tokenize(macro1);
 		Program pgm2 = (new Tokenizer()).tokenize(macro2);
 		Program pgm3 = (new Tokenizer()).tokenize(macro3);
-		boolean hasX = pgm1.hasWord("x") | pgm2.hasWord("x") | pgm3.hasWord("x")  ;
+		boolean hasX = pgm1.hasWord("x") | pgm2.hasWord("x") | pgm3.hasWord("x");
 		boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
 		boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
 		boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
@@ -515,7 +511,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Program pgm1 = (new Tokenizer()).tokenize(macro1);
 		Program pgm2 = (new Tokenizer()).tokenize(macro2);
 		Program pgm3 = (new Tokenizer()).tokenize(macro3);
-		boolean hasX = pgm1.hasWord("x") | pgm2.hasWord("x") | pgm3.hasWord("x")  ;
+		boolean hasX = pgm1.hasWord("x") | pgm2.hasWord("x") | pgm3.hasWord("x");
 		boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
 		boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
 		boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
@@ -835,7 +831,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Program pgm1 = (new Tokenizer()).tokenize(macro1);
 		Program pgm2 = (new Tokenizer()).tokenize(macro2);
 		Program pgm3 = (new Tokenizer()).tokenize(macro3);
-		boolean hasX = pgm1.hasWord("x") | pgm2.hasWord("x") | pgm3.hasWord("x")  ;
+		boolean hasX = pgm1.hasWord("x") | pgm2.hasWord("x") | pgm3.hasWord("x");
 		boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
 		boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
 		boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
@@ -1031,7 +1027,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Program pgm1 = (new Tokenizer()).tokenize(macro1);
 		Program pgm2 = (new Tokenizer()).tokenize(macro2);
 		Program pgm3 = (new Tokenizer()).tokenize(macro3);
-		boolean hasX = pgm1.hasWord("x") | pgm2.hasWord("x") | pgm3.hasWord("x")  ;
+		boolean hasX = pgm1.hasWord("x") | pgm2.hasWord("x") | pgm3.hasWord("x");
 		boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
 		boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
 		boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
