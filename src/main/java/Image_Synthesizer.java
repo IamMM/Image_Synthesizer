@@ -379,6 +379,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         f1TextField.getDocument().addDocumentListener(documentListener);
         f2TextField.getDocument().addDocumentListener(documentListener);
         f3TextField.getDocument().addDocumentListener(documentListener);
+        primitiveTextArea.getDocument().addDocumentListener(documentListener);
     }
 
     private void initKeyListener() {
@@ -593,8 +594,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		primitivePresetsComboBox.addActionListener(e -> {
 			PrimitivePreset primitivePreset = primitivePresetMap.get(primitivePresetsComboBox.getSelectedItem());
 			typesComboBox.setSelectedItem(primitivePreset.getType());
+			normalizeCheckBox.setSelected(primitivePreset.isNormalized());
 			primitiveTextArea.setText(primitivePreset.getPrimitive());
-			typesComboBox.setSelectedItem(primitivePreset.getType());
 			updatePreview();
 		});
     }
@@ -744,9 +745,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		}
 
 		String type = (String) typesComboBox.getSelectedItem();
+		boolean normalized = normalizeCheckBox.isSelected();
 		String primitive = primitiveTextArea.getText();
 
-		PrimitivePreset primitivePreset = new PrimitivePreset(primitive, type);
+		PrimitivePreset primitivePreset = new PrimitivePreset(type, normalized, primitive);
 
 		if(userPrimitivePresetMap==null) userPrimitivePresetMap = new HashMap<>();
 		userPrimitivePresetMap.put(name, primitivePreset);
