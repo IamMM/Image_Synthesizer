@@ -75,7 +75,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private JButton f1ResetButton;
 	private JButton f2ResetButton;
 	private JButton f3ResetButton;
-    private JButton previewButton;
+    private JButton previewFunctionButton;
     private JButton generateFunctionButton;
 
     // primitive swing components
@@ -84,6 +84,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private JComboBox<String> primitivePresetsComboBox;
 	private JButton addPrimitivePresetButton;
 	private JButton removePrimitivePresetButton;
+	private JTabbedPane synthieSelector;
+	private JButton previewPrimitiveButton;
 
 	// constants
     private static final String TITLE = "Function Image Synthesizer";
@@ -263,6 +265,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         initPresetMaps();
 
+        synthieSelector.addChangeListener(e -> updatePreview());
         addSizePresetButton.addActionListener(e -> addSizePreset());
         removeSizePresetButton.addActionListener(e -> removeSizePreset());
         addDimensionPresetButton.addActionListener(e -> addDimensionPreset());
@@ -275,8 +278,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         f1ResetButton.addActionListener(e -> resetTextField(f1TextField));
         f2ResetButton.addActionListener(e -> resetTextField(f2TextField));
         f3ResetButton.addActionListener(e -> resetTextField(f3TextField));
-        previewButton.addActionListener(e -> updatePreview());
+        previewFunctionButton.addActionListener(e -> updatePreview());
         generateFunctionButton.addActionListener(e -> generateFunction());
+        previewPrimitiveButton.addActionListener(e -> updatePreview());
         generatePrimitiveButton.addActionListener(e -> generatePrimitive());
 
         updatePreview();
@@ -841,6 +845,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		String function = getFunctionText(f1TextField);
 		String[] functions = new String[]{function, getFunctionText(f2TextField), getFunctionText(f3TextField)};
 
+		String macro = primitiveTextArea.getText();
+
 		// apply
 		ImagePlus imagePlus;
 		if(doNewImage) {
@@ -853,13 +859,20 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		Image previewImage;
 		int frame = slices>1?previewZSlider.getValue():1;
 
+		boolean drawAxes = drawAxesCheckBox.isSelected();
+		boolean normalize = normalizeCheckBox.isSelected();
+
 		try {
-			if (isRGB) {
-				previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected());
-			} else if(!is32Bit){
-				previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxesCheckBox.isSelected(), normalizeCheckBox.isSelected());
+			if(synthieSelector.getSelectedIndex()==0) {
+				if (isRGB) {
+					previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxes, normalize);
+				} else if (!is32Bit) {
+					previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxes, normalize);
+				} else {
+					previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxes, false);
+				}
 			} else {
-				previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxesCheckBox.isSelected(), false);
+				previewImage = PIS.getPreview(imagePlus, min, max, frame, macro, drawAxes, normalize);
 			}
 			preview.setIcon(new ImageIcon(previewImage));
 		} catch (RuntimeException e) {
@@ -993,7 +1006,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		// apply
 		ImagePlus imagePlus;
 		if(doNewImage) {
-			imagePlus = IJ.createImage("", type, width, height, slices);
+			imagePlus = IJ.createImage("", type + " Black", width, height, slices);
 		} else {
 			imagePlus = WindowManager.getImage((String)imageComboBox.getSelectedItem()).duplicate();
 			imagePlus.setTitle("");
@@ -1001,7 +1014,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
 
 		try {
-			PIS.primitiveToImage(imagePlus, min, max, macro);
+			if(normalizeCheckBox.isSelected() && !is32Bit){
+				PIS.primitiveToNormalizedImage(imagePlus, min, max, macro);
+			} else {
+				PIS.primitiveToImage(imagePlus, min, max, macro);
+			}
 			IJ.resetMinAndMax(imagePlus);
 			imagePlus.show();
 			IJ.run("Coordinates...", "left=" + min[0] + " right=" + max[0] + " top=" + min[1] + " bottom=" + max[1]);
