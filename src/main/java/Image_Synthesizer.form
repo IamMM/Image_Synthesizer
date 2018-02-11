@@ -548,7 +548,7 @@
                       </grid>
                     </constraints>
                     <properties>
-                      <text value="255*sin(d + a)"/>
+                      <text value="floor((a * 40.75 + 1) % 2)"/>
                     </properties>
                   </component>
                   <toolbar id="8637f">
@@ -703,7 +703,7 @@
                 </constraints>
                 <properties>
                   <font name="Source Code Pro"/>
-                  <text value=""/>
+                  <text value="if((x&gt;0 &amp;&amp; y&gt;0) || (y&lt;0 &amp;&amp; x&lt;0)) v = 0; else v = 255;"/>
                 </properties>
               </component>
               <toolbar id="875ad">
