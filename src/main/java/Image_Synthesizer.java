@@ -552,6 +552,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         functionPresetsComboBox.addActionListener(e -> {
             FunctionPreset functionPreset = functionPresetMap.get(functionPresetsComboBox.getSelectedItem());
             typesComboBox.setSelectedItem(functionPreset.getType());
+            normalizeCheckBox.setSelected(functionPreset.isNormalized());
             if(functionPreset.getType().equals("RGB")) {
                 f1TextField.setText(functionPreset.getFunctions()[0]);
                 f2TextField.setText(functionPreset.getFunctions()[1]);
@@ -616,10 +617,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             functions[0] = f1TextField.getText();
             functions[1] = f2TextField.getText();
             functions[2] = f3TextField.getText();
-            functionPreset = new FunctionPreset((String) typesComboBox.getSelectedItem(),functions);
+            functionPreset = new FunctionPreset((String) typesComboBox.getSelectedItem(), normalizeCheckBox.isSelected(), functions);
         } else {
             String function = f1TextField.getText();
-            functionPreset = new FunctionPreset((String) typesComboBox.getSelectedItem(),function);
+            functionPreset = new FunctionPreset((String) typesComboBox.getSelectedItem(), normalizeCheckBox.isSelected(), function);
         }
 
         if(userFunctionPresetMap==null) userFunctionPresetMap = new HashMap<>();

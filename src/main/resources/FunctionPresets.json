@@ -1,10 +1,12 @@
 {
   "Polar Moire": {
     "type": "8-bit",
-    "function": "255*(floor((a * 40.75 + 1) % 2))"
+    "normalized": true,
+    "function": "floor((a * 40.75 + 1) % 2)"
   },
   "Spiral": {
     "type": "RGB",
+    "normalized": false,
     "functions": [
       "255*sin(d + a)",
       "255*sin(d + a + 4.2)",
@@ -13,6 +15,7 @@
   },
   "Fibonacci": {
     "type": "RGB",
+    "normalized": true,
     "functions": [
       "255*(sin(log(d)*8 + a) * sin(a*8))",
       "255*(sin(log(d)*8 + a - PI/2) * sin(a*8))",
