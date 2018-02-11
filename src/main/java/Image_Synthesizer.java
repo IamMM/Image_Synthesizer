@@ -197,6 +197,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             } else {
                 f1Label.setText("v=");
             }
+            if(is32Bit) normalizeCheckBox.setSelected(false);
             invertingLUTCheckBox.setEnabled(!isRGB);
             f2Label.setVisible(isRGB);
             f2TextField.setVisible(isRGB);
@@ -412,6 +413,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		f1TextField.addKeyListener(keyListener);
 		f2TextField.addKeyListener(keyListener);
 		f3TextField.addKeyListener(keyListener);
+		primitiveTextArea.addKeyListener(keyListener);
     }
 
 	private int getNaturalNumValue(JTextField textField) {
@@ -863,15 +865,13 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		boolean normalize = normalizeCheckBox.isSelected();
 
 		try {
-			if(synthieSelector.getSelectedIndex()==0) {
+			if(synthieSelector.getSelectedIndex()==0) { // preview function
 				if (isRGB) {
 					previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxes, normalize);
-				} else if (!is32Bit) {
-					previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxes, normalize);
 				} else {
-					previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxes, false);
+					previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxes, normalize);
 				}
-			} else {
+			} else { // preview primitive
 				previewImage = PIS.getPreview(imagePlus, min, max, frame, macro, drawAxes, normalize);
 			}
 			preview.setIcon(new ImageIcon(previewImage));
