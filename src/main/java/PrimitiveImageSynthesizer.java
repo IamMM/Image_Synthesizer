@@ -408,9 +408,9 @@ public class PrimitiveImageSynthesizer {
 						interpreter.setVariable("g", green);
 						interpreter.setVariable("b", blue);
 						interpreter.run(PCStart);
-						redPixels[pos] = interpreter.getVariable("r_new");
-						greenPixels[pos] = interpreter.getVariable("g_new");
-						bluePixels[pos] = interpreter.getVariable("b_new");
+						redPixels[pos] = interpreter.getVariable("r");
+						greenPixels[pos] = interpreter.getVariable("g");
+						bluePixels[pos] = interpreter.getVariable("b");
 					}
 				}
 
@@ -794,9 +794,9 @@ public class PrimitiveImageSynthesizer {
 					interpreter.setVariable(hasG?"g":"v", green);
 					interpreter.setVariable(hasB?"b":"v", blue);
 					interpreter.run(PCStart);
-					redPixels[pos] = interpreter.getVariable("r_new");
-					greenPixels[pos] = interpreter.getVariable("g_new");
-					bluePixels[pos] = interpreter.getVariable("b_new");
+					redPixels[pos] = interpreter.getVariable("r");
+					greenPixels[pos] = interpreter.getVariable("g");
+					bluePixels[pos] = interpreter.getVariable("b");
 				}
 			}
 
