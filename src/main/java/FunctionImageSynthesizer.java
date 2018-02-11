@@ -107,7 +107,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 						double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
 						if (hasX) interpreter.setVariable("x", dx);
 
-						if (hasA) interpreter.setVariable("a", getA(dy, dx));
+						if (hasA) interpreter.setVariable("a", getA(dx, dy));
 						if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 						interpreter.run(PCStart);
 						v2 = (int) interpreter.getVariable("v");
@@ -143,7 +143,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 						double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
 						if (hasX) interpreter.setVariable("x", dx);
 
-						if (hasA) interpreter.setVariable("a", getA(dy, dx));
+						if (hasA) interpreter.setVariable("a", getA(dx, dy));
 						if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 						pos = y * width + x;
 						rgb = pixels1[pos];
@@ -199,7 +199,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 
 						v = ip.getPixelValue(x, y);
 						interpreter.setVariable("v", v);
-						if (hasA) interpreter.setVariable("a", getA(dy, dx));
+						if (hasA) interpreter.setVariable("a", getA(dx, dy));
 						if (hasD) interpreter.setVariable("d", Math.hypot(dx, dy));
 						interpreter.run(PCStart);
 						ip.putPixelValue(x, y, interpreter.getVariable("v"));
@@ -235,7 +235,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 						v = pixels1[pos] & 65535;
 						interpreter.setVariable("v", v);
 
-						if (hasA) interpreter.setVariable("a", getA(dy, dx));
+						if (hasA) interpreter.setVariable("a", getA(dx, dy));
 						if (hasD) interpreter.setVariable("d",Math.hypot(dx,dy));
 						interpreter.run(PCStart);
 						v2 = (int) interpreter.getVariable("v");
@@ -274,7 +274,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 						double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
 						if (hasX) interpreter.setVariable("x", dx);
 
-						if (hasA) interpreter.setVariable("a", getA(dy, dx));
+						if (hasA) interpreter.setVariable("a", getA(dx, dy));
 						if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 						interpreter.run(PCStart);
 						pixels2[pos] = (float) interpreter.getVariable("v");
@@ -350,7 +350,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 					double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
 					if (hasX) interpreter.setVariable("x", dx);
 
-					if (hasA) interpreter.setVariable("a",getA(dy, dx));
+					if (hasA) interpreter.setVariable("a",getA(dx, dy));
 					if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 					pos = y * width + x;
 					rgb = pixels[pos];
@@ -443,7 +443,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 						double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
 						if (hasX) interpreter.setVariable("x", dx);
 
-						if (hasA) interpreter.setVariable("a", getA(dy, dx));
+						if (hasA) interpreter.setVariable("a", getA(dx, dy));
 						if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 						interpreter.run(PCStart);
 						values[pos] = interpreter.getVariable("v");
@@ -482,7 +482,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 						v = pixels[pos] & 65535;
 						interpreter.setVariable("v", v);
 
-						if (hasA) interpreter.setVariable("a", getA(dy, dx));
+						if (hasA) interpreter.setVariable("a", getA(dx, dy));
 						if (hasD) interpreter.setVariable("d",Math.hypot(dx,dy));
 						interpreter.run(PCStart);
 						values[pos] = interpreter.getVariable("v");
@@ -563,7 +563,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 					double dx = min[0] + ((max[0] - min[0]) / (width - 1)) * x; // 0..x to min..max
 					if (hasX) interpreter.setVariable("x", dx);
 
-					if (hasA) interpreter.setVariable("a",getA(dy, dx));
+					if (hasA) interpreter.setVariable("a",getA(dx, dy));
 					if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 					pos = y * width + x;
 					rgb = pixels[pos];
@@ -652,7 +652,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 					double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
 					if (hasX) interpreter.setVariable("x", dx);
 
-					if (hasA) interpreter.setVariable("a", getA(dy, dx));
+					if (hasA) interpreter.setVariable("a", getA(dx, dy));
 					if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 					interpreter.run(PCStart);
 					v2 = (int) interpreter.getVariable("v");
@@ -685,7 +685,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 					double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
 					if (hasX) interpreter.setVariable("x", dx);
 
-					if (hasA) interpreter.setVariable("a", getA(dy, dx));
+					if (hasA) interpreter.setVariable("a", getA(dx, dy));
 					if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 					pos = y * width + x;
 					rgb = pixels1[pos];
@@ -738,7 +738,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 
 					v = ip.getPixelValue(x, y);
 					interpreter.setVariable("v", v);
-					if (hasA) interpreter.setVariable("a", getA(dy, dx));
+					if (hasA) interpreter.setVariable("a", getA(dx, dy));
 					if (hasD) interpreter.setVariable("d", Math.hypot(dx, dy));
 					interpreter.run(PCStart);
 					ip.putPixelValue(x, y, interpreter.getVariable("v"));
@@ -771,7 +771,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 					v = pixels1[pos] & 65535;
 					interpreter.setVariable("v", v);
 
-					if (hasA) interpreter.setVariable("a", getA(dy, dx));
+					if (hasA) interpreter.setVariable("a", getA(dx, dy));
 					if (hasD) interpreter.setVariable("d",Math.hypot(dx,dy));
 					interpreter.run(PCStart);
 					v2 = (int) interpreter.getVariable("v");
@@ -807,7 +807,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 					double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
 					if (hasX) interpreter.setVariable("x", dx);
 
-					if (hasA) interpreter.setVariable("a", getA(dy, dx));
+					if (hasA) interpreter.setVariable("a", getA(dx, dy));
 					if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 					interpreter.run(PCStart);
 					pixels2[pos] = (float) interpreter.getVariable("v");
@@ -875,7 +875,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 				double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
 				if (hasX) interpreter.setVariable("x", dx);
 
-				if (hasA) interpreter.setVariable("a",getA(dy, dx));
+				if (hasA) interpreter.setVariable("a",getA(dx, dy));
 				if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 				pos = y * width + x;
 				rgb = pixels[pos];
@@ -964,7 +964,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 					double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
 					if (hasX) interpreter.setVariable("x", dx);
 
-					if (hasA) interpreter.setVariable("a", getA(dy, dx));
+					if (hasA) interpreter.setVariable("a", getA(dx, dy));
 					if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 					interpreter.run(PCStart);
 					values[pos] = interpreter.getVariable("v");
@@ -1000,7 +1000,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 					v = pixels[pos] & 65535;
 					interpreter.setVariable("v", v);
 
-					if (hasA) interpreter.setVariable("a", getA(dy, dx));
+					if (hasA) interpreter.setVariable("a", getA(dx, dy));
 					if (hasD) interpreter.setVariable("d",Math.hypot(dx,dy));
 					interpreter.run(PCStart);
 					values[pos] = interpreter.getVariable("v");
@@ -1075,7 +1075,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 				double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
 				if (hasX) interpreter.setVariable("x", dx);
 
-				if (hasA) interpreter.setVariable("a",getA(dy, dx));
+				if (hasA) interpreter.setVariable("a",getA(dx, dy));
 				if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
 				pos = y * width + x;
 				rgb = pixels[pos];
@@ -1104,7 +1104,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		IJ.showProgress(1.0);
 	}
 
-	private double getA(double y, double x) {
+	private double getA(double x, double y) {
 		double angle = Math.atan2(y, x);
 		if (angle < 0) angle += 2 * Math.PI;
 		return angle;
