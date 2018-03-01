@@ -419,12 +419,24 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 	private int getNaturalNumValue(JTextField textField) {
 		String textFromGUI = textField.getText().replaceAll("[^\\d.]", "");
-		return textFromGUI.equals("")?1:Integer.parseInt(textFromGUI);
+		int value = 0;
+		try {
+			value = textFromGUI.equals("")?1:Integer.parseInt(textFromGUI);
+		} catch (NumberFormatException e) {
+			IJ.showMessage("Invalid Value Error", "Please provide a natural number (e.g. 128)");
+		}
+		return value;
 	}
 
 	private double getRealNumValue(JTextField textField) {
 		String textFromGUI = textField.getText().replaceAll("[^-\\d.]", "");
-		return textFromGUI.equals("")?0:Double.parseDouble(textFromGUI);
+		double value = 0;
+		try {
+			value =  textFromGUI.equals("")?0:Double.parseDouble(textFromGUI);
+		} catch (NumberFormatException e) {
+			IJ.showMessage("Invalid Value Error", "Please provide a float number (e.g. -10.0)");
+		}
+		return value;
 	}
 
 	private void showInactivePreviewOverlay() {
