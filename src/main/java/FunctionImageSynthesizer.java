@@ -698,9 +698,6 @@ public class FunctionImageSynthesizer extends ImageMath {
 		}
 
 		// convert float processors to RGB Stack
-		System.out.println(minimum);
-		System.out.println(maximum);
-
 		for (int z = 0; z < slices; z++) {
 			ip = (ColorProcessor) imagePlus.getImageStack().getProcessor(z + 1);
 
