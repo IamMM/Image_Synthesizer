@@ -7,6 +7,7 @@ public class PrimitivePreset {
 
 	public PrimitivePreset(String type, boolean normalized, String primitive) {
 		this.primitive = primitive;
+		this.normalized = normalized;
 		this.type = type;
 	}
 
