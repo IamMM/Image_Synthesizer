@@ -262,7 +262,7 @@ public class PrimitiveImageSynthesizer {
 		IJ.showProgress(1.0);
 	}
 
-	public void primitiveToNormalizedImage(ImagePlus imagePlus, double[] min, double[] max, String macro) throws RuntimeException {
+	public void primitiveToNormalizedImage(ImagePlus imagePlus, double[] min, double[] max, String macro, boolean global) throws RuntimeException {
 		ImageProcessor ip = imagePlus.getProcessor();
 
 		int PCStart = 23;
@@ -370,6 +370,12 @@ public class PrimitiveImageSynthesizer {
 				else imagePlus.setProcessor(floatProcessor.convertToShortProcessor(true));
 			}
 		} else if(bitDepth==24) {
+			double minimum = Double.MAX_VALUE; // minimum init with greatest possible value
+			double maximum = -Double.MAX_VALUE; // maximum init with smallest possible value
+
+			FloatProcessor[] redFloatProcessors = new FloatProcessor[slices];
+			FloatProcessor[] greenFloatProcessors = new FloatProcessor[slices];
+			FloatProcessor[] blueFloatProcessors = new FloatProcessor[slices];
 			for(int z = 0; z < slices; z++) {
 				ip = imagePlus.getImageStack().getProcessor(z + 1);
 
@@ -414,14 +420,31 @@ public class PrimitiveImageSynthesizer {
 					}
 				}
 
-				FloatProcessor redImageProcessor = new FloatProcessor(width, height, redPixels);
-				((ColorProcessor)ip).setChannel(1, redImageProcessor.convertToByteProcessor(true));
+				redFloatProcessors[z] = new FloatProcessor(width, height, redPixels);
+				greenFloatProcessors[z] = new FloatProcessor(width, height, greenPixels);
+				blueFloatProcessors[z] = new FloatProcessor(width, height, bluePixels);
 
-				FloatProcessor greenImageProcessor = new FloatProcessor(width, height, greenPixels);
-				((ColorProcessor)ip).setChannel(2, greenImageProcessor.convertToByteProcessor(true));
+				minimum = Math.min(minimum, redFloatProcessors[z].getMin());
+				minimum = Math.min(minimum, greenFloatProcessors[z].getMin());
+				minimum = Math.min(minimum, blueFloatProcessors[z].getMin());
 
-				FloatProcessor blueImageProcessor = new FloatProcessor(width, height, bluePixels);
-				((ColorProcessor)ip).setChannel(3, blueImageProcessor.convertToByteProcessor(true));
+				maximum = Math.max(maximum, redFloatProcessors[z].getMax());
+				maximum = Math.max(maximum, greenFloatProcessors[z].getMax());
+				maximum = Math.max(maximum, blueFloatProcessors[z].getMax());
+			}
+
+			// convert float processors to RGB Stack
+			for (int z = 0; z < slices; z++) {
+				ip = imagePlus.getImageStack().getProcessor(z + 1);
+
+				if(global) redFloatProcessors[z].setMinAndMax(minimum, maximum);
+				((ColorProcessor) ip).setChannel(1, redFloatProcessors[z].convertToByteProcessor(true));
+
+				if(global) greenFloatProcessors[z].setMinAndMax(minimum, maximum);
+				((ColorProcessor) ip).setChannel(2, greenFloatProcessors[z].convertToByteProcessor(true));
+
+				if(global) blueFloatProcessors[z].setMinAndMax(minimum, maximum);
+				((ColorProcessor) ip).setChannel(3, blueFloatProcessors[z].convertToByteProcessor(true));
 			}
 		}
 
@@ -655,7 +678,7 @@ public class PrimitiveImageSynthesizer {
 		IJ.showProgress(1.0);
 	}
 
-	private void primitiveToNormalizedFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String macro) throws RuntimeException {
+	private void primitiveToNormalizedFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String macro, boolean global) throws RuntimeException {
 		ImageProcessor ip = imagePlus.getProcessor();
 
 		int PCStart = 23;
@@ -801,13 +824,31 @@ public class PrimitiveImageSynthesizer {
 			}
 
 			FloatProcessor redImageProcessor = new FloatProcessor(width, height, redPixels);
-			((ColorProcessor)ip).setChannel(1, redImageProcessor.convertToByteProcessor(true));
-
 			FloatProcessor greenImageProcessor = new FloatProcessor(width, height, greenPixels);
-			((ColorProcessor)ip).setChannel(2, greenImageProcessor.convertToByteProcessor(true));
-
 			FloatProcessor blueImageProcessor = new FloatProcessor(width, height, bluePixels);
+
+			if(global) {
+				double minimum = Double.MAX_VALUE;
+				double maximum = -Double.MAX_VALUE;
+
+				minimum = Math.min(minimum, redImageProcessor.getMin());
+				minimum = Math.min(minimum, greenImageProcessor.getMin());
+				minimum = Math.min(minimum, blueImageProcessor.getMin());
+
+				maximum = Math.max(maximum, redImageProcessor.getMax());
+				maximum = Math.max(maximum, greenImageProcessor.getMax());
+				maximum = Math.max(maximum, blueImageProcessor.getMax());
+
+				redImageProcessor.setMinAndMax(minimum, maximum);
+				greenImageProcessor.setMinAndMax(minimum, maximum);
+				blueImageProcessor.setMinAndMax(minimum, maximum);
+
+			}
+
+			((ColorProcessor)ip).setChannel(1, redImageProcessor.convertToByteProcessor(true));
+			((ColorProcessor)ip).setChannel(2, greenImageProcessor.convertToByteProcessor(true));
 			((ColorProcessor)ip).setChannel(3, blueImageProcessor.convertToByteProcessor(true));
+
 			IJ.showProgress(1.0);
 		}
 		IJ.showProgress(1.0);
@@ -821,11 +862,11 @@ public class PrimitiveImageSynthesizer {
 
 	/*--- PREVIEW ---*/
 
-	public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, int frame, String macro, boolean drawAxes, boolean normalize) {
+	public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, int frame, String macro, boolean drawAxes, boolean normalize, boolean global) {
 
 		ImageProcessor resized = downsize(imagePlus, frame, PREVIEW_SIZE);
 		ImagePlus preview = new ImagePlus("preview", resized);
-		if(normalize)primitiveToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), macro);
+		if(normalize)primitiveToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), macro, global);
 		else primitiveToFrame(preview, min, max, frame-1, imagePlus.getNSlices(), macro);
 		resized.resetMinAndMax();
 

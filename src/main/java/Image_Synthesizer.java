@@ -878,16 +878,17 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 		boolean drawAxes = drawAxesCheckBox.isSelected();
 		boolean normalize = normalizeCheckBox.isSelected();
+		boolean globalNorm = localToggleButton.isSelected();
 
 		try {
 			if(synthieSelector.getSelectedIndex()==0) { // preview function
 				if (isRGB) {
-					previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxes, normalize, localToggleButton.isSelected());
+					previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxes, normalize, globalNorm);
 				} else {
 					previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxes, normalize);
 				}
 			} else { // preview primitive
-				previewImage = PIS.getPreview(imagePlus, min, max, frame, macro, drawAxes, normalize);
+				previewImage = PIS.getPreview(imagePlus, min, max, frame, macro, drawAxes, normalize, globalNorm);
 			}
 			preview.setIcon(new ImageIcon(previewImage));
 		} catch (RuntimeException e) {
@@ -1034,7 +1035,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 		try {
 			if(normalizeCheckBox.isSelected() && !is32Bit){
-				PIS.primitiveToNormalizedImage(imagePlus, min, max, macro);
+				PIS.primitiveToNormalizedImage(imagePlus, min, max, macro, localToggleButton.isSelected());
 			} else {
 				PIS.primitiveToImage(imagePlus, min, max, macro);
 			}
