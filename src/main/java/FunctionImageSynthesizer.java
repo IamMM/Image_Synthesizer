@@ -1137,7 +1137,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		IJ.showProgress(1.0);
 	}
 
-	private void functionToNormalizedFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String[] functions) throws RuntimeException {
+	private void functionToNormalizedFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String[] functions, boolean global) throws RuntimeException {
 		ColorProcessor ip = (ColorProcessor) imagePlus.getProcessor();
 		if(ip.getBitDepth()!=24) return;
 
@@ -1215,14 +1215,30 @@ public class FunctionImageSynthesizer extends ImageMath {
 				bluePixels[pos] = interpreter.getVariable("b_new");
 			}
 		}
-
 		FloatProcessor redImageProcessor = new FloatProcessor(width, height, redPixels);
-		ip.setChannel(1, redImageProcessor.convertToByteProcessor(true));
-
 		FloatProcessor greenImageProcessor = new FloatProcessor(width, height, greenPixels);
-		ip.setChannel(2, greenImageProcessor.convertToByteProcessor(true));
-
 		FloatProcessor blueImageProcessor = new FloatProcessor(width, height, bluePixels);
+
+		if(global) {
+			double minimum = Double.MAX_VALUE;
+			double maximum = -Double.MAX_VALUE;
+
+			minimum = Math.min(minimum, redImageProcessor.getMin());
+			minimum = Math.min(minimum, greenImageProcessor.getMin());
+			minimum = Math.min(minimum, blueImageProcessor.getMin());
+
+			maximum = Math.max(maximum, redImageProcessor.getMax());
+			maximum = Math.max(maximum, greenImageProcessor.getMax());
+			maximum = Math.max(maximum, blueImageProcessor.getMax());
+
+			redImageProcessor.setMinAndMax(minimum, maximum);
+			greenImageProcessor.setMinAndMax(minimum, maximum);
+			blueImageProcessor.setMinAndMax(minimum, maximum);
+
+		}
+
+		ip.setChannel(1, redImageProcessor.convertToByteProcessor(true));
+		ip.setChannel(2, greenImageProcessor.convertToByteProcessor(true));
 		ip.setChannel(3, blueImageProcessor.convertToByteProcessor(true));
 		IJ.showProgress(1.0);
 	}
@@ -1239,7 +1255,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 
 		ImageProcessor resized = downsize(imagePlus, frame, PREVIEW_SIZE);
 		ImagePlus preview = new ImagePlus("preview", resized);
-		if(normalize)functionToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), function);
+		if(normalize) functionToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), function);
 		else functionToFrame(preview, min, max, frame-1, imagePlus.getNSlices(), function);
 		resized.resetMinAndMax();
 
@@ -1254,11 +1270,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 		return preview.getImage();
 	}
 
-	public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, int frame, String[] functions, boolean drawAxes, boolean normalize) {
+	public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, int frame, String[] functions, boolean drawAxes, boolean normalize, boolean global) {
 
 		ImageProcessor resized = downsize(imagePlus, frame, PREVIEW_SIZE);
 		ImagePlus preview = new ImagePlus("preview", resized);
-		if(normalize)functionToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), functions);
+		if(normalize)functionToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), functions, global);
 		else functionToFrame(preview, min, max, frame-1, imagePlus.getNSlices(), functions);
 		resized.resetMinAndMax();
 

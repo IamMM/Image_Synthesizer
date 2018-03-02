@@ -882,7 +882,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		try {
 			if(synthieSelector.getSelectedIndex()==0) { // preview function
 				if (isRGB) {
-					previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxes, normalize);
+					previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxes, normalize, localToggleButton.isSelected());
 				} else {
 					previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxes, normalize);
 				}
