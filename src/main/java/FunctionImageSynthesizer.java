@@ -593,6 +593,129 @@ public class FunctionImageSynthesizer extends ImageMath {
 		IJ.showProgress(1.0);
 	}
 
+	public void functionToGlobalNormalizedImage(ImagePlus imagePlus, double[] min, double[] max, String[] functions) throws RuntimeException {
+		ColorProcessor ip = (ColorProcessor) imagePlus.getProcessor();
+		if(ip.getBitDepth()!=24) return;
+
+		// example macro: "code=v=v+50*sin(d/10)"
+		String macro1 = "code=r_new=" + functions[0];
+		String macro2 = "code=g_new=" + functions[1];
+		String macro3 = "code=b_new=" + functions[2];
+
+		int PCStart = 23;
+		Program pgm1 = (new Tokenizer()).tokenize(macro1);
+		Program pgm2 = (new Tokenizer()).tokenize(macro2);
+		Program pgm3 = (new Tokenizer()).tokenize(macro3);
+		boolean hasX = pgm1.hasWord("x") | pgm2.hasWord("x") | pgm3.hasWord("x");
+		boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
+		boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
+		boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
+		int width = ip.getWidth();
+		int height = ip.getHeight();
+		String code =
+				"var v,r,g,b,x,y,z,w,h,d,a;\n"+
+						"function dummy() {}\n"+
+						macro1+";\n"+
+						macro2+";\n"+
+						macro3+";\n"; // code starts at program counter location 'PCStart'
+		Interpreter interpreter = new Interpreter();
+		interpreter.run(code, null);
+		if (interpreter.wasError()) return;
+
+		Prefs.set(MACRO_KEY, macro1);
+		interpreter.setVariable("w", width);
+		interpreter.setVariable("h", height);
+
+		Rectangle r = ip.getRoi();
+		int inc = r.height/50;
+		if (inc<1) inc = 1;
+		int slices = imagePlus.getNSlices();
+		int pos;
+
+		double minimum = Double.MAX_VALUE; // minimum init with greatest possible value
+		double maximum = -Double.MAX_VALUE; // maximum init with smallest possible value
+
+		FloatProcessor[] redFloatProcessors = new FloatProcessor[slices];
+		FloatProcessor[] greenFloatProcessors = new FloatProcessor[slices];
+		FloatProcessor[] blueFloatProcessors = new FloatProcessor[slices];
+
+		for(int z = 0; z < slices; z++) {
+			ip = (ColorProcessor) imagePlus.getImageStack().getProcessor(z + 1);
+
+			if (hasZ) {
+				double dz = min[2] + ((max[2] - min[2]) / (slices - 1)) * z; // 0..z to min..max
+				if (Double.isNaN(dz)) dz = min[2];
+				interpreter.setVariable("z", dz);
+			}
+
+			int rgb;
+			double red, green, blue;
+			int[] pixels = (int[]) ip.getPixels();
+			double[] redPixels = new double[pixels.length],
+					greenPixels = new double[pixels.length],
+					bluePixels = new double[pixels.length];
+
+			for (int y = r.y; y < (r.y + r.height); y++) {
+				if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
+
+				double dy = min[1] + ((max[1] - min[1]) / (height - 1)) * y; // 0..y to min..max
+				interpreter.setVariable("y", dy);
+
+				for (int x = r.x; x < (r.x + r.width); x++) {
+					double dx = min[0] + ((max[0] - min[0]) / (width - 1)) * x; // 0..x to min..max
+					if (hasX) interpreter.setVariable("x", dx);
+
+					if (hasA) interpreter.setVariable("a",getA(dx, dy));
+					if (hasD) interpreter.setVariable("d", Math.hypot(dx,dy));
+					pos = y * width + x;
+					rgb = pixels[pos];
+
+					red = (rgb & 0xff0000) >> 16;
+					green = (rgb & 0xff00) >> 8;
+					blue = rgb & 0xff;
+					interpreter.setVariable("r", red);
+					interpreter.setVariable("g", green);
+					interpreter.setVariable("b", blue);
+					interpreter.run(PCStart);
+					redPixels[pos] = interpreter.getVariable("r_new");
+					greenPixels[pos] = interpreter.getVariable("g_new");
+					bluePixels[pos] = interpreter.getVariable("b_new");
+				}
+			}
+
+			redFloatProcessors[z] = new FloatProcessor(width, height, redPixels);
+			greenFloatProcessors[z] = new FloatProcessor(width, height, greenPixels);
+			blueFloatProcessors[z] = new FloatProcessor(width, height, bluePixels);
+
+			minimum = Math.min(minimum, redFloatProcessors[z].getMin());
+			minimum = Math.min(minimum, greenFloatProcessors[z].getMin());
+			minimum = Math.min(minimum, blueFloatProcessors[z].getMin());
+
+			maximum = Math.max(maximum, redFloatProcessors[z].getMax());
+			maximum = Math.max(maximum, greenFloatProcessors[z].getMax());
+			maximum = Math.max(maximum, blueFloatProcessors[z].getMax());
+
+		}
+
+		// convert float processors to RGB Stack
+		System.out.println(minimum);
+		System.out.println(maximum);
+
+		for (int z = 0; z < slices; z++) {
+			ip = (ColorProcessor) imagePlus.getImageStack().getProcessor(z + 1);
+
+			redFloatProcessors[z].setMinAndMax(minimum, maximum);
+			ip.setChannel(1, redFloatProcessors[z].convertToByteProcessor(true));
+
+			greenFloatProcessors[z].setMinAndMax(minimum, maximum);
+			ip.setChannel(2, greenFloatProcessors[z].convertToByteProcessor(true));
+
+			blueFloatProcessors[z].setMinAndMax(minimum, maximum);
+			ip.setChannel(3, blueFloatProcessors[z].convertToByteProcessor(true));
+		}
+		IJ.showProgress(1.0);
+	}
+
 	private void functionToFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String function) throws RuntimeException{
 		// example macro: "code=v=v+50*sin(d/10)"
 		String macro = "code=v=" + function;

@@ -936,7 +936,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         try {
             if (isRGB) {
                 if (normalizeCheckBox.isSelected()) {
-                    FIS.functionToNormalizedImage(imagePlus, min, max, functions, localToggleButton.isSelected());
+                	if(localToggleButton.isSelected()) {
+                		FIS.functionToGlobalNormalizedImage(imagePlus, min, max, functions);
+					} else {
+                    	FIS.functionToNormalizedImage(imagePlus, min, max, functions);
+					}
                 } else {
                     FIS.functionToImage(imagePlus, min, max, functions);
                 }
