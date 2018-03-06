@@ -86,6 +86,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private JButton removePrimitivePresetButton;
 	private JTabbedPane synthieSelector;
 	private JButton previewPrimitiveButton;
+	private JCheckBox interpolateCheckBox;
 
 	// constants
     private static final String TITLE = "Image Synthesizer";
@@ -263,6 +264,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			}
 		});
 
+        interpolateCheckBox.addActionListener(e -> updatePreview());
         drawAxesCheckBox.addActionListener(e -> updatePreview());
 
         initPresetMaps();
@@ -879,13 +881,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		boolean drawAxes = drawAxesCheckBox.isSelected();
 		boolean normalize = normalizeCheckBox.isSelected();
 		boolean globalNorm = localToggleButton.isSelected();
+		boolean interpolate = interpolateCheckBox.isSelected();
 
 		try {
 			if(synthieSelector.getSelectedIndex()==0) { // preview function
 				if (isRGB) {
-					previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxes, normalize, globalNorm);
+					previewImage = FIS.getPreview(imagePlus, min, max, frame, functions, drawAxes, normalize, globalNorm, interpolate);
 				} else {
-					previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxes, normalize);
+					previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxes, normalize, interpolate);
 				}
 			} else { // preview primitive
 				previewImage = PIS.getPreview(imagePlus, min, max, frame, macro, drawAxes, normalize, globalNorm);
