@@ -140,6 +140,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         frame = new JFrame(TITLE + VERSION);
         frame.setContentPane(this.mainPanel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setResizable(false);
         frame.pack();
 //        frame.setLocationRelativeTo(null); //center the frame on screen
         setLocationRelativeToImageJFrame();
