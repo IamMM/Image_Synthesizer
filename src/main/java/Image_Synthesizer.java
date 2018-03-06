@@ -88,7 +88,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private JButton previewPrimitiveButton;
 
 	// constants
-    private static final String TITLE = "Function Image Synthesizer";
+    private static final String TITLE = "Image Synthesizer";
     private static final String VERSION = " v0.1.0";
 
     // Synthesizer Objects
