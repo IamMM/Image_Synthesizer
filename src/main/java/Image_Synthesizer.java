@@ -788,7 +788,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
     private String checkName(String name) {
         GenericDialog id_alert = new GenericDialog("Identical Name Alert");
-        id_alert.addMessage("Please give you preset an identical name.");
         id_alert.addMessage(name + " is the name of one of the presets already.");
         id_alert.addStringField("Better name: ", name + " alternative", 30);
         id_alert.showDialog();
