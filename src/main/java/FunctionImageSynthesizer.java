@@ -57,11 +57,12 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasZ = pgm.hasWord("z");
 		boolean hasA = pgm.hasWord("a");
 		boolean hasD = pgm.hasWord("d");
+		boolean hasE = pgm.hasWord("E");
 		boolean hasGetPixel = pgm.hasWord("getPixel");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,x,y,z,w,h,d,a;\n"+
+				"var v,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -71,7 +72,8 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Prefs.set(MACRO_KEY, macro);
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
-		interpreter.setVariable("z", ip.getSliceNumber()-1);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
+
 		int bitDepth = ip.getBitDepth();
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
@@ -306,10 +308,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
 		boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
 		boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
+		boolean hasE = pgm1.hasWord("E") | pgm2.hasWord("E") | pgm3.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a;\n"+
+				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro1+";\n"+
 						macro2+";\n"+
@@ -321,6 +324,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Prefs.set(MACRO_KEY, macro1);
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
@@ -389,15 +393,16 @@ public class FunctionImageSynthesizer extends ImageMath {
 		String macro = "code=v=" + function;
 
 		int PCStart = 23;
-		Program pgm1 = (new Tokenizer()).tokenize(macro);
-		boolean hasX = pgm1.hasWord("x");
-		boolean hasZ = pgm1.hasWord("z");
-		boolean hasA = pgm1.hasWord("a");
-		boolean hasD = pgm1.hasWord("d");
+		Program pgm = (new Tokenizer()).tokenize(macro);
+		boolean hasX = pgm.hasWord("x");
+		boolean hasZ = pgm.hasWord("z");
+		boolean hasA = pgm.hasWord("a");
+		boolean hasD = pgm.hasWord("d");
+		boolean hasE = pgm.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,x,y,z,w,h,d,a;\n"+
+				"var v,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -407,6 +412,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Prefs.set(MACRO_KEY, macro);
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
@@ -515,10 +521,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
 		boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
 		boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
+		boolean hasE = pgm1.hasWord("E") | pgm2.hasWord("E") | pgm3.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a;\n"+
+				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro1+";\n"+
 						macro2+";\n"+
@@ -530,6 +537,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Prefs.set(MACRO_KEY, macro1);
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
@@ -610,10 +618,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
 		boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
 		boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
+		boolean hasE = pgm1.hasWord("E") | pgm2.hasWord("E") | pgm3.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a;\n"+
+				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro1+";\n"+
 						macro2+";\n"+
@@ -625,6 +634,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Prefs.set(MACRO_KEY, macro1);
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
@@ -725,11 +735,12 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasZ = pgm.hasWord("z");
 		boolean hasA = pgm.hasWord("a");
 		boolean hasD = pgm.hasWord("d");
+		boolean hasE = pgm.hasWord("E");
 		boolean hasGetPixel = pgm.hasWord("getPixel");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,x,y,z,w,h,d,a;\n"+
+				"var v,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -739,7 +750,8 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Prefs.set(MACRO_KEY, macro);
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
-		interpreter.setVariable("z", ip.getSliceNumber()-1);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
+
 		int bitDepth = ip.getBitDepth();
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
@@ -955,10 +967,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
 		boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
 		boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
+		boolean hasE = pgm1.hasWord("E") | pgm2.hasWord("E") | pgm3.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a;\n"+
+				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro1+";\n"+
 						macro2+";\n"+
@@ -970,6 +983,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Prefs.set(MACRO_KEY, macro1);
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
@@ -1033,15 +1047,16 @@ public class FunctionImageSynthesizer extends ImageMath {
 		String macro = "code=v=" + function;
 
 		int PCStart = 23;
-		Program pgm1 = (new Tokenizer()).tokenize(macro);
-		boolean hasX = pgm1.hasWord("x");
-		boolean hasZ = pgm1.hasWord("z");
-		boolean hasA = pgm1.hasWord("a");
-		boolean hasD = pgm1.hasWord("d");
+		Program pgm = (new Tokenizer()).tokenize(macro);
+		boolean hasX = pgm.hasWord("x");
+		boolean hasZ = pgm.hasWord("z");
+		boolean hasA = pgm.hasWord("a");
+		boolean hasD = pgm.hasWord("d");
+		boolean hasE = pgm.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,x,y,z,w,h,d,a;\n"+
+				"var v,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -1051,6 +1066,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Prefs.set(MACRO_KEY, macro);
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
@@ -1151,10 +1167,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasZ = pgm1.hasWord("z") | pgm2.hasWord("z") | pgm3.hasWord("z");
 		boolean hasA = pgm1.hasWord("a") | pgm2.hasWord("a") | pgm3.hasWord("a");
 		boolean hasD = pgm1.hasWord("d") | pgm2.hasWord("d") | pgm3.hasWord("d");
+		boolean hasE = pgm1.hasWord("E") | pgm2.hasWord("E") | pgm3.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a;\n"+
+				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro1+";\n"+
 						macro2+";\n"+
@@ -1166,6 +1183,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		Prefs.set(MACRO_KEY, macro1);
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
