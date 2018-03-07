@@ -44,8 +44,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JCheckBox normalizeCheckBox;
     private JLabel preview;
     private JCheckBox drawAxesCheckBox;
-    private JComboBox<String> sizeComboBox;
-    private JComboBox<String> dimensionComboBox;
+    private JComboBox<String> sizePresetComboBox;
+    private JComboBox<String> rangePresetComboBox;
     private JTextField widthTextField;
     private JTextField heightTextField;
     private JTextField slicesTextField;
@@ -112,6 +112,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private Map<String, PrimitivePreset> primitivePresetMap;
     private Map<String, PrimitivePreset> userPrimitivePresetMap;
 	private boolean previewIsActive = true;
+	private boolean customSize;
+	private boolean customRange;
+	private boolean customFunction;
+	private boolean customPrimitive;
 
 	/**
      * Main method for debugging.
@@ -403,15 +407,15 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     }
 
     private void initKeyListener() {
-    	KeyListener keyListener = new KeyListener() {
+    	KeyListener sizeKeyListener = new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-
+				customSize = true;
+				sizePresetComboBox.setSelectedIndex(0);
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-
 			}
 
 			@Override
@@ -422,19 +426,73 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			}
 		};
 
-    	widthTextField.addKeyListener(keyListener);
-    	heightTextField.addKeyListener(keyListener);
-    	slicesTextField.addKeyListener(keyListener);
-		minX.addKeyListener(keyListener);
-		maxX.addKeyListener(keyListener);
-		minY.addKeyListener(keyListener);
-		maxY.addKeyListener(keyListener);
-		minZ.addKeyListener(keyListener);
-		maxZ.addKeyListener(keyListener);
-		f1TextField.addKeyListener(keyListener);
-		f2TextField.addKeyListener(keyListener);
-		f3TextField.addKeyListener(keyListener);
-		primitiveTextArea.addKeyListener(keyListener);
+		KeyListener rangeKeyListener = new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				customRange = true;
+				rangePresetComboBox.setSelectedIndex(0);
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					updatePreview();
+				}
+			}
+		};
+
+		KeyListener functionKeyListener = new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				customFunction = true;
+				functionPresetsComboBox.setSelectedIndex(0);
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					updatePreview();
+				}
+			}
+		};
+
+		KeyListener primitiveKeyListener = new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				customPrimitive = true;
+				primitivePresetsComboBox.setSelectedIndex(0);
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+		};
+
+    	widthTextField.addKeyListener(sizeKeyListener);
+    	heightTextField.addKeyListener(sizeKeyListener);
+    	slicesTextField.addKeyListener(sizeKeyListener);
+		minX.addKeyListener(rangeKeyListener);
+		maxX.addKeyListener(rangeKeyListener);
+		minY.addKeyListener(rangeKeyListener);
+		maxY.addKeyListener(rangeKeyListener);
+		minZ.addKeyListener(rangeKeyListener);
+		maxZ.addKeyListener(rangeKeyListener);
+		f1TextField.addKeyListener(functionKeyListener);
+		f2TextField.addKeyListener(functionKeyListener);
+		f3TextField.addKeyListener(functionKeyListener);
+		primitiveTextArea.addKeyListener(primitiveKeyListener);
     }
 
     private void initMouseListener() {
@@ -534,15 +592,19 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		}
 
 		for (String preset : sizePresetMap.keySet()) {
-			sizeComboBox.addItem(preset);
+			sizePresetComboBox.addItem(preset);
 		}
 
-		sizeComboBox.addActionListener(e -> {
-			SizePreset sizePreset = sizePresetMap.get(sizeComboBox.getSelectedItem());
-			widthTextField.setText(""+sizePreset.getX());
-			heightTextField.setText(""+sizePreset.getY());
-			slicesTextField.setText(""+sizePreset.getZ());
-			updatePreview();
+		sizePresetComboBox.addActionListener(e -> {
+			String selectedItem = (String) sizePresetComboBox.getSelectedItem();
+			customSize = sizePresetComboBox.getSelectedIndex() == 0;
+			if(!customSize) {
+				SizePreset sizePreset = sizePresetMap.get(selectedItem);
+				widthTextField.setText("" + sizePreset.getX());
+				heightTextField.setText("" + sizePreset.getY());
+				slicesTextField.setText("" + sizePreset.getZ());
+				updatePreview();
+			}
 		});
 
 		// get user size presets from preferences
@@ -550,7 +612,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		userSizePresetMap = gson.fromJson(userSizePrefs, type);
 		if(userSizePresetMap!=null) {
 			for (String preset : userSizePresetMap.keySet()) {
-				sizeComboBox.addItem(preset);
+				sizePresetComboBox.addItem(preset);
 			}
 			sizePresetMap.putAll(userSizePresetMap);
 		}
@@ -567,18 +629,22 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		}
 
 		for (String preset : dimensionPresetMap.keySet()) {
-			dimensionComboBox.addItem(preset);
+			rangePresetComboBox.addItem(preset);
 		}
 
-		dimensionComboBox.addActionListener(e -> {
-			DimensionPreset dimensionPreset = dimensionPresetMap.get(dimensionComboBox.getSelectedItem());
-			minX.setText(""+dimensionPreset.getMinX());
-			maxX.setText(""+dimensionPreset.getMaxX());
-			minY.setText(""+dimensionPreset.getMinY());
-			maxY.setText(""+dimensionPreset.getMaxY());
-			minZ.setText(""+dimensionPreset.getMinZ());
-			maxZ.setText(""+dimensionPreset.getMaxZ());
-			updatePreview();
+		rangePresetComboBox.addActionListener(e -> {
+			String selectedItem = (String) rangePresetComboBox.getSelectedItem();
+			customRange = rangePresetComboBox.getSelectedIndex() == 0;
+			if(!customRange) {
+				DimensionPreset dimensionPreset = dimensionPresetMap.get(selectedItem);
+				minX.setText("" + dimensionPreset.getMinX());
+				maxX.setText("" + dimensionPreset.getMaxX());
+				minY.setText("" + dimensionPreset.getMinY());
+				maxY.setText("" + dimensionPreset.getMaxY());
+				minZ.setText("" + dimensionPreset.getMinZ());
+				maxZ.setText("" + dimensionPreset.getMaxZ());
+				updatePreview();
+			}
 		});
 
 		// get user dimension presets from preferences
@@ -586,7 +652,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		userDimensionPresetMap = gson.fromJson(userDimPrefs, type);
 		if(userDimensionPresetMap!=null) {
 			for (String preset : userDimensionPresetMap.keySet()) {
-				dimensionComboBox.addItem(preset);
+				rangePresetComboBox.addItem(preset);
 			}
 			dimensionPresetMap.putAll(userDimensionPresetMap);
 		}
@@ -617,19 +683,23 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		}
 
         functionPresetsComboBox.addActionListener(e -> {
-            FunctionPreset functionPreset = functionPresetMap.get(functionPresetsComboBox.getSelectedItem());
-            typesComboBox.setSelectedItem(functionPreset.getType());
-            normalizeCheckBox.setSelected(functionPreset.isNormalized());
-            if(functionPreset.getType().equals("RGB")) {
-                f1TextField.setText(functionPreset.getFunctions()[0]);
-                f2TextField.setText(functionPreset.getFunctions()[1]);
-                f3TextField.setText(functionPreset.getFunctions()[2]);
-            } else {
-                f1TextField.setText(functionPreset.getFunction());
-                f2TextField.setText(functionPreset.getFunction());
-                f3TextField.setText(functionPreset.getFunction());
-            }
-            updatePreview();
+			String selectedItem = (String) functionPresetsComboBox.getSelectedItem();
+			customFunction = functionPresetsComboBox.getSelectedIndex() == 0;
+			if(!customFunction) {
+				FunctionPreset functionPreset = functionPresetMap.get(selectedItem);
+				typesComboBox.setSelectedItem(functionPreset.getType());
+				normalizeCheckBox.setSelected(functionPreset.isNormalized());
+				if (functionPreset.getType().equals("RGB")) {
+					f1TextField.setText(functionPreset.getFunctions()[0]);
+					f2TextField.setText(functionPreset.getFunctions()[1]);
+					f3TextField.setText(functionPreset.getFunctions()[2]);
+				} else {
+					f1TextField.setText(functionPreset.getFunction());
+					f2TextField.setText(functionPreset.getFunction());
+					f3TextField.setText(functionPreset.getFunction());
+				}
+				updatePreview();
+			}
         });
 
         // primitives
@@ -658,11 +728,15 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		}
 
 		primitivePresetsComboBox.addActionListener(e -> {
-			PrimitivePreset primitivePreset = primitivePresetMap.get(primitivePresetsComboBox.getSelectedItem());
-			typesComboBox.setSelectedItem(primitivePreset.getType());
-			normalizeCheckBox.setSelected(primitivePreset.isNormalized());
-			primitiveTextArea.setText(primitivePreset.getPrimitive());
-			updatePreview();
+			String selectedItem = (String) primitivePresetsComboBox.getSelectedItem();
+			customPrimitive = primitivePresetsComboBox.getSelectedIndex() == 0;
+			if(!customPrimitive) {
+				PrimitivePreset primitivePreset = primitivePresetMap.get(selectedItem);
+				typesComboBox.setSelectedItem(primitivePreset.getType());
+				normalizeCheckBox.setSelected(primitivePreset.isNormalized());
+				primitiveTextArea.setText(primitivePreset.getPrimitive());
+				updatePreview();
+			}
 		});
     }
 
@@ -734,14 +808,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		if(userSizePresetMap==null) userSizePresetMap = new HashMap<>();
 		userSizePresetMap.put(name, sizePreset);
 		sizePresetMap.put(name, sizePreset);
-		sizeComboBox.addItem(name);
-		sizeComboBox.setSelectedItem(name);
+		sizePresetComboBox.addItem(name);
+		sizePresetComboBox.setSelectedItem(name);
 
 		updateUserSizePresets();
 	}
 
 	private void removeSizePreset() {
-		String selectedPreset = (String) sizeComboBox.getSelectedItem();
+		String selectedPreset = (String) sizePresetComboBox.getSelectedItem();
 		GenericDialog genericDialog = new GenericDialog("Remove Size Preset");
 		genericDialog.addMessage("You are about to remove the following preset: " + selectedPreset);
 		genericDialog.showDialog();
@@ -749,7 +823,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		if (genericDialog.wasCanceled()) return;
 		userSizePresetMap.remove(selectedPreset);
 		sizePresetMap.remove(selectedPreset);
-		sizeComboBox.removeItem(selectedPreset);
+		sizePresetComboBox.removeItem(selectedPreset);
 
 		updateUserSizePresets();
 	}
@@ -778,14 +852,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		if(userDimensionPresetMap==null) userDimensionPresetMap = new HashMap<>();
 		userDimensionPresetMap.put(name, dimensionPreset);
 		dimensionPresetMap.put(name, dimensionPreset);
-		dimensionComboBox.addItem(name);
-		dimensionComboBox.setSelectedItem(name);
+		rangePresetComboBox.addItem(name);
+		rangePresetComboBox.setSelectedItem(name);
 
 		updateUserDimensionPresets();
 	}
 
 	private void removeDimensionPreset() {
-		String selectedPreset = (String) dimensionComboBox.getSelectedItem();
+		String selectedPreset = (String) rangePresetComboBox.getSelectedItem();
 		GenericDialog genericDialog = new GenericDialog("Remove Dimension Preset");
 		genericDialog.addMessage("You are about to remove the following preset: " + selectedPreset);
 		genericDialog.showDialog();
@@ -793,7 +867,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		if (genericDialog.wasCanceled()) return;
 		userDimensionPresetMap.remove(selectedPreset);
 		dimensionPresetMap.remove(selectedPreset);
-		dimensionComboBox.removeItem(selectedPreset);
+		rangePresetComboBox.removeItem(selectedPreset);
 
 		updateUserDimensionPresets();
 	}
@@ -942,7 +1016,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 					previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxes, normalize, interpolate);
 				}
 			} else { // preview primitive
-				previewImage = PIS.getPreview(imagePlus, min, max, frame, macro, drawAxes, normalize, globalNorm);
+				previewImage = PIS.getPreview(imagePlus, min, max, frame, macro, drawAxes, normalize, globalNorm, interpolate);
 			}
 			preview.setIcon(new ImageIcon(previewImage));
 		} catch (RuntimeException e) {

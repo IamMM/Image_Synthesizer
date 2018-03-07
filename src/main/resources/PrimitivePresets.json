@@ -1,4 +1,8 @@
 {
+  "custom": {
+    "type": "32-bit",
+    "primitive": "v=0"
+  },
   "Quadrants": {
     "type": "32-bit",
     "primitive": "if((x>0 && y>0) || (y<0 && x<0)) v = 0;\nelse v = 255;"
