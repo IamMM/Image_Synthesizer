@@ -35,12 +35,12 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     // global swing components
     private JFrame frame;
     private JPanel mainPanel;
+	private JTextField titleTextField;
     private JComboBox<String> imageComboBox;
     private JComboBox<String> typesComboBox;
     private JButton openImageButton;
     private JCheckBox invertingLUTCheckBox;
     private JCheckBox normalizeCheckBox;
-	private JToggleButton localToggleButton;
     private JLabel preview;
     private JCheckBox drawAxesCheckBox;
     private JComboBox<String> sizeComboBox;
@@ -75,6 +75,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private JButton f1ResetButton;
 	private JButton f2ResetButton;
 	private JButton f3ResetButton;
+	private JToolBar f2ResetToolBar;
+	private JToolBar f3ResetToolBar;
     private JButton previewFunctionButton;
     private JButton generateFunctionButton;
 
@@ -87,6 +89,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private JTabbedPane synthieSelector;
 	private JButton previewPrimitiveButton;
 	private JCheckBox interpolateCheckBox;
+	private JRadioButton localRadioButton;
+	private JRadioButton globalRadioButton;
 
 	// constants
     private static final String TITLE = "Image Synthesizer";
@@ -176,11 +180,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             doNewImage = imageComboBox.getSelectedIndex()==0;
             if(!doNewImage) {
                 ImagePlus tmp = WindowManager.getImage((String)imageComboBox.getSelectedItem());
+                titleTextField.setText("new_" + tmp.getTitle());
                 typesComboBox.setSelectedItem(getTypeString(tmp.getType()));
                 widthTextField.setText(""+tmp.getWidth());
                 heightTextField.setText(""+tmp.getHeight());
                 slicesTextField.setText(""+tmp.getNSlices());
-            }
+            } else {
+            	titleTextField.setText("new_image");
+			}
             widthTextField.setEnabled(doNewImage);
             heightTextField.setEnabled(doNewImage);
             slicesTextField.setEnabled(doNewImage);
@@ -203,11 +210,12 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             invertingLUTCheckBox.setEnabled(!isRGB);
             f2Label.setVisible(isRGB);
             f2TextField.setVisible(isRGB);
-            f2ResetButton.setVisible(isRGB);
+            f2ResetToolBar.setVisible(isRGB);
             f3Label.setVisible(isRGB);
             f3TextField.setVisible(isRGB);
-            f3ResetButton.setVisible(isRGB);
-            localToggleButton.setEnabled(isRGB);
+            f3ResetToolBar.setVisible(isRGB);
+            localRadioButton.setEnabled(normalizeCheckBox.isSelected() && isRGB);
+            globalRadioButton.setEnabled(normalizeCheckBox.isSelected() && isRGB);
 
             if(!doNewImage) {
                 ImagePlus tmp = WindowManager.getImage((String) imageComboBox.getSelectedItem());
@@ -223,13 +231,16 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         invertingLUTCheckBox.addActionListener(e -> updatePreview());
 
-        normalizeCheckBox.addActionListener(e -> updatePreview());
-
-        localToggleButton.addActionListener(e -> {
-        	if(localToggleButton.isSelected()) localToggleButton.setText("global");
-        	else localToggleButton.setText("local");
+        normalizeCheckBox.addActionListener(e -> {
+        	if(Objects.equals(typesComboBox.getSelectedItem(), "RGB")){
+				localRadioButton.setEnabled(normalizeCheckBox.isSelected());
+				globalRadioButton.setEnabled(normalizeCheckBox.isSelected());
+			}
         	updatePreview();
 		});
+
+        localRadioButton.addActionListener(e -> updatePreview());
+        globalRadioButton.addActionListener(e -> updatePreview());
 
         initDocumentListener();
 
@@ -880,7 +891,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 		boolean drawAxes = drawAxesCheckBox.isSelected();
 		boolean normalize = normalizeCheckBox.isSelected();
-		boolean globalNorm = localToggleButton.isSelected();
+		boolean globalNorm = globalRadioButton.isSelected();
 		boolean interpolate = interpolateCheckBox.isSelected();
 
 		try {
@@ -902,6 +913,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
     private void generateFunction() {
         // meta
+		String title = WindowManager.makeUniqueName(titleTextField.getText());
         String type = (String) typesComboBox.getSelectedItem();
         assert type != null;
 
@@ -930,17 +942,17 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         // apply
         ImagePlus imagePlus;
         if(doNewImage) {
-            imagePlus = IJ.createImage(function, type, width, height, slices);
+            imagePlus = IJ.createImage(title, type, width, height, slices);
         } else {
             imagePlus = WindowManager.getImage((String)imageComboBox.getSelectedItem()).duplicate();
-            imagePlus.setTitle(function);
+            imagePlus.setTitle(title);
         }
         if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
 
         try {
             if (isRGB) {
                 if (normalizeCheckBox.isSelected()) {
-                	if(localToggleButton.isSelected()) {
+                	if(globalRadioButton.isSelected()) {
                 		FIS.functionToGlobalNormalizedImage(imagePlus, min, max, functions);
 					} else {
                     	FIS.functionToNormalizedImage(imagePlus, min, max, functions);
@@ -1002,6 +1014,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 	private void generatePrimitive() {
 		// meta
+		String title = WindowManager.makeUniqueName(titleTextField.getText());
 		String type = (String) typesComboBox.getSelectedItem();
 		assert type != null;
 
@@ -1029,16 +1042,16 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		// apply
 		ImagePlus imagePlus;
 		if(doNewImage) {
-			imagePlus = IJ.createImage("", type + " Black", width, height, slices);
+			imagePlus = IJ.createImage(title, type + " Black", width, height, slices);
 		} else {
 			imagePlus = WindowManager.getImage((String)imageComboBox.getSelectedItem()).duplicate();
-			imagePlus.setTitle("");
+			imagePlus.setTitle(title);
 		}
 		if(invertingLUTCheckBox.isSelected()) imagePlus.getProcessor().invertLut();
 
 		try {
 			if(normalizeCheckBox.isSelected() && !is32Bit){
-				PIS.primitiveToNormalizedImage(imagePlus, min, max, macro, localToggleButton.isSelected());
+				PIS.primitiveToNormalizedImage(imagePlus, min, max, macro, globalRadioButton.isSelected());
 			} else {
 				PIS.primitiveToImage(imagePlus, min, max, macro);
 			}
