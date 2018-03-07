@@ -1004,6 +1004,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 				}
             }
             IJ.resetMinAndMax(imagePlus);
+            imagePlus.getCalibration().setUnit("units");
             imagePlus.show();
             IJ.run("Coordinates...", "left=" + min[0] + " right=" + max[0] + " top=" + min[1] + " bottom=" + max[1]);
         } catch (RuntimeException e) {
@@ -1092,6 +1093,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 				PIS.primitiveToImage(imagePlus, min, max, macro);
 			}
 			IJ.resetMinAndMax(imagePlus);
+			imagePlus.getCalibration().setUnit("units");
 			imagePlus.show();
 			IJ.run("Coordinates...", "left=" + min[0] + " right=" + max[0] + " top=" + min[1] + " bottom=" + max[1]);
 		} catch (RuntimeException e) {
