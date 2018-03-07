@@ -713,7 +713,6 @@
                     </constraints>
                     <properties>
                       <text value="255*sin(d + a + 4.2)"/>
-                      <visible value="false"/>
                     </properties>
                   </component>
                   <component id="870cc" class="javax.swing.JTextField" binding="f3TextField">
@@ -724,7 +723,6 @@
                     </constraints>
                     <properties>
                       <text value="255*sin(d + a + 2.1)"/>
-                      <visible value="false"/>
                     </properties>
                   </component>
                   <component id="b6d3e" class="javax.swing.JLabel" binding="f1Label">
@@ -733,7 +731,7 @@
                     </constraints>
                     <properties>
                       <horizontalAlignment value="4"/>
-                      <text value="v="/>
+                      <text value="r="/>
                     </properties>
                   </component>
                   <component id="726fc" class="javax.swing.JLabel" binding="f2Label">
@@ -742,7 +740,6 @@
                     </constraints>
                     <properties>
                       <text value="g="/>
-                      <visible value="false"/>
                     </properties>
                   </component>
                   <component id="2ade" class="javax.swing.JLabel" binding="f3Label">
@@ -751,7 +748,6 @@
                     </constraints>
                     <properties>
                       <text value="b="/>
-                      <visible value="false"/>
                     </properties>
                   </component>
                   <toolbar id="55949" binding="f2ResetToolBar">
@@ -760,7 +756,6 @@
                     </constraints>
                     <properties>
                       <borderPainted value="false"/>
-                      <visible value="false"/>
                     </properties>
                     <border type="none"/>
                     <children>
@@ -780,7 +775,6 @@
                     </constraints>
                     <properties>
                       <borderPainted value="false"/>
-                      <visible value="false"/>
                     </properties>
                     <border type="none"/>
                     <children>
@@ -819,7 +813,6 @@
                           <focusable value="false"/>
                           <selected value="true"/>
                           <text value="local"/>
-                          <visible value="false"/>
                         </properties>
                       </component>
                       <component id="4b3da" class="javax.swing.JRadioButton" binding="globalRadioButton" default-binding="true">
@@ -829,7 +822,6 @@
                         <properties>
                           <focusable value="false"/>
                           <text value="global"/>
-                          <visible value="false"/>
                         </properties>
                       </component>
                     </children>

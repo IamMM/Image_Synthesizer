@@ -172,7 +172,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         typesComboBox.addItem("16-bit");
         typesComboBox.addItem("32-bit");
         typesComboBox.addItem("RGB");
-        typesComboBox.setSelectedIndex(2);
+        typesComboBox.setSelectedIndex(3);
 
         // init change- and actions listeners
         imageComboBox.addActionListener(evt -> {
