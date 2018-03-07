@@ -372,14 +372,18 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		slicesTextField.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
+				double newValue = getRealNumValue(slicesTextField);
 				previewZSlider.setMinimum(1);
-				previewZSlider.setMaximum((int) getRealNumValue(slicesTextField));
+				previewZSlider.setMaximum((int) newValue);
+				maxZ.setEnabled(newValue != 1);
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
+				double newValue = getRealNumValue(slicesTextField);
 				previewZSlider.setMinimum(1);
-				previewZSlider.setMaximum((int) getRealNumValue(slicesTextField));
+				previewZSlider.setMaximum((int) newValue);
+				maxZ.setEnabled(newValue != 1);
 			}
 
 			@Override
