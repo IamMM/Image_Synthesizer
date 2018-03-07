@@ -30,11 +30,12 @@ public class PrimitiveImageSynthesizer {
 		boolean hasR = pgm.hasWord("r");
 		boolean hasG = pgm.hasWord("g");
 		boolean hasB = pgm.hasWord("b");
+		boolean hasE = pgm.hasWord("E");
 		boolean hasGetPixel = pgm.hasWord("getPixel");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a;\n"+
+				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -43,7 +44,8 @@ public class PrimitiveImageSynthesizer {
 
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
-		interpreter.setVariable("z", ip.getSliceNumber()-1);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
+
 		int bitDepth = ip.getBitDepth();
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
@@ -271,10 +273,11 @@ public class PrimitiveImageSynthesizer {
 		boolean hasZ = pgm.hasWord("z");
 		boolean hasA = pgm.hasWord("a");
 		boolean hasD = pgm.hasWord("d");
+		boolean hasE = pgm.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a;\n"+
+				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -283,6 +286,7 @@ public class PrimitiveImageSynthesizer {
 
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
@@ -463,11 +467,12 @@ public class PrimitiveImageSynthesizer {
 		boolean hasR = pgm.hasWord("r");
 		boolean hasG = pgm.hasWord("g");
 		boolean hasB = pgm.hasWord("b");
+		boolean hasE = pgm.hasWord("E");
 		boolean hasGetPixel = pgm.hasWord("getPixel");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a;\n"+
+				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -476,7 +481,8 @@ public class PrimitiveImageSynthesizer {
 
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
-		interpreter.setVariable("z", ip.getSliceNumber()-1);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
+
 		int bitDepth = ip.getBitDepth();
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
@@ -690,10 +696,11 @@ public class PrimitiveImageSynthesizer {
 		boolean hasR = pgm.hasWord("r");
 		boolean hasG = pgm.hasWord("g");
 		boolean hasB = pgm.hasWord("b");
+		boolean hasE = pgm.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a;\n"+
+				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -702,6 +709,7 @@ public class PrimitiveImageSynthesizer {
 
 		interpreter.setVariable("w", width);
 		interpreter.setVariable("h", height);
+		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
