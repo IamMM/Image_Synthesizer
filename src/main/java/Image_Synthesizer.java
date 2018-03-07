@@ -10,6 +10,7 @@ import ij.gui.GenericDialog;
 import ij.io.OpenDialog;
 import ij.io.Opener;
 import ij.plugin.PlugIn;
+import ij.process.ImageProcessor;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -77,7 +78,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private JButton f3ResetButton;
 	private JToolBar f2ResetToolBar;
 	private JToolBar f3ResetToolBar;
-    private JButton previewFunctionButton;
     private JButton generateFunctionButton;
 
     // primitive swing components
@@ -87,7 +87,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private JButton addPrimitivePresetButton;
 	private JButton removePrimitivePresetButton;
 	private JTabbedPane synthieSelector;
-	private JButton previewPrimitiveButton;
 	private JCheckBox interpolateCheckBox;
 	private JRadioButton localRadioButton;
 	private JRadioButton globalRadioButton;
@@ -214,8 +213,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             f3Label.setVisible(isRGB);
             f3TextField.setVisible(isRGB);
             f3ResetToolBar.setVisible(isRGB);
-            localRadioButton.setEnabled(normalizeCheckBox.isSelected() && isRGB);
-            globalRadioButton.setEnabled(normalizeCheckBox.isSelected() && isRGB);
+            localRadioButton.setVisible(isRGB);
+            globalRadioButton.setVisible(isRGB);
+            localRadioButton.setEnabled(normalizeCheckBox.isSelected());
+            globalRadioButton.setEnabled(normalizeCheckBox.isSelected());
 
             if(!doNewImage) {
                 ImagePlus tmp = WindowManager.getImage((String) imageComboBox.getSelectedItem());
@@ -229,22 +230,12 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         openImageButton.addActionListener(evt -> showOpenImageDialog());
 
-        invertingLUTCheckBox.addActionListener(e -> updatePreview());
-
-        normalizeCheckBox.addActionListener(e -> {
-        	if(Objects.equals(typesComboBox.getSelectedItem(), "RGB")){
-				localRadioButton.setEnabled(normalizeCheckBox.isSelected());
-				globalRadioButton.setEnabled(normalizeCheckBox.isSelected());
-			}
-        	updatePreview();
-		});
-
-        localRadioButton.addActionListener(e -> updatePreview());
-        globalRadioButton.addActionListener(e -> updatePreview());
 
         initDocumentListener();
 
         initKeyListener();
+
+        initMouseListener();
 
         previewZSlider.addChangeListener(e -> currentSliceLabel.setText(previewZSlider.getValue() + ""));
 
@@ -280,6 +271,19 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         initPresetMaps();
 
+        invertingLUTCheckBox.addActionListener(e -> updatePreview());
+
+        normalizeCheckBox.addActionListener(e -> {
+        	if(Objects.equals(typesComboBox.getSelectedItem(), "RGB")){
+				localRadioButton.setEnabled(normalizeCheckBox.isSelected());
+				globalRadioButton.setEnabled(normalizeCheckBox.isSelected());
+			}
+        	updatePreview();
+		});
+
+        localRadioButton.addActionListener(e -> updatePreview());
+        globalRadioButton.addActionListener(e -> updatePreview());
+
         synthieSelector.addChangeListener(e -> updatePreview());
         addSizePresetButton.addActionListener(e -> addSizePreset());
         removeSizePresetButton.addActionListener(e -> removeSizePreset());
@@ -293,9 +297,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         f1ResetButton.addActionListener(e -> resetTextField(f1TextField));
         f2ResetButton.addActionListener(e -> resetTextField(f2TextField));
         f3ResetButton.addActionListener(e -> resetTextField(f3TextField));
-        previewFunctionButton.addActionListener(e -> updatePreview());
         generateFunctionButton.addActionListener(e -> generateFunction());
-        previewPrimitiveButton.addActionListener(e -> updatePreview());
         generatePrimitiveButton.addActionListener(e -> generatePrimitive());
 
         updatePreview();
@@ -431,6 +433,35 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		primitiveTextArea.addKeyListener(keyListener);
     }
 
+    private void initMouseListener() {
+		preview.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				updatePreview();
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+
+			}
+		});
+	}
+
 	private int getNaturalNumValue(JTextField textField) {
 		String textFromGUI = textField.getText().replaceAll("[^\\d.]", "");
 		int value = 0;
@@ -456,8 +487,13 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private void showInactivePreviewOverlay() {
 		if(previewIsActive) {
 			Image currPreview = ((ImageIcon)preview.getIcon()).getImage();
-			ImagePlus previewPlus = new ImagePlus("preview", currPreview);
-			previewPlus.getProcessor().blurGaussian(20);
+			ImagePlus previewPlus = new ImagePlus("", currPreview);
+			previewPlus.getProcessor().add(-128);
+			int x = previewPlus.getWidth()/2;
+			int y = previewPlus.getHeight()/2;
+			previewPlus.getProcessor().setColor(Color.WHITE);
+			previewPlus.getProcessor().setJustification(ImageProcessor.CENTER_JUSTIFY);
+			previewPlus.getProcessor().drawString("click here or press enter to update", x, y);
 			preview.setIcon(new ImageIcon(previewPlus.getImage()));
 			previewIsActive = false;
 		}
