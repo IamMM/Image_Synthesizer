@@ -1,4 +1,4 @@
-# Function Image Synthesizer
+# Image Synthesizer
 This is a plugin solution for ImageJ/Fiji to generate images or stacks out mathematical functions. The UI makes it possible to play around various parameters and will let you preview the result.
 
 ![GUI Screenshot](/screenshot.jpg)
