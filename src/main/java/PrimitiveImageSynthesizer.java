@@ -21,7 +21,7 @@ public class PrimitiveImageSynthesizer {
 
 		ImageProcessor ip = imagePlus.getProcessor();
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm = (new Tokenizer()).tokenize(macro);
 		boolean hasX = pgm.hasWord("x");
 		boolean hasZ = pgm.hasWord("z");
@@ -35,15 +35,16 @@ public class PrimitiveImageSynthesizer {
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
+				"var v,r,g,b,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
 		interpreter.run(code, null);
 		if (interpreter.wasError()) return;
 
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		int bitDepth = ip.getBitDepth();
@@ -267,7 +268,7 @@ public class PrimitiveImageSynthesizer {
 	public void primitiveToNormalizedImage(ImagePlus imagePlus, double[] min, double[] max, String macro, boolean global) throws RuntimeException {
 		ImageProcessor ip = imagePlus.getProcessor();
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm = (new Tokenizer()).tokenize(macro);
 		boolean hasX = pgm.hasWord("x");
 		boolean hasZ = pgm.hasWord("z");
@@ -277,15 +278,16 @@ public class PrimitiveImageSynthesizer {
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
+				"var v,r,g,b,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
 		interpreter.run(code, null);
 		if (interpreter.wasError()) return;
 
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
@@ -458,7 +460,7 @@ public class PrimitiveImageSynthesizer {
 	private void primitiveToFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String macro) throws RuntimeException{
 		ImageProcessor ip = imagePlus.getProcessor();
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm = (new Tokenizer()).tokenize(macro);
 		boolean hasX = pgm.hasWord("x");
 		boolean hasZ = pgm.hasWord("z");
@@ -472,15 +474,16 @@ public class PrimitiveImageSynthesizer {
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
+				"var v,r,g,b,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
 		interpreter.run(code, null);
 		if (interpreter.wasError()) return;
 
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		int bitDepth = ip.getBitDepth();
@@ -687,7 +690,7 @@ public class PrimitiveImageSynthesizer {
 	private void primitiveToNormalizedFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String macro, boolean global) throws RuntimeException {
 		ImageProcessor ip = imagePlus.getProcessor();
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm = (new Tokenizer()).tokenize(macro);
 		boolean hasX = pgm.hasWord("x");
 		boolean hasZ = pgm.hasWord("z");
@@ -700,15 +703,16 @@ public class PrimitiveImageSynthesizer {
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
+				"var v,r,g,b,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
 		interpreter.run(code, null);
 		if (interpreter.wasError()) return;
 
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();

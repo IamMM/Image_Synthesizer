@@ -51,7 +51,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 
 		ImageProcessor ip = imagePlus.getProcessor();
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm = (new Tokenizer()).tokenize(macro);
 		boolean hasX = pgm.hasWord("x");
 		boolean hasZ = pgm.hasWord("z");
@@ -61,8 +61,9 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasGetPixel = pgm.hasWord("getPixel");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
+		int slices = imagePlus.getNSlices();
 		String code =
-				"var v,x,y,z,w,h,d,a,E;\n"+
+				"var v,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -70,15 +71,15 @@ public class FunctionImageSynthesizer extends ImageMath {
 		if (interpreter.wasError()) return;
 
 		Prefs.set(MACRO_KEY, macro);
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		int bitDepth = ip.getBitDepth();
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
 		if (inc<1) inc = 1;
-		int slices = imagePlus.getNSlices();
 		double v;
 		int pos, v2;
 		if (bitDepth==8) { // 8-Bit
@@ -300,7 +301,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		String macro2 = "code=g_new=" + functions[1];
 		String macro3 = "code=b_new=" + functions[2];
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm1 = (new Tokenizer()).tokenize(macro1);
 		Program pgm2 = (new Tokenizer()).tokenize(macro2);
 		Program pgm3 = (new Tokenizer()).tokenize(macro3);
@@ -311,8 +312,9 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasE = pgm1.hasWord("E") | pgm2.hasWord("E") | pgm3.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
+		int slices = imagePlus.getNSlices();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
+				"var v,r,g,b,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro1+";\n"+
 						macro2+";\n"+
@@ -322,14 +324,14 @@ public class FunctionImageSynthesizer extends ImageMath {
 		if (interpreter.wasError()) return;
 
 		Prefs.set(MACRO_KEY, macro1);
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
 		if (inc<1) inc = 1;
-		int slices = imagePlus.getNSlices();
 		int pos;
 
 		for(int z = 0; z < slices; z++) {
@@ -392,7 +394,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		// example macro: "code=v=v+50*sin(d/10)"
 		String macro = "code=v=" + function;
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm = (new Tokenizer()).tokenize(macro);
 		boolean hasX = pgm.hasWord("x");
 		boolean hasZ = pgm.hasWord("z");
@@ -401,8 +403,9 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasE = pgm.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
+		int slices = imagePlus.getNSlices();
 		String code =
-				"var v,x,y,z,w,h,d,a,E;\n"+
+				"var v,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -410,14 +413,14 @@ public class FunctionImageSynthesizer extends ImageMath {
 		if (interpreter.wasError()) return;
 
 		Prefs.set(MACRO_KEY, macro);
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
 		if (inc<1) inc = 1;
-		int slices = imagePlus.getNSlices();
 		int pos, v;
 		int bitDepth = imagePlus.getBitDepth();
 
@@ -513,7 +516,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		String macro2 = "code=g_new=" + functions[1];
 		String macro3 = "code=b_new=" + functions[2];
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm1 = (new Tokenizer()).tokenize(macro1);
 		Program pgm2 = (new Tokenizer()).tokenize(macro2);
 		Program pgm3 = (new Tokenizer()).tokenize(macro3);
@@ -524,8 +527,9 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasE = pgm1.hasWord("E") | pgm2.hasWord("E") | pgm3.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
+		int slices = imagePlus.getNSlices();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
+				"var v,r,g,b,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro1+";\n"+
 						macro2+";\n"+
@@ -535,14 +539,14 @@ public class FunctionImageSynthesizer extends ImageMath {
 		if (interpreter.wasError()) return;
 
 		Prefs.set(MACRO_KEY, macro1);
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
 		if (inc<1) inc = 1;
-		int slices = imagePlus.getNSlices();
 		int pos;
 
 		for(int z = 0; z < slices; z++) {
@@ -610,7 +614,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		String macro2 = "code=g_new=" + functions[1];
 		String macro3 = "code=b_new=" + functions[2];
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm1 = (new Tokenizer()).tokenize(macro1);
 		Program pgm2 = (new Tokenizer()).tokenize(macro2);
 		Program pgm3 = (new Tokenizer()).tokenize(macro3);
@@ -621,8 +625,9 @@ public class FunctionImageSynthesizer extends ImageMath {
 		boolean hasE = pgm1.hasWord("E") | pgm2.hasWord("E") | pgm3.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
+		int slices = imagePlus.getNSlices();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
+				"var v,r,g,b,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro1+";\n"+
 						macro2+";\n"+
@@ -632,14 +637,14 @@ public class FunctionImageSynthesizer extends ImageMath {
 		if (interpreter.wasError()) return;
 
 		Prefs.set(MACRO_KEY, macro1);
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
 		int inc = r.height/50;
 		if (inc<1) inc = 1;
-		int slices = imagePlus.getNSlices();
 		int pos;
 
 		double minimum = Double.MAX_VALUE; // minimum init with greatest possible value
@@ -729,7 +734,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 
 		ImageProcessor ip = imagePlus.getProcessor();
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm = (new Tokenizer()).tokenize(macro);
 		boolean hasX = pgm.hasWord("x");
 		boolean hasZ = pgm.hasWord("z");
@@ -740,7 +745,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,x,y,z,w,h,d,a,E;\n"+
+				"var v,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -748,8 +753,9 @@ public class FunctionImageSynthesizer extends ImageMath {
 		if (interpreter.wasError()) return;
 
 		Prefs.set(MACRO_KEY, macro);
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		int bitDepth = ip.getBitDepth();
@@ -959,7 +965,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		String macro2 = "code=g_new=" + functions[1];
 		String macro3 = "code=b_new=" + functions[2];
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm1 = (new Tokenizer()).tokenize(macro1);
 		Program pgm2 = (new Tokenizer()).tokenize(macro2);
 		Program pgm3 = (new Tokenizer()).tokenize(macro3);
@@ -971,7 +977,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
+				"var v,r,g,b,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro1+";\n"+
 						macro2+";\n"+
@@ -981,8 +987,9 @@ public class FunctionImageSynthesizer extends ImageMath {
 		if (interpreter.wasError()) return;
 
 		Prefs.set(MACRO_KEY, macro1);
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
@@ -1046,7 +1053,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		// example macro: "code=v=v+50*sin(d/10)"
 		String macro = "code=v=" + function;
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm = (new Tokenizer()).tokenize(macro);
 		boolean hasX = pgm.hasWord("x");
 		boolean hasZ = pgm.hasWord("z");
@@ -1056,7 +1063,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,x,y,z,w,h,d,a,E;\n"+
+				"var v,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro+";\n"; // code starts at program counter location 'PCStart'
 		Interpreter interpreter = new Interpreter();
@@ -1064,8 +1071,9 @@ public class FunctionImageSynthesizer extends ImageMath {
 		if (interpreter.wasError()) return;
 
 		Prefs.set(MACRO_KEY, macro);
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
@@ -1159,7 +1167,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		String macro2 = "code=g_new=" + functions[1];
 		String macro3 = "code=b_new=" + functions[2];
 
-		int PCStart = 23;
+		int PCStart = 25;
 		Program pgm1 = (new Tokenizer()).tokenize(macro1);
 		Program pgm2 = (new Tokenizer()).tokenize(macro2);
 		Program pgm3 = (new Tokenizer()).tokenize(macro3);
@@ -1171,7 +1179,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 		String code =
-				"var v,r,g,b,x,y,z,w,h,d,a,E;\n"+
+				"var v,r,g,b,x,y,z,w,h,s,d,a,E;\n"+
 						"function dummy() {}\n"+
 						macro1+";\n"+
 						macro2+";\n"+
@@ -1181,8 +1189,9 @@ public class FunctionImageSynthesizer extends ImageMath {
 		if (interpreter.wasError()) return;
 
 		Prefs.set(MACRO_KEY, macro1);
-		interpreter.setVariable("w", width);
-		interpreter.setVariable("h", height);
+		interpreter.setVariable("w", Math.abs(max[0]-min[0]));
+		interpreter.setVariable("h", Math.abs(max[1]-min[1]));
+		interpreter.setVariable("s", Math.abs(max[2]-min[2]));
 		if(hasE) interpreter.setVariable("E", Math.exp(1));
 
 		Rectangle r = ip.getRoi();
