@@ -90,6 +90,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private JCheckBox interpolateCheckBox;
 	private JRadioButton localRadioButton;
 	private JRadioButton globalRadioButton;
+	private JButton openPrimitiveHelp;
 
 	// constants
     private static final String TITLE = "Image Synthesizer";
@@ -176,7 +177,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         typesComboBox.addItem("16-bit");
         typesComboBox.addItem("32-bit");
         typesComboBox.addItem("RGB");
-        typesComboBox.setSelectedIndex(3);
 
         // init change- and actions listeners
         imageComboBox.addActionListener(evt -> {
@@ -188,6 +188,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
                 widthTextField.setText(""+tmp.getWidth());
                 heightTextField.setText(""+tmp.getHeight());
                 slicesTextField.setText(""+tmp.getNSlices());
+                WindowManager.setTempCurrentImage(tmp);
             } else {
             	titleTextField.setText("new_image");
 			}
@@ -233,9 +234,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         });
 
         openImageButton.addActionListener(evt -> showOpenImageDialog());
-
-
-        initDocumentListener();
 
         initKeyListener();
 
@@ -297,14 +295,16 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         removeFunctionPresetButton.addActionListener(e -> removeFunctionPreset());
         addPrimitivePresetButton.addActionListener(e -> addPrimitivePreset());
         removePrimitivePresetButton.addActionListener(e -> removePrimitivePreset());
-        openHelpButton.addActionListener(e -> openMacroHelp());
+        openHelpButton.addActionListener(e -> openMacroHelp("#functions"));
         f1ResetButton.addActionListener(e -> resetTextField(f1TextField));
         f2ResetButton.addActionListener(e -> resetTextField(f2TextField));
         f3ResetButton.addActionListener(e -> resetTextField(f3TextField));
         generateFunctionButton.addActionListener(e -> generateFunction());
+        openPrimitiveHelp.addActionListener(e -> openMacroHelp("#primitive"));
         generatePrimitiveButton.addActionListener(e -> generatePrimitive());
 
-        updatePreview();
+		// select first default preset and update preview
+        functionPresetsComboBox.setSelectedIndex(1);
     }
 
     private String getTypeString(int type) {
@@ -353,65 +353,13 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
     }
 
-    private void initDocumentListener() {
-    	DocumentListener documentListener = new DocumentListener() {
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				showInactivePreviewOverlay();
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				showInactivePreviewOverlay();
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-
-			}
-		};
-
-        widthTextField.getDocument().addDocumentListener(documentListener);
-        heightTextField.getDocument().addDocumentListener(documentListener);
-		slicesTextField.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				double newValue = getRealNumValue(slicesTextField);
-				previewZSlider.setMinimum(1);
-				previewZSlider.setMaximum((int) newValue);
-				maxZ.setEnabled(newValue != 1);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				double newValue = getRealNumValue(slicesTextField);
-				previewZSlider.setMinimum(1);
-				previewZSlider.setMaximum((int) newValue);
-				maxZ.setEnabled(newValue != 1);
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-			}
-		});
-        minX.getDocument().addDocumentListener(documentListener);
-        maxX.getDocument().addDocumentListener(documentListener);
-        minY.getDocument().addDocumentListener(documentListener);
-        maxY.getDocument().addDocumentListener(documentListener);
-        minZ.getDocument().addDocumentListener(documentListener);
-        maxZ.getDocument().addDocumentListener(documentListener);
-        f1TextField.getDocument().addDocumentListener(documentListener);
-        f2TextField.getDocument().addDocumentListener(documentListener);
-        f3TextField.getDocument().addDocumentListener(documentListener);
-        primitiveTextArea.getDocument().addDocumentListener(documentListener);
-    }
-
     private void initKeyListener() {
     	KeyListener sizeKeyListener = new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				customSize = true;
 				sizePresetComboBox.setSelectedIndex(0);
+				showInactivePreviewOverlay();
 			}
 
 			@Override
@@ -431,6 +379,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			public void keyTyped(KeyEvent e) {
 				customRange = true;
 				rangePresetComboBox.setSelectedIndex(0);
+				showInactivePreviewOverlay();
 			}
 
 			@Override
@@ -450,6 +399,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			public void keyTyped(KeyEvent e) {
 				customFunction = true;
 				functionPresetsComboBox.setSelectedIndex(0);
+				showInactivePreviewOverlay();
 			}
 
 			@Override
@@ -469,6 +419,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			public void keyTyped(KeyEvent e) {
 				customPrimitive = true;
 				primitivePresetsComboBox.setSelectedIndex(0);
+				showInactivePreviewOverlay();
 			}
 
 			@Override
@@ -687,7 +638,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			customFunction = functionPresetsComboBox.getSelectedIndex() == 0;
 			if(!customFunction) {
 				FunctionPreset functionPreset = functionPresetMap.get(selectedItem);
-				typesComboBox.setSelectedItem(functionPreset.getType());
 				normalizeCheckBox.setSelected(functionPreset.isNormalized());
 				if (functionPreset.getType().equals("RGB")) {
 					f1TextField.setText(functionPreset.getFunctions()[0]);
@@ -698,7 +648,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 					f2TextField.setText(functionPreset.getFunction());
 					f3TextField.setText(functionPreset.getFunction());
 				}
-				updatePreview();
+				typesComboBox.setSelectedItem(functionPreset.getType());
 			}
         });
 
@@ -1090,15 +1040,15 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
     }
 
-    private void openMacroHelp() {
-        String pathToFile = Prefs.getPrefsDir() + "/ij-fis-functions.html";
+    private void openMacroHelp(String anchor) {
+        String pathToFile = Prefs.getPrefsDir() + "/is-help.html" + anchor;
         try {
             File file = new File(pathToFile);
             Path path;
             if(file.exists() && !file.isDirectory()) {
                 path = file.toPath();
             } else {
-                InputStream inputStream = getClass().getResourceAsStream("/functions.html");
+                InputStream inputStream = getClass().getResourceAsStream("/is-help.html");
                 path = new File(pathToFile).toPath();
                 Files.copy(inputStream, path);
             }

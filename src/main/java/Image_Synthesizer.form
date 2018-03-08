@@ -712,7 +712,7 @@
                       </grid>
                     </constraints>
                     <properties>
-                      <text value="floor((a * 40.75 + 1) % 2)"/>
+                      <text value="255*(sin(log(d)*8 + a) * sin(a*8))"/>
                     </properties>
                   </component>
                   <component id="56d02" class="javax.swing.JTextField" binding="f2TextField">
@@ -722,7 +722,7 @@
                       </grid>
                     </constraints>
                     <properties>
-                      <text value="255*sin(d + a + 4.2)"/>
+                      <text value="255*(sin(log(d)*8 + a - PI/2) * sin(a*8))"/>
                     </properties>
                   </component>
                   <component id="870cc" class="javax.swing.JTextField" binding="f3TextField">
@@ -732,7 +732,7 @@
                       </grid>
                     </constraints>
                     <properties>
-                      <text value="255*sin(d + a + 2.1)"/>
+                      <text value="255*(sin(log(d)*8 + a + PI/2) * sin(a*8))"/>
                     </properties>
                   </component>
                   <component id="b6d3e" class="javax.swing.JLabel" binding="f1Label">
@@ -933,7 +933,7 @@
                     <constraints/>
                     <properties/>
                   </component>
-                  <component id="647a2" class="javax.swing.JButton">
+                  <component id="647a2" class="javax.swing.JButton" binding="openPrimitiveHelp">
                     <constraints/>
                     <properties>
                       <focusable value="false"/>
