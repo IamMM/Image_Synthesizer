@@ -1,0 +1,308 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Maximilian Maske">
+    <title>Image Synthesizer Help</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+  </head>
+  <body style="font-family: serif;">
+    <div class="container">
+      <h1 class="text-center">Image Synthesizer</h1>
+      <hr>
+      <p>This plugin generates images from mathematical functions and primitive patterns in all ImageJ image types. It can be used to generate synthetic test-cards to analyze for example the behavior of filter-operations or to test the functionality of various algorithms in image-processing. The tool can also be used in a teaching environment, where example images for presentations can be prepared or even to demonstrate basic principles of digital image processing (e.g. by showing the relation between function values and the generated images). Further on an artistic use to create images  stacks or videos is also imaginable.</p>
+
+      <hr>
+
+      <a name="functions"></a>
+      <h2 class="text-center">Functions</h2>
+      <p>The function value of a two- or three-dimensional function <i>f(x, y)</i> or <i>f(x, y, z)</i> is interpreted as the intensity value of the image. Use the following variables, constants and functions.</p>
+
+      <h3>Variables</h3>
+      <table class="table table-bordered table-striped">
+        <tr>
+          <td width="180px"><b>x, y, z</b></td>
+          <td>Coordinate variables.</td>
+        </tr>
+        <tr>
+          <td width="180px"><b>w, h, s</b></td>
+          <td>Range of axes or width, height and slices of the predefined coordinate system variables.</td>
+        </tr>
+        <tr>
+          <td width="180px"><b>v</b></td>
+          <td>Instensity value for 8-bit, 16-bit and 32-bit input</td>
+        </tr>
+        <tr>
+          <td width="180px"><b>r, g, b</b></td>
+          <td>Instensity values for RGB input (red, green, blue values)</td>
+        </tr>
+        <tr>
+          <td><b>d</b></td>
+          <td>Distance of the point of origin</td>
+        </tr>
+        <tr>
+          <td><b>a</b></td>
+          <td>Angle to the point of origin.</td>
+        </tr>
+        <tr>
+          <td><b>random</b></td>
+          <td>Random number within [0, 1]</td>
+        </tr>
+      </table>
+
+      <h3>Constants</h3>
+      <table class="table table-bordered table-striped">
+        <tr>
+          <td width="180px"><b>PI</b></td>
+          <td>The constant &#960; (3.14159265), the ratio of the circumference to the diameter of a circle.</td>
+        </tr>
+        <tr>
+          <td><b>E</b></td>
+          <td>The exponential number e (2.718)</td>
+        </tr>
+      </table>
+
+      <h3>Elementary functions</h3>
+
+      <table class="table table-bordered table-striped">
+
+        <tbody>
+          <tr>
+            <td width="180px"><b>sin(n)</b></td>
+            <td>The sine of <i>n</i> (in radians)</td>
+          </tr>
+          <tr>
+            <td><b>asin(n)</b></td>
+            <td>The inverse sine of <i>n</i> (in radians)</td>
+          </tr>
+          <tr>
+            <td><b>cos(n)</b></td>
+            <td>The cosine of <i>n</i> (in radians)</td>
+          </tr>
+          <tr>
+            <td><b>acos(n)</b></td>
+            <td>The inverse cosine of <i>n</i> (in radians)</td>
+          </tr>
+          <tr>
+            <td><b>tan(n)</b></td>
+            <td>The tangent of <i>n</i> (in radians)</td>
+          </tr>
+          <tr>
+            <td><b>atan(n)</b></td>
+            <td>Calculates the inverse tangent (arctangent) of <i>n</i>. Returns
+              a value in the range -PI/2 through PI/2.</td>
+          </tr>
+          <tr>
+            <td><b>atan2(x,y)</b></td>
+            <td>Calculates the inverse tangent of <i>y/x</i> and returns an angle in the 
+              range -PI to PI, using the signs of the arguments to determine the quadrant. 
+              Multiply the result by 180/PI to convert to degrees.</td>
+          </tr>
+          <tr>
+            <td><b>abs(n)</b></td>
+            <td>The absolute value or modulus |x|</td>
+          </tr>
+          <tr>
+            <td><b>pow(base, exponent)</b></td>
+            <td>The value of base raised to the power of exponent.</td>
+          </tr>
+          <tr>
+            <td><b>sqrt(n)</b></td>
+            <td>The square root of <i>n</i>. Returns NaN if <i>n</i> is less than zero.</td>
+          </tr>
+          <tr>
+            <td><b>log(n)</b></td>
+            <td>The natural logarithm (base e) of <i>n</i>. Note that log10(n) = log(n)/log(10).</td>
+          </tr>
+          <tr>
+            <td><b>maxOf(n1, n2)</b></td>
+            <td>The greater of two values.</td>
+          </tr>
+          <tr>
+            <td><b>minOf(n1, n2)</b></td>
+            <td>The smaller of two values.</td>
+          </tr>
+          <tr>
+            <td><b>round(n)</b></td>
+            <td>The closest integer to <i>n</i>.</td>
+          </tr>
+          <tr>
+            <td><b>exp(n)</b></td>
+            <td>The exponential number e (i.e., 2.718...) raised to the power of <i>n</i>.</td>
+          </tr>
+          <tr>
+            <td><b>getPixel(x, y)</b></td>
+            <td>Returns the value of the pixel at <i>(x,y)</i>. Note that pixels in RGB images contain red, green and blue components that need to be extracted using shifting and masking. See the Color Picker Tool macro for an example that shows how to do this.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>You can also use other <a href="https://imagej.nih.gov/ij/developer/macro/functions.html" target="_blank">bulit in ImageJ Macro  Functions</a>.</p>
+
+      <hr>
+
+      <a name="primitives"></a>
+      <h2 class="text-center">Primitives</h2>
+      <p>To generate an primitive pattern, sometimes it is more convenient to write discreet commands, then representing a repetitive pattern by a complex function. The imageJ macro code in the text area will be executed for each pixel in the image inside the given coordinate range. </p>
+
+      <h3>Assigning Variables</h3>
+      <p>The ImageJ macro language is mostly "typeless". Variables do not need to be declared and do not have explicit data
+        types. Variable names are case-sensitive. "Name" and "name" are different
+        variables. </p>
+      <p>Assign local variables like <code>n = 1.23; </code> or global valriables: <code>var n = x &lt; y;</code></p>
+
+      <br>
+
+      <h3>Operators</h3>
+      <p>The ImageJ macro language supports almost all of the standard Java operators but with fewer precedence levels.</p>
+
+      <table class="table table-bordered table-striped">
+        <tbody>
+          <tr>
+            <th>Operator</th>
+            <th>Precedence</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td>++</td>
+            <td>1</td>
+            <td>pre or post incerement</td>
+          </tr>
+          <tr>
+            <td>--</td>
+            <td>1</td>
+            <td>pre or post decrement</td>
+          </tr>
+          <tr>
+            <td>-</td>
+            <td>1</td>
+            <td>unary minus</td>
+          </tr>
+          <tr>
+            <td>!</td>
+            <td>1</td>
+            <td>boolean complement</td>
+          </tr>
+          <tr>
+            <td>~</td>
+            <td>1</td>
+            <td>bitwise complement</td>
+          </tr>
+          <tr>
+            <td>*</td>
+            <td>2</td>
+            <td>multiplication</td>
+          </tr>
+          <tr>
+            <td>/</td>
+            <td>2</td>
+            <td>division</td>
+          </tr>
+          <tr>
+            <td>&#37;</td>
+            <td>2</td>
+            <td>euclidean division / modulo operation</td>
+          </tr>
+          <tr>
+            <td>&amp;</td>
+            <td>2</td>
+            <td>bitwise AND</td>
+          </tr>
+          <tr>
+            <td>|</td>
+            <td>2</td>
+            <td>bitwise OR</td>
+          </tr>
+          <tr>
+            <td>&#94;</td>
+            <td>2</td>
+            <td>bitwise XOR</td>
+          </tr>
+          <tr>
+            <td>&lt;&lt;, &gt;&gt;</td>
+            <td>2</td>
+            <td>bitwise left shift, right shift</td>
+          </tr>
+          <tr>
+            <td>+</td>
+            <td>3</td>
+            <td>addition or string concatenation</td>
+          </tr>
+          <tr>
+            <td>--</td>
+            <td>3</td>
+            <td>subtraction</td>
+          </tr>
+          <tr>
+            <td>&lt;, &lt;&#61;</td>
+            <td>4</td>
+            <td>less than, less than or equal</td>
+          </tr>
+          <tr>
+            <td>&gt;, &gt;&#61;</td>
+            <td>4</td>
+            <td>greater than, greater than or equal</td>
+          </tr>
+          <tr>
+            <td>==, &#33;&#61;</td>
+            <td>4</td>
+            <td>equal, not equal</td>
+          </tr>
+          <tr>
+            <td>&amp;&amp;</td>
+            <td>5</td>
+            <td>boolean AND</td>
+          </tr>
+          <tr>
+            <td>||</td>
+            <td>5</td>
+            <td>boolean OR</td>
+          </tr>
+          <tr>
+            <td>=</td>
+            <td>6</td>
+            <td>assignment</td>
+          </tr>
+          <tr>
+            <td>*=, -=, *=, /=</td>
+            <td>6</td>
+            <td>assignment with operation</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br>
+
+      <h3>Conditional-statements</h3>
+      <p>Use if-statements like the following</p>
+      <p><code>if (condition) {
+        statement(s)
+        } <br> else {
+        statement(s)
+        }  </code></p>
+
+      <br>
+
+      <h3>Loops</h3>
+      <h4>For-loop</h4>
+      <p>The <i>for-loop</i> has the following form:</p>
+      <p><code>for (initialization; condition; increment) { statement(s) }</code></p>
+
+      <h4>While-loop</h4>
+      <p>The <i>while-loop</i> has the following form:</p>
+      <p><code>while (condition) { statement(s) } </code></p>
+
+      <h4>Do...While-loop</h4>
+      <p>The <i>do...while-loop</i> has the following form:</p>
+      <p><code>do { statement(s) } while (condition);  </code></p>
+
+      <br>
+
+      <p>For more details see <a href="https://imagej.nih.gov/ij/docs/macro_reference_guide.pdf" target="_blank">ImageJ Macro Language Programmer’s Reference Guide</a>.</p>
+
+
+      <footer class="text-muted">
+        <small>ImageJ plugin | Image-Synthesizer by Maximilian Maske</small>
+      </footer>
+    </div>
+  </body>
+</html>
