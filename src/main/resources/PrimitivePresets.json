@@ -7,9 +7,34 @@
     "type": "32-bit",
     "primitive": "if((x>0 && y>0) || (y<0 && x<0)) v = 0;\nelse v = 255;"
   },
-  "Japan": {
+  "Circle": {
     "type": "RGB",
     "normalized": false,
-    "primitive": "r = g = b = 255;\nif(d<5) g = b = 0;"
+    "primitive": "r = g = b = 255;\nif(d<h/3) g = b = 0;"
+  },
+  "Circle pattern": {
+    "type":"8-bit",
+    "normalized": false,
+    "primitive": "deltaX = round(x)-x;\ndeltaY = round(y)-y;\nd = sqrt(deltaX*deltaX+deltaY*deltaY);\nradius = 0.25;\n\nif (d<radius) v= 0;\nelse v = 255;"
+  },
+  "Conic circles": {
+    "type":"8-bit",
+    "normalized": false,
+    "primitive": "thickness = 0.5;\nif(d%2<=thickness) v=0;"
+  },
+  "Stripes": {
+    "type":"8-bit",
+    "normalized": false,
+    "primitive": "if ((x%2 == 0) || (y%2 == 0)) v= 0; \n else v = 255;"
+  },
+  "Square Pattern": {
+    "type":"8-bit",
+    "normalized": false,
+    "primitive": "if ((round(x/(w/10))%2 == 0) ||(round(y/(h/10))%2 == 0) ) v= 0; \nelse v = 255;"
+  },
+  "Checkerboard": {
+    "type":"8-bit",
+    "normalized": false,
+    "primitive": "if ((floor(x/(w/8)) + floor(y/(h/8)))%2==0 ) v= 0; \nelse v = 255;"
   }
 }

@@ -20,5 +20,34 @@
       "255*sin(d + a + 4.2)",
       "255*sin(d + a + 2.1)"
     ]
+  },
+  "Dots": {
+    "type": "32-bit",
+    "function": "sin(x)*sin(x)+sin(y)*sin(y)"
+  },
+  "Purple curves": {
+    "type": "RGB",
+    "normalized": true,
+    "functions": [
+      "sin((d+z)*x*y)",
+      "0",
+      "sin((d+z)*x*y)"
+    ]
+  },
+  "Water circles": {
+    "type": "32-bit",
+    "function": "sin(d-z)"
+  },
+  "Triangle wave": {
+    "type": "32-bit",
+    "function": "abs(x%4-2)-1"
+  },
+  "Cross wave": {
+    "type": "32-bit",
+    "function": "abs(x*y%6)"
+  },
+  "Rising frequency": {
+    "type": "32-bit",
+    "function": "sin(x*x)"
   }
 }
