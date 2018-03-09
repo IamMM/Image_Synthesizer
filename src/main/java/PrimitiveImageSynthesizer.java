@@ -274,6 +274,9 @@ public class PrimitiveImageSynthesizer {
 		boolean hasZ = pgm.hasWord("z");
 		boolean hasA = pgm.hasWord("a");
 		boolean hasD = pgm.hasWord("d");
+		boolean hasR = pgm.hasWord("r");
+		boolean hasG = pgm.hasWord("g");
+		boolean hasB = pgm.hasWord("b");
 		boolean hasE = pgm.hasWord("E");
 		int width = ip.getWidth();
 		int height = ip.getHeight();
@@ -416,13 +419,15 @@ public class PrimitiveImageSynthesizer {
 						red = (rgb & 0xff0000) >> 16;
 						green = (rgb & 0xff00) >> 8;
 						blue = rgb & 0xff;
-						interpreter.setVariable("r", red);
-						interpreter.setVariable("g", green);
-						interpreter.setVariable("b", blue);
+						interpreter.setVariable(hasR?"r":"v", red);
 						interpreter.run(PCStart);
-						redPixels[pos] = interpreter.getVariable("r");
-						greenPixels[pos] = interpreter.getVariable("g");
-						bluePixels[pos] = interpreter.getVariable("b");
+						redPixels[pos] = interpreter.getVariable(hasR?"r":"v");
+						interpreter.setVariable(hasG?"g":"v", green);
+						interpreter.run(PCStart);
+						greenPixels[pos] = interpreter.getVariable(hasG?"g":"v");
+						interpreter.setVariable(hasB?"b":"v", blue);
+						interpreter.run(PCStart);
+						bluePixels[pos] = interpreter.getVariable(hasB?"b":"v");
 					}
 				}
 
@@ -810,11 +815,11 @@ public class PrimitiveImageSynthesizer {
 			for (int y = r.y; y < (r.y + r.height); y++) {
 				if (y % inc == 0) IJ.showProgress(y - r.y, r.height);
 
-				double dy = min[1]+((max[1]-min[1])/height)*y; // 0..y to min..max
+				double dy = min[1]+((max[1]-min[1])/(height-1))*y; // 0..y to min..max
 				interpreter.setVariable("y", dy);
 
 				for (int x = r.x; x < (r.x + r.width); x++) {
-					double dx = min[0]+((max[0]-min[0])/width)*x; // 0..x to min..max
+					double dx = min[0]+((max[0]-min[0])/(width-1))*x; // 0..x to min..max
 					if (hasX) interpreter.setVariable("x", dx);
 
 					if (hasA) interpreter.setVariable("a",getA(dx, dy));
@@ -826,12 +831,14 @@ public class PrimitiveImageSynthesizer {
 					green = (rgb & 0xff00) >> 8;
 					blue = rgb & 0xff;
 					interpreter.setVariable(hasR?"r":"v", red);
+					interpreter.run(PCStart);
+					redPixels[pos] = interpreter.getVariable(hasR?"r":"v");
 					interpreter.setVariable(hasG?"g":"v", green);
+					interpreter.run(PCStart);
+					greenPixels[pos] = interpreter.getVariable(hasG?"g":"v");
 					interpreter.setVariable(hasB?"b":"v", blue);
 					interpreter.run(PCStart);
-					redPixels[pos] = interpreter.getVariable("r");
-					greenPixels[pos] = interpreter.getVariable("g");
-					bluePixels[pos] = interpreter.getVariable("b");
+					bluePixels[pos] = interpreter.getVariable(hasB?"b":"v");
 				}
 			}
 
@@ -854,14 +861,11 @@ public class PrimitiveImageSynthesizer {
 				redImageProcessor.setMinAndMax(minimum, maximum);
 				greenImageProcessor.setMinAndMax(minimum, maximum);
 				blueImageProcessor.setMinAndMax(minimum, maximum);
-
 			}
 
 			((ColorProcessor)ip).setChannel(1, redImageProcessor.convertToByteProcessor(true));
 			((ColorProcessor)ip).setChannel(2, greenImageProcessor.convertToByteProcessor(true));
 			((ColorProcessor)ip).setChannel(3, blueImageProcessor.convertToByteProcessor(true));
-
-			IJ.showProgress(1.0);
 		}
 		IJ.showProgress(1.0);
 	}

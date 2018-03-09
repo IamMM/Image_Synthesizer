@@ -13,8 +13,6 @@ import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -218,8 +216,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             f3Label.setVisible(isRGB);
             f3TextField.setVisible(isRGB);
             f3ResetToolBar.setVisible(isRGB);
-            localRadioButton.setVisible(isRGB);
-            globalRadioButton.setVisible(isRGB);
+            localRadioButton.setEnabled(isRGB);
+            globalRadioButton.setEnabled(isRGB);
             localRadioButton.setEnabled(normalizeCheckBox.isSelected());
             globalRadioButton.setEnabled(normalizeCheckBox.isSelected());
 
@@ -295,12 +293,12 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         removeFunctionPresetButton.addActionListener(e -> removeFunctionPreset());
         addPrimitivePresetButton.addActionListener(e -> addPrimitivePreset());
         removePrimitivePresetButton.addActionListener(e -> removePrimitivePreset());
-        openHelpButton.addActionListener(e -> openMacroHelp("#functions"));
+        openHelpButton.addActionListener(e -> openMacroHelp());
         f1ResetButton.addActionListener(e -> resetTextField(f1TextField));
         f2ResetButton.addActionListener(e -> resetTextField(f2TextField));
         f3ResetButton.addActionListener(e -> resetTextField(f3TextField));
         generateFunctionButton.addActionListener(e -> generateFunction());
-        openPrimitiveHelp.addActionListener(e -> openMacroHelp("#primitive"));
+        openPrimitiveHelp.addActionListener(e -> openMacroHelp());
         generatePrimitiveButton.addActionListener(e -> generatePrimitive());
 
 		// select first default preset and update preview
@@ -433,7 +431,27 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
     	widthTextField.addKeyListener(sizeKeyListener);
     	heightTextField.addKeyListener(sizeKeyListener);
-    	slicesTextField.addKeyListener(sizeKeyListener);
+    	slicesTextField.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				customSize = true;
+				sizePresetComboBox.setSelectedIndex(0);
+				showInactivePreviewOverlay();
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				double newValue = getRealNumValue(slicesTextField);
+				previewZSlider.setMinimum(1);
+				previewZSlider.setMaximum((int)newValue);
+				maxZ.setEnabled(newValue != 1);
+			}
+		});
 		minX.addKeyListener(rangeKeyListener);
 		maxX.addKeyListener(rangeKeyListener);
 		minY.addKeyListener(rangeKeyListener);
@@ -941,6 +959,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 		String macro = primitiveTextArea.getText();
 
+		if(doNewImage && (containsSubstring("getPixel", functions) || macro.contains("getPixel"))) {
+			IJ.showMessage("Error", "Please select or open an image to use getPixel()");
+			return;
+		}
+
 		// apply
 		ImagePlus imagePlus;
 		if(doNewImage) {
@@ -975,7 +998,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		previewIsActive = true;
 	}
 
-    private void generateFunction() {
+	private boolean containsSubstring(String substring, String[] strings) {
+		for (String s : strings) {
+			if(s.contains(substring)) return true;
+		}
+		return false;
+	}
+
+	private void generateFunction() {
         // meta
 		String title = WindowManager.makeUniqueName(titleTextField.getText());
         String type = (String) typesComboBox.getSelectedItem();
@@ -1003,6 +1033,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         String function = getFunctionText(f1TextField);
         String[] functions = new String[]{function, getFunctionText(f2TextField), getFunctionText(f3TextField)};
 
+		if(doNewImage && containsSubstring("getPixel", functions)) {
+			IJ.showMessage("Error", "Please select or open an image to use getPixel()");
+			return;
+		}
         // apply
         ImagePlus imagePlus;
         if(doNewImage) {
@@ -1040,8 +1074,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         }
     }
 
-    private void openMacroHelp(String anchor) {
-        String pathToFile = Prefs.getPrefsDir() + "/is-help.html" + anchor;
+    private void openMacroHelp() {
+        String pathToFile = Prefs.getPrefsDir() + "/is-help.html";
         try {
             File file = new File(pathToFile);
             Path path;
@@ -1103,6 +1137,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 		// function
 		String macro = primitiveTextArea.getText();
+
+		if(doNewImage && macro.contains("getPixel")) {
+			IJ.showMessage("Error", "Please select or open an image to use getPixel()");
+			return;
+		}
 
 		// apply
 		ImagePlus imagePlus;
