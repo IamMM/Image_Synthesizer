@@ -1,5 +1,5 @@
 # Image Synthesizer
-This is a plugin solution for ImageJ/Fiji to generate images or stacks out mathematical functions. The UI makes it possible to play around various parameters and will let you preview the result.
+This plugin generates images from mathematical functions and primitive patterns in a predefined coordinate system. It can be used to synthesize test-cards to analyze for example the behavior of filter-operations or to test the functionality of various image-processing algorithms. The tool can also be used in a teaching environment, where example images for presentations can be prepared or even to demonstrate basic principles of digital image processing. The UI makes it possible to play around various parameters and will show a preview of the result. Further on, an artistic use to create images stacks or videos, is also imaginable.
 
 ![GUI Screenshot](/screenshot.jpg)
 
