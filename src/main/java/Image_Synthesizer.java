@@ -148,6 +148,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         frame.setContentPane(this.mainPanel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setResizable(false);
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.pack();
 //        frame.setLocationRelativeTo(null); //center the frame on screen
         setLocationRelativeToImageJFrame();
@@ -208,7 +209,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             } else {
                 f1Label.setText("v=");
             }
-            if(is32Bit) normalizeCheckBox.setSelected(false);
             invertingLUTCheckBox.setEnabled(!isRGB);
             f2Label.setVisible(isRGB);
             f2TextField.setVisible(isRGB);
@@ -216,10 +216,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             f3Label.setVisible(isRGB);
             f3TextField.setVisible(isRGB);
             f3ResetToolBar.setVisible(isRGB);
-            localRadioButton.setEnabled(isRGB);
-            globalRadioButton.setEnabled(isRGB);
-            localRadioButton.setEnabled(normalizeCheckBox.isSelected());
-            globalRadioButton.setEnabled(normalizeCheckBox.isSelected());
+            localRadioButton.setEnabled(isRGB && normalizeCheckBox.isSelected());
+            globalRadioButton.setEnabled(isRGB && normalizeCheckBox.isSelected());
 
             if(!doNewImage) {
                 ImagePlus tmp = WindowManager.getImage((String) imageComboBox.getSelectedItem());
@@ -977,7 +975,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		int frame = slices>1?previewZSlider.getValue():1;
 
 		boolean drawAxes = drawAxesCheckBox.isSelected();
-		boolean normalize = normalizeCheckBox.isSelected();
+		boolean normalize = is32Bit?false:normalizeCheckBox.isSelected();
 		boolean globalNorm = globalRadioButton.isSelected();
 		boolean interpolate = interpolateCheckBox.isSelected();
 
