@@ -16,7 +16,7 @@
     <artifactId>Image_Synthesizer</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
-    <name>plugins/Image_Synthesizer.jar</name>
+    <name>Image_Synthesizer</name>
     <description>A Maven project implementing an ImageJ 1.x plugin</description>
 
     <developers>
