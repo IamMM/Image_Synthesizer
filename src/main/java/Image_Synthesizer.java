@@ -1164,7 +1164,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		min[2] = getRealNumValue(minZ);
 		max[2] = getRealNumValue(maxZ);
 
-		// function
+		// convert conditional to macro
 		String macro = conditionalToMacro();
 
 		if(doNewImage && macro.contains("getPixel")) {
