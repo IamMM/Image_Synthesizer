@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="5" left="5" bottom="5" right="5"/>
     <constraints>
-      <xy x="20" y="20" width="615" height="800"/>
+      <xy x="20" y="20" width="634" height="776"/>
     </constraints>
     <properties>
       <enabled value="true"/>
@@ -16,7 +16,7 @@
       <grid id="1ff11" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="4" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
         <border type="none"/>
@@ -655,7 +655,7 @@
       </component>
       <tabbedpane id="68a21" binding="synthieSelector">
         <constraints>
-          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="200" height="200"/>
           </grid>
         </constraints>
@@ -884,38 +884,15 @@
               </grid>
             </children>
           </grid>
-          <grid id="13c39" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="b4dda" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <tabbedpane title="Primitives"/>
+              <tabbedpane title="Conditional"/>
             </constraints>
             <properties/>
             <border type="none"/>
             <children>
-              <grid id="6b16e" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-                <margin top="0" left="0" bottom="0" right="0"/>
-                <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties/>
-                <border type="none"/>
-                <children>
-                  <component id="6d286" class="javax.swing.JButton" binding="generatePrimitiveButton">
-                    <constraints>
-                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <text value="Generate"/>
-                    </properties>
-                  </component>
-                  <hspacer id="782ca">
-                    <constraints>
-                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                  </hspacer>
-                </children>
-              </grid>
-              <toolbar id="875ad">
+              <toolbar id="9007c">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -925,39 +902,41 @@
                 </properties>
                 <border type="none"/>
                 <children>
-                  <hspacer id="8b5de">
+                  <hspacer id="613b1">
                     <constraints/>
                   </hspacer>
-                  <component id="eb901" class="javax.swing.JLabel">
+                  <component id="6758e" class="javax.swing.JLabel">
                     <constraints/>
                     <properties>
                       <text value="Presets"/>
                     </properties>
                   </component>
-                  <component id="b74e0" class="javax.swing.JComboBox" binding="primitivePresetsComboBox">
+                  <component id="abf4" class="javax.swing.JComboBox" binding="conditionalPrestComboBox">
                     <constraints/>
                     <properties>
+                      <focusable value="false"/>
                       <minimumSize width="150" height="26"/>
                     </properties>
                   </component>
-                  <component id="1cf3a" class="javax.swing.JButton" binding="addPrimitivePresetButton">
+                  <component id="154a" class="javax.swing.JButton" binding="addConditionalPresetButton">
                     <constraints/>
                     <properties>
                       <focusable value="false"/>
                       <text value="+"/>
                     </properties>
                   </component>
-                  <component id="c0aa1" class="javax.swing.JButton" binding="removePrimitivePresetButton">
+                  <component id="7e6b6" class="javax.swing.JButton" binding="removeConditionalPresetButton">
                     <constraints/>
                     <properties>
+                      <focusable value="false"/>
                       <text value="-"/>
                     </properties>
                   </component>
-                  <component id="d7a4f" class="javax.swing.JToolBar$Separator">
+                  <component id="90968" class="javax.swing.JToolBar$Separator">
                     <constraints/>
                     <properties/>
                   </component>
-                  <component id="647a2" class="javax.swing.JButton" binding="openPrimitiveHelp">
+                  <component id="ca0c3" class="javax.swing.JButton" binding="openHelpButton2">
                     <constraints/>
                     <properties>
                       <focusable value="false"/>
@@ -966,22 +945,183 @@
                   </component>
                 </children>
               </toolbar>
-              <scrollpane id="787e">
+              <splitpane id="1b844">
                 <constraints>
-                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <preferred-size width="200" height="200"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <dividerLocation value="150"/>
+                  <dividerSize value="5"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <grid id="7953c" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                    <margin top="0" left="0" bottom="0" right="0"/>
+                    <constraints>
+                      <splitpane position="right"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="ccb8a" class="javax.swing.JTextField" binding="conditionalIfField">
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="d%2&lt;=thickness"/>
+                        </properties>
+                      </component>
+                      <component id="8d057" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="if"/>
+                        </properties>
+                      </component>
+                      <splitpane id="175d0">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                            <preferred-size width="200" height="200"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <dividerLocation value="216"/>
+                          <dividerSize value="5"/>
+                        </properties>
+                        <border type="none"/>
+                        <children>
+                          <grid id="6136b" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                            <margin top="0" left="0" bottom="0" right="0"/>
+                            <constraints>
+                              <splitpane position="left"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <scrollpane id="840ff">
+                                <constraints>
+                                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                </constraints>
+                                <properties/>
+                                <border type="none"/>
+                                <children>
+                                  <component id="6096d" class="javax.swing.JTextArea" binding="conditionalThenField">
+                                    <constraints/>
+                                    <properties>
+                                      <rows value="0"/>
+                                      <text value="v=0;"/>
+                                    </properties>
+                                  </component>
+                                </children>
+                              </scrollpane>
+                              <component id="7ab73" class="javax.swing.JLabel">
+                                <constraints>
+                                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                </constraints>
+                                <properties>
+                                  <text value="then"/>
+                                </properties>
+                              </component>
+                            </children>
+                          </grid>
+                          <grid id="ac9db" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                            <margin top="0" left="0" bottom="0" right="0"/>
+                            <constraints>
+                              <splitpane position="right"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <scrollpane id="d42b3">
+                                <constraints>
+                                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                </constraints>
+                                <properties/>
+                                <border type="none"/>
+                                <children>
+                                  <component id="60ad5" class="javax.swing.JTextArea" binding="conditionalElseField">
+                                    <constraints/>
+                                    <properties/>
+                                  </component>
+                                </children>
+                              </scrollpane>
+                              <component id="ba3a4" class="javax.swing.JLabel">
+                                <constraints>
+                                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                </constraints>
+                                <properties>
+                                  <text value="else"/>
+                                </properties>
+                              </component>
+                            </children>
+                          </grid>
+                        </children>
+                      </splitpane>
+                    </children>
+                  </grid>
+                  <grid id="47cfb" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                    <margin top="0" left="0" bottom="0" right="0"/>
+                    <constraints>
+                      <splitpane position="left"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="a9778" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="variables"/>
+                        </properties>
+                      </component>
+                      <scrollpane id="be14b">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <component id="9539e" class="javax.swing.JTextArea" binding="conditionalVariableField">
+                            <constraints/>
+                            <properties>
+                              <text value="thickness = 0.5;"/>
+                            </properties>
+                          </component>
+                        </children>
+                      </scrollpane>
+                    </children>
+                  </grid>
+                </children>
+              </splitpane>
+              <grid id="90897" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="5f77b" class="javax.swing.JTextPane" binding="primitiveTextArea">
-                    <constraints/>
+                  <component id="390a9" class="javax.swing.JButton" binding="generateConditional">
+                    <constraints>
+                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
                     <properties>
-                      <font name="Source Code Pro"/>
-                      <text value="if((x&gt;0 &amp;&amp; y&gt;0) || (y&lt;0 &amp;&amp; x&lt;0)) v = 0; else v = 255;"/>
+                      <text value="Generate"/>
                     </properties>
                   </component>
+                  <hspacer id="4f972">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                  </hspacer>
                 </children>
-              </scrollpane>
+              </grid>
             </children>
           </grid>
         </children>

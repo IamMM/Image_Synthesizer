@@ -93,8 +93,8 @@
           </tr>
           <tr>
             <td><b>atan2(x,y)</b></td>
-            <td>Calculates the inverse tangent of <i>y/x</i> and returns an angle in the 
-              range -PI to PI, using the signs of the arguments to determine the quadrant. 
+            <td>Calculates the inverse tangent of <i>y/x</i> and returns an angle in the
+              range -PI to PI, using the signs of the arguments to determine the quadrant.
               Multiply the result by 180/PI to convert to degrees.</td>
           </tr>
           <tr>
@@ -144,15 +144,91 @@
 
       <hr>
 
-      <a name="primitives"></a>
-      <h2 class="text-center">Primitives</h2>
-      <p>To generate an primitive pattern, sometimes it is more convenient to write discreet commands, then representing a repetitive pattern by a complex function. The imageJ macro code in the text area will be executed for each pixel in the image inside the given coordinate range. </p>
+      <a name="conditional"></a>
+      <h2 class="text-center">Conditional Statements</h2>
+      <p>Generate primitive patterns using boolean expressions with ImageJ macro code. The conditional will be executed for each pixel in the image inside the given coordinate range. </p>
+
+      <p>The given commands will be interpreted as an if-statements like the following</p>
+      <p><code>
+        [variables] <br>
+        if ([condition]) {
+        [then_statement]
+        } <br> else {
+        [else_statement]
+        }  </code></p>
+
+      <br>
 
       <h3>Assigning Variables</h3>
       <p>The ImageJ macro language is mostly "typeless". Variables do not need to be declared and do not have explicit data
         types. Variable names are case-sensitive. "Name" and "name" are different
         variables. </p>
-      <p>Assign local variables like <code>n = 1.23; </code> or global valriables: <code>var n = x &lt; y;</code></p>
+      <p>Assign local variables simply like <code>my_variable = 1.23; </code> and use them later, e.g. for a boolean expression, like <code> x * y >= my_variable</code></p>
+
+      <br>
+
+      <h3>Assigning Conditions</h3>
+      <p>A condition must be a boolean expression with logic operators like AND (conjunctions), OR (disjunctions) or NOT (negations). See the basic behavior of boolean algebra in the following truth tables:</p>
+
+      <div class="row">
+        <div class="col-md-9">
+          <table class="table table-bordered table-striped">
+            <tbody>
+            <tr>
+              <th>x</th>
+              <th>y</th>
+              <th>x AND y</th>
+              <th>x OR y</th>
+            </tr>
+            <tr>
+              <td>false</td>
+              <td>false</td>
+              <td>false</td>
+              <td>false</td>
+            </tr>
+            <tr>
+              <td>true</td>
+              <td>false</td>
+              <td>false</td>
+              <td>true</td>
+            </tr>
+            <tr>
+              <td>false</td>
+              <td>true</td>
+              <td>false</td>
+              <td>true</td>
+            </tr>
+            <tr>
+              <td>true</td>
+              <td>true</td>
+              <td>true</td>
+              <td>true</td>
+            </tr>
+            </tbody>
+          </table>
+       </div>
+
+
+        <div class="col-md-3">
+          <table class="table table-bordered table-striped">
+            <tbody>
+            <tr>
+              <th>x</th>
+              <th>NOT x</th>
+            </tr>
+            <tr>
+              <td>false</td>
+              <td>true</td>
+            </tr>
+            <tr>
+              <td>true</td>
+              <td>false</td>
+            </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
 
       <br>
 
@@ -274,35 +350,9 @@
         </tbody>
       </table>
 
-      <br>
-
-      <h3>Conditional-statements</h3>
-      <p>Use if-statements like the following</p>
-      <p><code>if (condition) {
-        statement(s)
-        } <br> else {
-        statement(s)
-        }  </code></p>
-
-      <br>
-
-      <h3>Loops</h3>
-      <h4>For-loop</h4>
-      <p>The <i>for-loop</i> has the following form:</p>
-      <p><code>for (initialization; condition; increment) { statement(s) }</code></p>
-
-      <h4>While-loop</h4>
-      <p>The <i>while-loop</i> has the following form:</p>
-      <p><code>while (condition) { statement(s) } </code></p>
-
-      <h4>Do...While-loop</h4>
-      <p>The <i>do...while-loop</i> has the following form:</p>
-      <p><code>do { statement(s) } while (condition);  </code></p>
-
-      <br>
-
       <p>For more details see <a href="https://imagej.nih.gov/ij/docs/macro_reference_guide.pdf" target="_blank">ImageJ Macro Language Programmer’s Reference Guide</a>.</p>
 
+      <br>
 
       <footer class="text-muted">
         <small>ImageJ plugin | Image-Synthesizer by Maximilian Maske</small>

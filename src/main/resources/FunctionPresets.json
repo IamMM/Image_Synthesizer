@@ -1,7 +1,5 @@
 {
   "custom": {
-    "type": "32-bit",
-    "function": "x"
   },
   "Fibonacci": {
     "type": "RGB",

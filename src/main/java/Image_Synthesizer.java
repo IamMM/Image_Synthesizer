@@ -1,7 +1,4 @@
-import Presets.DimensionPreset;
-import Presets.FunctionPreset;
-import Presets.PrimitivePreset;
-import Presets.SizePreset;
+import Presets.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -39,8 +36,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JComboBox<String> typesComboBox;
     private JButton openImageButton;
     private JCheckBox invertingLUTCheckBox;
-    private JCheckBox normalizeCheckBox;
     private JLabel preview;
+    private JSlider previewZSlider;
+	private JLabel currentSliceLabel;
+	private JCheckBox interpolateCheckBox;
     private JCheckBox drawAxesCheckBox;
     private JComboBox<String> sizePresetComboBox;
     private JComboBox<String> rangePresetComboBox;
@@ -53,12 +52,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JTextField maxY;
     private JTextField minZ;
     private JTextField maxZ;
+    private JCheckBox normalizeCheckBox;
+	private JRadioButton localRadioButton;
+	private JRadioButton globalRadioButton;
+	private JTabbedPane synthieSelector;
 	private JButton addSizePresetButton;
 	private JButton removeSizePresetButton;
 	private JButton addDimensionPresetButton;
 	private JButton removeDimensionPresetButton;
-    private JSlider previewZSlider;
-	private JLabel currentSliceLabel;
 
     // function swing components
     private JComboBox<String> functionPresetsComboBox;
@@ -78,17 +79,17 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private JToolBar f3ResetToolBar;
     private JButton generateFunctionButton;
 
-    // primitive swing components
-    private JTextPane primitiveTextArea;
-	private JButton generatePrimitiveButton;
-	private JComboBox<String> primitivePresetsComboBox;
-	private JButton addPrimitivePresetButton;
-	private JButton removePrimitivePresetButton;
-	private JTabbedPane synthieSelector;
-	private JCheckBox interpolateCheckBox;
-	private JRadioButton localRadioButton;
-	private JRadioButton globalRadioButton;
-	private JButton openPrimitiveHelp;
+
+	// conditional swing components
+	private JTextField conditionalIfField;
+	private JTextArea conditionalThenField;
+	private JTextArea conditionalVariableField;
+	private JTextArea conditionalElseField;
+	private JComboBox<String> conditionalPrestComboBox;
+	private JButton addConditionalPresetButton;
+	private JButton removeConditionalPresetButton;
+	private JButton generateConditional;
+	private JButton openHelpButton2;
 
 	// constants
     private static final String TITLE = "Image Synthesizer";
@@ -108,12 +109,13 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private Map<String, DimensionPreset> userDimensionPresetMap;
     private Map<String, FunctionPreset> functionPresetMap;
     private Map<String, FunctionPreset> userFunctionPresetMap;
-    private Map<String, PrimitivePreset> primitivePresetMap;
-    private Map<String, PrimitivePreset> userPrimitivePresetMap;
+    private Map<String, ConditionalPreset> conditionalPresetMap;
+    private Map<String, ConditionalPreset> userConditionalPresetMap;
 	private boolean previewIsActive = true;
 	private boolean customSize;
 	private boolean customRange;
 	private boolean customFunction;
+	private boolean customConditional;
 	private boolean customPrimitive;
 
 	/**
@@ -289,15 +291,15 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         removeDimensionPresetButton.addActionListener(e -> removeDimensionPreset());
         addFunctionPresetButton.addActionListener(e -> addFunctionPreset());
         removeFunctionPresetButton.addActionListener(e -> removeFunctionPreset());
-        addPrimitivePresetButton.addActionListener(e -> addPrimitivePreset());
-        removePrimitivePresetButton.addActionListener(e -> removePrimitivePreset());
+        addConditionalPresetButton.addActionListener(e -> addConditionalPreset());
+        removeConditionalPresetButton.addActionListener(e -> removeConditionalPreset());
         openHelpButton.addActionListener(e -> openMacroHelp());
         f1ResetButton.addActionListener(e -> resetTextField(f1TextField));
         f2ResetButton.addActionListener(e -> resetTextField(f2TextField));
         f3ResetButton.addActionListener(e -> resetTextField(f3TextField));
         generateFunctionButton.addActionListener(e -> generateFunction());
-        openPrimitiveHelp.addActionListener(e -> openMacroHelp());
-        generatePrimitiveButton.addActionListener(e -> generatePrimitive());
+        openHelpButton2.addActionListener(e -> openMacroHelp());
+        generateConditional.addActionListener(e -> generateConditional());
 
 		// select first default preset and update preview
         functionPresetsComboBox.setSelectedIndex(1);
@@ -410,11 +412,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			}
 		};
 
-		KeyListener primitiveKeyListener = new KeyListener() {
+		KeyListener conditionalKeyListener = new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				customPrimitive = true;
-				primitivePresetsComboBox.setSelectedIndex(0);
+				conditionalPrestComboBox.setSelectedIndex(0);
 				showInactivePreviewOverlay();
 			}
 
@@ -459,7 +461,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		f1TextField.addKeyListener(functionKeyListener);
 		f2TextField.addKeyListener(functionKeyListener);
 		f3TextField.addKeyListener(functionKeyListener);
-		primitiveTextArea.addKeyListener(primitiveKeyListener);
+		conditionalVariableField.addKeyListener(conditionalKeyListener);
+		conditionalIfField.addKeyListener(conditionalKeyListener);
+		conditionalThenField.addKeyListener(conditionalKeyListener);
+		conditionalElseField.addKeyListener(conditionalKeyListener);
     }
 
     private void initMouseListener() {
@@ -535,18 +540,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	 ********************************************************/
 
     private void initPresetMaps() {
-
-//    	Map<String, PrimitivePreset> tempMap = new HashMap<>();
-//    	PrimitivePreset primitivePreset = new PrimitivePreset("if(x>0) v=sin(x);", "32-Bit");
-//    	tempMap.put("Quadrant", primitivePreset);
-//
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter("PrimitivePresets.json"))) {
-//            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//            gson.toJson(tempMap, writer);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
     	// size
 		sizePresetMap = new HashMap<>();
 		InputStream inputStream = getClass().getResourceAsStream("/SizePresets.json");
@@ -668,39 +661,42 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			}
         });
 
-        // primitives
-		primitivePresetMap = new HashMap<>();
-		inputStream = getClass().getResourceAsStream("/PrimitivePresets.json");
+        // conditional
+		conditionalPresetMap = new HashMap<>();
+		inputStream = getClass().getResourceAsStream("/ConditionalPresets.json");
 		gson = new Gson();
-		type = new TypeToken<Map<String, PrimitivePreset>>(){}.getType();
+		type = new TypeToken<Map<String, ConditionalPreset>>(){}.getType();
 		try (Reader reader = new InputStreamReader(inputStream)) {
-			primitivePresetMap = gson.fromJson(reader, type);
+			conditionalPresetMap = gson.fromJson(reader, type);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		for (String preset : primitivePresetMap.keySet()) {
-			primitivePresetsComboBox.addItem(preset);
+		for (String preset : conditionalPresetMap.keySet()) {
+			conditionalPrestComboBox.addItem(preset);
 		}
 
 		// get user function presets from preferences
-		String userPrimitivePrefs = Prefs.get("fis.PrimitivePresets", "");
-		userPrimitivePresetMap = gson.fromJson(userPrimitivePrefs, type);
-		if(userPrimitivePresetMap!=null) {
-			for (String preset : userPrimitivePresetMap.keySet()) {
-				primitivePresetsComboBox.addItem(preset);
+		String userConditionalPrefs = Prefs.get("fis.ConditionalPresets", "");
+		userConditionalPresetMap = gson.fromJson(userConditionalPrefs, type);
+		if(userConditionalPresetMap!=null) {
+			for (String preset : userConditionalPresetMap.keySet()) {
+				conditionalPrestComboBox.addItem(preset);
 			}
-			primitivePresetMap.putAll(userPrimitivePresetMap);
+			conditionalPresetMap.putAll(userConditionalPresetMap);
 		}
 
-		primitivePresetsComboBox.addActionListener(e -> {
-			String selectedItem = (String) primitivePresetsComboBox.getSelectedItem();
-			customPrimitive = primitivePresetsComboBox.getSelectedIndex() == 0;
-			if(!customPrimitive) {
-				PrimitivePreset primitivePreset = primitivePresetMap.get(selectedItem);
-				typesComboBox.setSelectedItem(primitivePreset.getType());
-				normalizeCheckBox.setSelected(primitivePreset.isNormalized());
-				primitiveTextArea.setText(primitivePreset.getPrimitive());
+		conditionalPrestComboBox.addActionListener(e -> {
+			String selectedItem = (String) conditionalPrestComboBox.getSelectedItem();
+			customConditional = conditionalPrestComboBox.getSelectedIndex() == 0;
+			if(!customConditional) {
+				ConditionalPreset conditionalPreset = conditionalPresetMap.get(selectedItem);
+				typesComboBox.setSelectedItem(conditionalPreset.getType());
+				normalizeCheckBox.setSelected(conditionalPreset.isNormalized());
+				conditionalVariableField.setText(conditionalPreset.getVariables());
+				conditionalIfField.setText(conditionalPreset.getCondition());
+				conditionalThenField.setText(conditionalPreset.getThen_statement());
+				conditionalElseField.setText(conditionalPreset.getElse_statement());
 				updatePreview();
 			}
 		});
@@ -838,43 +834,47 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		updateUserDimensionPresets();
 	}
 
-	private void addPrimitivePreset() {
-		GenericDialog genericDialog = new GenericDialog("Add Primitive Preset");
+	private void addConditionalPreset() {
+		GenericDialog genericDialog = new GenericDialog("Add Conditional Preset");
 		genericDialog.addStringField("Name: ", "", 15);
 		genericDialog.showDialog();
 		if (genericDialog.wasCanceled()) return;
 		String name = genericDialog.getNextString();
 
-		if (primitivePresetMap.containsKey(name)) {
+		if (conditionalPresetMap.containsKey(name)) {
 			name = checkName(name);
 			if(name.isEmpty()) return;
 		}
 
 		String type = (String) typesComboBox.getSelectedItem();
 		boolean normalized = normalizeCheckBox.isSelected();
-		String primitive = primitiveTextArea.getText();
+		String variables = conditionalVariableField.getText();
+		String condition = conditionalIfField.getText();
+		String then_statement = conditionalThenField.getText();
+		String else_statement = conditionalElseField.getText();
 
-		PrimitivePreset primitivePreset = new PrimitivePreset(type, normalized, primitive);
+		ConditionalPreset conditionalPreset =
+				new ConditionalPreset(type, normalized, variables, condition, then_statement, else_statement);
 
-		if(userPrimitivePresetMap==null) userPrimitivePresetMap = new HashMap<>();
-		userPrimitivePresetMap.put(name, primitivePreset);
-		primitivePresetMap.put(name, primitivePreset);
-		primitivePresetsComboBox.addItem(name);
-		primitivePresetsComboBox.setSelectedItem(name);
+		if(userConditionalPresetMap==null) userConditionalPresetMap = new HashMap<>();
+		userConditionalPresetMap.put(name, conditionalPreset);
+		conditionalPresetMap.put(name, conditionalPreset);
+		conditionalPrestComboBox.addItem(name);
+		conditionalPrestComboBox.setSelectedItem(name);
 
 		updateUserPrimitivePresets();
 	}
 
-	private void removePrimitivePreset() {
-		String selectedPreset = (String) primitivePresetsComboBox.getSelectedItem();
-		GenericDialog genericDialog = new GenericDialog("Remove Primitive Preset");
+	private void removeConditionalPreset() {
+		String selectedPreset = (String) conditionalPrestComboBox.getSelectedItem();
+		GenericDialog genericDialog = new GenericDialog("Remove Conditional Preset");
 		genericDialog.addMessage("You are about to remove the following preset: " + selectedPreset);
 		genericDialog.showDialog();
 
 		if (genericDialog.wasCanceled()) return;
-		userPrimitivePresetMap.remove(selectedPreset);
-		primitivePresetMap.remove(selectedPreset);
-		primitivePresetsComboBox.removeItem(selectedPreset);
+		userConditionalPresetMap.remove(selectedPreset);
+		conditionalPresetMap.remove(selectedPreset);
+		conditionalPrestComboBox.removeItem(selectedPreset);
 
 		updateUserPrimitivePresets();
 	}
@@ -917,8 +917,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 	private void updateUserPrimitivePresets(){
 		Gson gsonBuilder = new GsonBuilder().disableHtmlEscaping().create();
-		String json = gsonBuilder.toJson(userPrimitivePresetMap);
-		Prefs.set("fis.PrimitivePresets", json);
+		String json = gsonBuilder.toJson(userConditionalPresetMap);
+		Prefs.set("fis.ConditionalPresets", json);
 		Prefs.savePreferences();
 	}
 
@@ -955,9 +955,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		String function = getFunctionText(f1TextField);
 		String[] functions = new String[]{function, getFunctionText(f2TextField), getFunctionText(f3TextField)};
 
-		String macro = primitiveTextArea.getText();
+		String macro = conditionalToMacro();
 
-		if(doNewImage && (containsSubstring("getPixel", functions) || macro.contains("getPixel"))) {
+		if(doNewImage && (containsSubstringGetPixel(functions) || macro.contains("getPixel"))) {
 			IJ.showMessage("Error", "Please select or open an image to use getPixel()");
 			return;
 		}
@@ -975,7 +975,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		int frame = slices>1?previewZSlider.getValue():1;
 
 		boolean drawAxes = drawAxesCheckBox.isSelected();
-		boolean normalize = is32Bit?false:normalizeCheckBox.isSelected();
+		boolean normalize = !is32Bit && normalizeCheckBox.isSelected();
 		boolean globalNorm = globalRadioButton.isSelected();
 		boolean interpolate = interpolateCheckBox.isSelected();
 
@@ -996,9 +996,18 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		previewIsActive = true;
 	}
 
-	private boolean containsSubstring(String substring, String[] strings) {
+	private String conditionalToMacro() {
+		String variables = conditionalVariableField.getText();
+		String condition = conditionalIfField.getText();
+		String then_statement = conditionalThenField.getText();
+		String else_statement = conditionalElseField.getText();
+
+		return variables + "\n" + "if(" + condition + ")\n{" + then_statement + "} \nelse {" + else_statement + "}";
+	}
+
+	private boolean containsSubstringGetPixel(String[] strings) {
 		for (String s : strings) {
-			if(s.contains(substring)) return true;
+			if(s.contains("getPixel")) return true;
 		}
 		return false;
 	}
@@ -1031,7 +1040,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         String function = getFunctionText(f1TextField);
         String[] functions = new String[]{function, getFunctionText(f2TextField), getFunctionText(f3TextField)};
 
-		if(doNewImage && containsSubstring("getPixel", functions)) {
+		if(doNewImage && containsSubstringGetPixel(functions)) {
 			IJ.showMessage("Error", "Please select or open an image to use getPixel()");
 			return;
 		}
@@ -1073,14 +1082,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     }
 
     private void openMacroHelp() {
-        String pathToFile = Prefs.getPrefsDir() + "/is-help.html";
+        String pathToFile = Prefs.getPrefsDir() + "/image-synthesizer-help.htm";
         try {
             File file = new File(pathToFile);
             Path path;
             if(file.exists() && !file.isDirectory()) {
                 path = file.toPath();
             } else {
-                InputStream inputStream = getClass().getResourceAsStream("/is-help.html");
+                InputStream inputStream = getClass().getResourceAsStream("/image-synthesizer-help.htm");
                 path = new File(pathToFile).toPath();
                 Files.copy(inputStream, path);
             }
@@ -1105,11 +1114,11 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 	/********************************************************
 	 * 														*
-	 *						PIS-METHODS						*
+	 *						CIS-METHODS						*
 	 *														*
 	 ********************************************************/
 
-	private void generatePrimitive() {
+	private void generateConditional() {
 		// meta
 		String title = WindowManager.makeUniqueName(titleTextField.getText());
 		String type = (String) typesComboBox.getSelectedItem();
@@ -1134,7 +1143,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		max[2] = getRealNumValue(maxZ);
 
 		// function
-		String macro = primitiveTextArea.getText();
+		String macro = conditionalToMacro();
 
 		if(doNewImage && macro.contains("getPixel")) {
 			IJ.showMessage("Error", "Please select or open an image to use getPixel()");
