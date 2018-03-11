@@ -97,7 +97,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
     // Synthesizer Objects
     private static FunctionImageSynthesizer FIS = new FunctionImageSynthesizer();
-    private static PrimitiveImageSynthesizer PIS = new PrimitiveImageSynthesizer();
+    private static MacroImageSynthesizer MIS = new MacroImageSynthesizer();
 
     // globals
     private boolean doNewImage = true;
@@ -116,7 +116,6 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private boolean customRange;
 	private boolean customFunction;
 	private boolean customConditional;
-	private boolean customPrimitive;
 
 	/**
      * Main method for debugging.
@@ -415,7 +414,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		KeyListener conditionalKeyListener = new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				customPrimitive = true;
+				customConditional = true;
 				conditionalPrestComboBox.setSelectedIndex(0);
 				showInactivePreviewOverlay();
 			}
@@ -450,6 +449,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 				previewZSlider.setMinimum(1);
 				previewZSlider.setMaximum((int)newValue);
 				maxZ.setEnabled(newValue != 1);
+				previewZSlider.setEnabled(newValue > 1);
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					updatePreview();
+				}
 			}
 		});
 		minX.addKeyListener(rangeKeyListener);
@@ -462,7 +465,26 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		f2TextField.addKeyListener(functionKeyListener);
 		f3TextField.addKeyListener(functionKeyListener);
 		conditionalVariableField.addKeyListener(conditionalKeyListener);
-		conditionalIfField.addKeyListener(conditionalKeyListener);
+		conditionalIfField.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				customConditional = true;
+				conditionalPrestComboBox.setSelectedIndex(0);
+				showInactivePreviewOverlay();
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					updatePreview();
+				}
+			}
+		});
 		conditionalThenField.addKeyListener(conditionalKeyListener);
 		conditionalElseField.addKeyListener(conditionalKeyListener);
     }
@@ -862,7 +884,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		conditionalPrestComboBox.addItem(name);
 		conditionalPrestComboBox.setSelectedItem(name);
 
-		updateUserPrimitivePresets();
+		updateUserConditionalPresets();
 	}
 
 	private void removeConditionalPreset() {
@@ -876,7 +898,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		conditionalPresetMap.remove(selectedPreset);
 		conditionalPrestComboBox.removeItem(selectedPreset);
 
-		updateUserPrimitivePresets();
+		updateUserConditionalPresets();
 	}
 
     private String checkName(String name) {
@@ -915,7 +937,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
         Prefs.savePreferences();
     }
 
-	private void updateUserPrimitivePresets(){
+	private void updateUserConditionalPresets(){
 		Gson gsonBuilder = new GsonBuilder().disableHtmlEscaping().create();
 		String json = gsonBuilder.toJson(userConditionalPresetMap);
 		Prefs.set("fis.ConditionalPresets", json);
@@ -986,8 +1008,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 				} else {
 					previewImage = FIS.getPreview(imagePlus, min, max, frame, function, drawAxes, normalize, interpolate);
 				}
-			} else { // preview primitive
-				previewImage = PIS.getPreview(imagePlus, min, max, frame, macro, drawAxes, normalize, globalNorm, interpolate);
+			} else { // preview conditional
+				previewImage = MIS.getPreview(imagePlus, min, max, frame, macro, drawAxes, normalize, globalNorm, interpolate);
 			}
 			preview.setIcon(new ImageIcon(previewImage));
 		} catch (RuntimeException e) {
@@ -1082,14 +1104,14 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     }
 
     private void openMacroHelp() {
-        String pathToFile = Prefs.getPrefsDir() + "/image-synthesizer-help.htm";
+        String pathToFile = Prefs.getPrefsDir() + "/image-synthesizer-help.html";
         try {
             File file = new File(pathToFile);
             Path path;
             if(file.exists() && !file.isDirectory()) {
                 path = file.toPath();
             } else {
-                InputStream inputStream = getClass().getResourceAsStream("/image-synthesizer-help.htm");
+                InputStream inputStream = getClass().getResourceAsStream("/image-synthesizer-help.html");
                 path = new File(pathToFile).toPath();
                 Files.copy(inputStream, path);
             }
@@ -1162,9 +1184,9 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 		try {
 			if(normalizeCheckBox.isSelected() && !is32Bit){
-				PIS.primitiveToNormalizedImage(imagePlus, min, max, macro, globalRadioButton.isSelected());
+				MIS.macroToNormalizedImage(imagePlus, min, max, macro, globalRadioButton.isSelected());
 			} else {
-				PIS.primitiveToImage(imagePlus, min, max, macro);
+				MIS.macroToImage(imagePlus, min, max, macro);
 			}
 			IJ.resetMinAndMax(imagePlus);
 			imagePlus.getCalibration().setUnit("units");

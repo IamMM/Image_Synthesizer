@@ -19,11 +19,11 @@
   },
   "Circle pattern": {
     "type": "8-bit",
-    "normalized": false,
+    "normalized": true,
     "variables": "deltaX = round(x)-x;\ndeltaY = round(y)-y;\nd = sqrt(deltaX*deltaX+deltaY*deltaY);\nradius = 0.25;",
     "condition": "d<radius",
-    "then_statement": "v= 0;",
-    "else_statement": "v = 255;"
+    "then_statement": "v = x;",
+    "else_statement": "v = -y;"
   },
   "Conic circles": {
     "type": "8-bit",

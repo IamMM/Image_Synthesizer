@@ -10,14 +10,14 @@ import ij.process.ImageProcessor;
 
 import java.awt.*;
 
-public class PrimitiveImageSynthesizer {
+public class MacroImageSynthesizer {
 
 	// Constants
 	private static final int PREVIEW_SIZE = 256 ;
 
-	/*--- primitive to Image ---*/
+	/*--- macro to Image ---*/
 
-	public void primitiveToImage(ImagePlus imagePlus, double[] min, double[] max, String macro) throws RuntimeException {
+	public void macroToImage(ImagePlus imagePlus, double[] min, double[] max, String macro) throws RuntimeException {
 
 		ImageProcessor ip = imagePlus.getProcessor();
 
@@ -265,7 +265,7 @@ public class PrimitiveImageSynthesizer {
 		IJ.showProgress(1.0);
 	}
 
-	public void primitiveToNormalizedImage(ImagePlus imagePlus, double[] min, double[] max, String macro, boolean global) throws RuntimeException {
+	public void macroToNormalizedImage(ImagePlus imagePlus, double[] min, double[] max, String macro, boolean global) throws RuntimeException {
 		ImageProcessor ip = imagePlus.getProcessor();
 
 		int PCStart = 25;
@@ -462,7 +462,7 @@ public class PrimitiveImageSynthesizer {
 		IJ.showProgress(1.0);
 	}
 
-	private void primitiveToFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String macro) throws RuntimeException{
+	private void macroToFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String macro) throws RuntimeException{
 		ImageProcessor ip = imagePlus.getProcessor();
 
 		int PCStart = 25;
@@ -692,7 +692,7 @@ public class PrimitiveImageSynthesizer {
 		IJ.showProgress(1.0);
 	}
 
-	private void primitiveToNormalizedFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String macro, boolean global) throws RuntimeException {
+	private void macroToNormalizedFrame(ImagePlus imagePlus, double[] min, double[] max, int z, int slices, String macro, boolean global) throws RuntimeException {
 		ImageProcessor ip = imagePlus.getProcessor();
 
 		int PCStart = 25;
@@ -882,8 +882,8 @@ public class PrimitiveImageSynthesizer {
 
 		ImageProcessor resized = downsize(imagePlus, frame, PREVIEW_SIZE);
 		ImagePlus preview = new ImagePlus("preview", resized);
-		if(normalize)primitiveToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), macro, global);
-		else primitiveToFrame(preview, min, max, frame-1, imagePlus.getNSlices(), macro);
+		if(normalize) macroToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), macro, global);
+		else macroToFrame(preview, min, max, frame-1, imagePlus.getNSlices(), macro);
 		resized.resetMinAndMax();
 
 		// interpolate if to small
