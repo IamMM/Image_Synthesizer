@@ -21,14 +21,10 @@ or alternatively just download the [stand-alone](https://visual-computing.com/fi
 
 Find more informations about the project and all available downloads here: https://visual-computing.com/imagej/
 
-## Authors
-- [Maximilian Maske](mailto:m.maske@posteo.de).
+## Feedback
+It would be awesome to get some feedback about the user experience or other constructive suggestions.
+Please let me know via [mail](mailto:maximilian.maske@student.htw-berlin.de)
+or via the ImageJ Forum directly [here in this thread](http://forum.imagej.net/t/request-for-feedback-of-a-new-plugin-for-image-synthesis/9795)
 
 ## License
 MIT. See [LICENSE.txt](/LICENSE.txt).
-
-## Feedback
-It would be awesome to get some feedback about the user experience or other constructive suggestions.
-
-Please let me know via [mail](mailto:maximilian.maske@student.htw-berlin.de)
-or via the ImageJ Forum directly [here in this thread](http://forum.imagej.net/t/request-for-feedback-of-a-new-plugin-for-image-synthesis/9795)
