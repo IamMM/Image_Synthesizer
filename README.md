@@ -13,12 +13,22 @@ Generate primitive patterns using boolean expressions with ImageJ macro code. Th
 ![GUI screenshot conditional](/screenshot_conditional.jpg)
 
 ## Development
-This Project started off the [minimal Maven project](https://github.com/imagej/minimal-ij1-plugin) implementing an ImageJ 1.x plugin.
+This Project started off the [minimal Maven project](https://github.com/imagej/minimal-ij1-plugin) implementing an ImageJ 1.x plugin. The Development is part of a bachelor thesis at the University of Applied Sciences Berlin.
+
+## Download
+Feel free to download the [plugin](https://visual-computing.com/files/imagej/Image_Synthesizer.jar) and drop it into the plugin folder of ImageJ/Fiji or alternativly just download the [stand-alone](https://visual-computing.com/files/imagej/ImageSynthesizerStandalone.jar) version including ImageJ.
+
+Find more informations about the project and all avaialbe downloads here:
+https://visual-computing.com/imagej/
 
 ## Authors
-
 - [Maximilian Maske](mailto:m.maske@posteo.de).
 
 ## License
-
 MIT. See [LICENSE.txt](/LICENSE.txt).
+
+## Feedback
+It would be awesome to get some feedback about the user experience or other constructive suggestions.
+
+Please let me know via [mail](mailto:maximilian.maske@student.htw-berlin.de)
+or via the ImageJ Froum directly [here in this thread](http://forum.imagej.net/t/request-for-feedback-of-a-new-plugin-for-image-synthesis/9795)
