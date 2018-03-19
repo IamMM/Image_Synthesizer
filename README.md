@@ -19,6 +19,8 @@ This Project started off the [minimal Maven project](https://github.com/imagej/m
 Feel free to [download the plugin](https://visual-computing.com/files/imagej/Image_Synthesizer.jar) and drop it into the plugin folder of ImageJ/Fiji  
 or alternatively just [download the stand-alone](https://visual-computing.com/files/imagej/ImageSynthesizerStandalone.jar) version including ImageJ.
 
+With Fiji/ImageJ2 you can also add my personal update site to the ImageJ Updater: [sites.imagej.net/IamMM/](sites.imagej.net/IamMM/) 
+
 Find more informations about the project and all available downloads here: https://visual-computing.com/imagej/
 
 ## Feedback
