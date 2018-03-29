@@ -16,7 +16,10 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -39,7 +42,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
     private JLabel preview;
     private JSlider previewZSlider;
 	private JLabel currentSliceLabel;
-	private JCheckBox interpolateCheckBox;
+	private JComboBox<String> interpolateComboBox;
     private JCheckBox drawAxesCheckBox;
     private JComboBox<String> sizePresetComboBox;
     private JComboBox<String> rangePresetComboBox;
@@ -116,6 +119,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 	private boolean customRange;
 	private boolean customFunction;
 	private boolean customConditional;
+	private DecimalFormat decimalFormat = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.US));
+
 
 	/**
      * Main method for debugging.
@@ -170,7 +175,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         ImagePlus.addImageListener(this);
 
-        // fill choice boxes
+		// fill choice boxes
         initImageList();
 
         typesComboBox.addItem("8-bit");
@@ -236,8 +241,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
         initMouseListener();
 
-        previewZSlider.addChangeListener(e -> currentSliceLabel.setText(previewZSlider.getValue() + ""));
-
+        previewZSlider.addChangeListener(e -> updateSliceLabelText());
         previewZSlider.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -265,7 +269,10 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			}
 		});
 
-        interpolateCheckBox.addActionListener(e -> updatePreview());
+        interpolateComboBox.addItem("none");
+        interpolateComboBox.addItem("bilinear");
+        interpolateComboBox.addItem("bicubic");
+        interpolateComboBox.addActionListener(e -> updatePreview());
         drawAxesCheckBox.addActionListener(e -> updatePreview());
 
         initPresetMaps();
@@ -538,6 +545,16 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			IJ.showMessage("Invalid Value Error", "Please provide a float number (e.g. -10.0)");
 		}
 		return value;
+	}
+
+	private void updateSliceLabelText() {
+    	double min_z = getRealNumValue(minZ);
+    	double max_z = getRealNumValue(maxZ);
+    	int slices = getNaturalNumValue(slicesTextField);
+    	slices = slices>1?slices:2;
+    	int currentSlice = previewZSlider.getValue();
+    	double dz = min_z + ((max_z - min_z) / (slices - 1)) * (currentSlice - 1);
+    	currentSliceLabel.setText("slice = " + currentSlice + " | z = " + decimalFormat.format(dz));
 	}
 
 	private void showInactivePreviewOverlay() {
@@ -999,7 +1016,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		boolean drawAxes = drawAxesCheckBox.isSelected();
 		boolean normalize = !is32Bit && normalizeCheckBox.isSelected();
 		boolean globalNorm = globalRadioButton.isSelected();
-		boolean interpolate = interpolateCheckBox.isSelected();
+		int interpolate = interpolateComboBox.getSelectedIndex();
 
 		try {
 			if(synthieSelector.getSelectedIndex()==0) { // preview function

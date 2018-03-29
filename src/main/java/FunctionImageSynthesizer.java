@@ -1275,9 +1275,9 @@ public class FunctionImageSynthesizer extends ImageMath {
 
 	/*--- PREVIEW ---*/
 
-	public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, int frame, String function, boolean drawAxes, boolean normalize, boolean interpolate) {
+	public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, int frame, String function, boolean drawAxes, boolean normalize, int interpolate) {
 
-		ImageProcessor resized = downsize(imagePlus, frame, PREVIEW_SIZE);
+		ImageProcessor resized = downsize(imagePlus, frame, PREVIEW_SIZE, interpolate);
 		ImagePlus preview = new ImagePlus("preview", resized);
 		if(normalize) functionToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), function);
 		else functionToFrame(preview, min, max, frame-1, imagePlus.getNSlices(), function);
@@ -1294,9 +1294,9 @@ public class FunctionImageSynthesizer extends ImageMath {
 		return preview.getImage();
 	}
 
-	public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, int frame, String[] functions, boolean drawAxes, boolean normalize, boolean global, boolean interpolate) {
+	public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, int frame, String[] functions, boolean drawAxes, boolean normalize, boolean global, int interpolate) {
 
-		ImageProcessor resized = downsize(imagePlus, frame, PREVIEW_SIZE);
+		ImageProcessor resized = downsize(imagePlus, frame, PREVIEW_SIZE, interpolate);
 		ImagePlus preview = new ImagePlus("preview", resized);
 		if(normalize)functionToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), functions, global);
 		else functionToFrame(preview, min, max, frame-1, imagePlus.getNSlices(), functions);
@@ -1313,7 +1313,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 		return preview.getImage();
 	}
 
-	private ImageProcessor downsize(ImagePlus imagePlus, int frame, int maxSize) {
+	private ImageProcessor downsize(ImagePlus imagePlus, int frame, int maxSize, int interpolate) {
 		int width = imagePlus.getWidth();
 		int height = imagePlus.getHeight();
 
@@ -1330,11 +1330,11 @@ public class FunctionImageSynthesizer extends ImageMath {
 			height = maxSize;
 		}
 		ImageProcessor ip = imagePlus.getStack().getProcessor(frame);
-		ip.setInterpolate(true);
+		ip.setInterpolationMethod(interpolate);
 		return ip.resize(width, height);
 	}
 
-	private void enlarge(ImagePlus imagePlus, int minSize, boolean interpolate) {
+	private void enlarge(ImagePlus imagePlus, int minSize, int interpolate) {
 		int width = imagePlus.getWidth();
 		int height = imagePlus.getHeight();
 
@@ -1347,7 +1347,7 @@ public class FunctionImageSynthesizer extends ImageMath {
 				height = minSize;
 			}
 			ImageProcessor ip = imagePlus.getProcessor();
-			ip.setInterpolate(interpolate);
+			ip.setInterpolationMethod(interpolate);
 			ImageProcessor resized = ip.resize(width, height);
 			imagePlus.setProcessor(resized);
 		}

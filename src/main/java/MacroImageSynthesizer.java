@@ -878,9 +878,9 @@ public class MacroImageSynthesizer {
 
 	/*--- PREVIEW ---*/
 
-	public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, int frame, String macro, boolean drawAxes, boolean normalize, boolean global, boolean interpolate) {
+	public Image getPreview(ImagePlus imagePlus, double[] min, double[] max, int frame, String macro, boolean drawAxes, boolean normalize, boolean global, int interpolate) {
 
-		ImageProcessor resized = downsize(imagePlus, frame, PREVIEW_SIZE);
+		ImageProcessor resized = downsize(imagePlus, frame, PREVIEW_SIZE, interpolate);
 		ImagePlus preview = new ImagePlus("preview", resized);
 		if(normalize) macroToNormalizedFrame(preview, min, max, frame-1, imagePlus.getNSlices(), macro, global);
 		else macroToFrame(preview, min, max, frame-1, imagePlus.getNSlices(), macro);
@@ -897,7 +897,7 @@ public class MacroImageSynthesizer {
 		return preview.getImage();
 	}
 
-	private ImageProcessor downsize(ImagePlus imagePlus, int frame, int maxSize) {
+	private ImageProcessor downsize(ImagePlus imagePlus, int frame, int maxSize, int interpolate) {
 		int width = imagePlus.getWidth();
 		int height = imagePlus.getHeight();
 
@@ -914,11 +914,11 @@ public class MacroImageSynthesizer {
 			height = maxSize;
 		}
 		ImageProcessor ip = imagePlus.getStack().getProcessor(frame);
-		ip.setInterpolate(true);
+		ip.setInterpolationMethod(interpolate);
 		return ip.resize(width, height);
 	}
 
-	private void enlarge(ImagePlus imagePlus, int minSize, boolean interpolate) {
+	private void enlarge(ImagePlus imagePlus, int minSize, int interpolate) {
 		int width = imagePlus.getWidth();
 		int height = imagePlus.getHeight();
 
@@ -931,7 +931,7 @@ public class MacroImageSynthesizer {
 				height = minSize;
 			}
 			ImageProcessor ip = imagePlus.getProcessor();
-			ip.setInterpolate(interpolate);
+			ip.setInterpolationMethod(interpolate);
 			ImageProcessor resized = ip.resize(width, height);
 			imagePlus.setProcessor(resized);
 		}
