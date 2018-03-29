@@ -13,7 +13,7 @@
     "type": "RGB",
     "normalized": false,
     "variables": "r = g = b = 255;",
-    "condition": "d<h/3",
+    "condition": "d < h/3",
     "then_statement": "g = b = 0;",
     "else_statement": ""
   },
@@ -21,7 +21,7 @@
     "type": "8-bit",
     "normalized": true,
     "variables": "deltaX = round(x)-x;\ndeltaY = round(y)-y;\nd = sqrt(deltaX*deltaX+deltaY*deltaY);\nradius = 0.25;",
-    "condition": "d<radius",
+    "condition": "d < radius",
     "then_statement": "v = x;",
     "else_statement": "v = -y;"
   },
@@ -29,8 +29,8 @@
     "type": "8-bit",
     "normalized": false,
     "variables": "thickness = 0.5;",
-    "condition": "d%2<=thickness",
-    "then_statement": "v= 0;",
+    "condition": "d%2 <= thickness",
+    "then_statement": "v = 0;",
     "else_statement": "v = 255;"
   },
   "Stripes": {
@@ -38,7 +38,7 @@
     "normalized": false,
     "variables": "",
     "condition": "(x%2 == 0) || (y%2 == 0)",
-    "then_statement": "v= 0;",
+    "then_statement": "v = 0;",
     "else_statement": "v = 255;"
   },
   "Square Pattern": {
@@ -46,7 +46,7 @@
     "normalized": false,
     "variables": "",
     "condition": "(round(x/(w/10))%2 == 0) ||(round(y/(h/10))%2 == 0)",
-    "then_statement": "v= 0;",
+    "then_statement": "v = 0;",
     "else_statement": "v = 255;"
   },
   "Checkerboard": {
@@ -54,7 +54,7 @@
     "normalized": false,
     "variables": "",
     "condition": "(floor(x/(w/8)) + floor(y/(h/8)))%2==0",
-    "then_statement": "v= 0;",
+    "then_statement": "v = 0;",
     "else_statement": "v = 255;"
   }
 }
