@@ -3,6 +3,7 @@ package Presets;
 public class ConditionalPreset {
 	private String type;
 	private boolean normalized;
+	private boolean local;
 	private String variables;
 	private String condition;
 	private String then_statement;
@@ -24,6 +25,14 @@ public class ConditionalPreset {
 
 	public boolean isNormalized() {
 		return normalized;
+	}
+
+	public boolean isLocal() {
+		return local;
+	}
+
+	public void setLocal(boolean local) {
+		this.local = local;
 	}
 
 	public String getVariables() {

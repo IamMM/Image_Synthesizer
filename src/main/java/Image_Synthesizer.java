@@ -691,6 +691,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 					f1TextField.setText(functionPreset.getFunctions()[0]);
 					f2TextField.setText(functionPreset.getFunctions()[1]);
 					f3TextField.setText(functionPreset.getFunctions()[2]);
+					localRadioButton.setSelected(functionPreset.isLocal());
+					globalRadioButton.setSelected(!functionPreset.isLocal());
 				} else {
 					f1TextField.setText(functionPreset.getFunction());
 					f2TextField.setText(functionPreset.getFunction());
@@ -730,12 +732,16 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 			customConditional = conditionalPrestComboBox.getSelectedIndex() == 0;
 			if(!customConditional) {
 				ConditionalPreset conditionalPreset = conditionalPresetMap.get(selectedItem);
-				typesComboBox.setSelectedItem(conditionalPreset.getType());
 				normalizeCheckBox.setSelected(conditionalPreset.isNormalized());
 				conditionalVariableField.setText(conditionalPreset.getVariables());
 				conditionalIfField.setText(conditionalPreset.getCondition());
 				conditionalThenField.setText(conditionalPreset.getThen_statement());
 				conditionalElseField.setText(conditionalPreset.getElse_statement());
+				if(conditionalPreset.getType().equals("RGB")) {
+					localRadioButton.setSelected(conditionalPreset.isLocal());
+					globalRadioButton.setSelected(!conditionalPreset.isLocal());
+				}
+				typesComboBox.setSelectedItem(conditionalPreset.getType());
 				updatePreview();
 			}
 		});
@@ -760,7 +766,8 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
             functions[1] = f2TextField.getText();
             functions[2] = f3TextField.getText();
             functionPreset = new FunctionPreset((String) typesComboBox.getSelectedItem(), normalizeCheckBox.isSelected(), functions);
-        } else {
+            functionPreset.setLocal(localRadioButton.isSelected());
+		} else {
             String function = f1TextField.getText();
             functionPreset = new FunctionPreset((String) typesComboBox.getSelectedItem(), normalizeCheckBox.isSelected(), function);
         }
@@ -895,6 +902,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 		ConditionalPreset conditionalPreset =
 				new ConditionalPreset(type, normalized, variables, condition, then_statement, else_statement);
 
+		if("RGB".equals(type)) conditionalPreset.setLocal(localRadioButton.isSelected());
 		if(userConditionalPresetMap==null) userConditionalPresetMap = new HashMap<>();
 		userConditionalPresetMap.put(name, conditionalPreset);
 		conditionalPresetMap.put(name, conditionalPreset);

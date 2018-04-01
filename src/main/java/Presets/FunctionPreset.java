@@ -3,6 +3,7 @@ package Presets;
 public class FunctionPreset {
     private String type;
     private boolean normalized;
+    private boolean local;
     private String function;
     private String[] functions;
 
@@ -24,6 +25,14 @@ public class FunctionPreset {
 
     public boolean isNormalized() {
         return normalized;
+    }
+
+    public boolean isLocal() {
+        return local;
+    }
+
+    public void setLocal(boolean local) {
+        this.local = local;
     }
 
     public String[] getFunctions() {
