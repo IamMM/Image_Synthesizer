@@ -1,51 +1,54 @@
 {
   "custom": {
   },
+  "Logarithmic Spiral": {
+  "type": "RGB",
+  "normalized": true,
+  "local": true,
+  "functions": [
+    "sin(log(d) * 2 + a)",
+    "sin(log(d) * 2 + a - 2 * PI/3)",
+    "sin(log(d) * 2 + a + 2 * PI/3)"
+  ]
+  },
   "Fibonacci": {
     "type": "RGB",
     "normalized": true,
+    "local": false,
     "functions": [
-      "sin(log(d)*8 + a) * sin(a*8)",
-      "sin(log(d)*8 + a - PI/2) * sin(a*8)",
-      "sin(log(d)*8 + a + PI/2) * sin(a*8)"
-    ]
-  },
-  "Spiral": {
-    "type": "RGB",
-    "normalized": false,
-    "functions": [
-      "255*sin(d + a)",
-      "255*sin(d + a + 4.2)",
-      "255*sin(d + a + 2.1)"
+      "sin(log(d) * 8 + a) * sin(a * 8)",
+      "sin(log(d) * 8 + a - PI/2) * sin(a * 8)",
+      "sin(log(d) * 8 + a + PI/2) * sin(a * 8)"
     ]
   },
   "Dots": {
     "type": "32-bit",
-    "function": "sin(x)*sin(x)+sin(y)*sin(y)"
+    "function": "sin(x) * sin(x) + sin(y) * sin(y)"
   },
   "Purple curves": {
     "type": "RGB",
     "normalized": true,
+    "local": true,
     "functions": [
-      "sin((d+z)*x*y)",
+      "sin((d + z) * x * y)",
       "0",
-      "sin((d+z)*x*y)"
+      "sin((d + z) * x * y)"
     ]
   },
   "Water circles": {
     "type": "32-bit",
-    "function": "sin(d-z)"
+    "function": "sin(d - z)"
   },
   "Triangle wave": {
     "type": "32-bit",
-    "function": "abs(x%4-2)-1"
+    "function": "abs(x % 4 - 2) - 1"
   },
   "Cross wave": {
     "type": "32-bit",
-    "function": "abs(x*y%6)"
+    "function": "abs(x * y % 6)"
   },
   "Rising frequency": {
     "type": "32-bit",
-    "function": "sin(x*x)"
+    "function": "sin(x * x)"
   }
 }

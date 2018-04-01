@@ -36,16 +36,16 @@
   "Stripes": {
     "type":"8-bit",
     "normalized": false,
-    "variables": "",
-    "condition": "(x%2 == 0) || (y%2 == 0)",
+    "variables": "size = 3;",
+    "condition": "(round(x) % size == 0)",
     "then_statement": "v = 0;",
     "else_statement": "v = 255;"
   },
-  "Square Pattern": {
+  "Rectangle Pattern": {
     "type":"8-bit",
     "normalized": false,
-    "variables": "",
-    "condition": "(round(x/(w/10))%2 == 0) ||(round(y/(h/10))%2 == 0)",
+    "variables": "size = 2;",
+    "condition": "(round(x) % size == 0) || (round(y) % size == 0)",
     "then_statement": "v = 0;",
     "else_statement": "v = 255;"
   },
