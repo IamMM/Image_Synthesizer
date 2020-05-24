@@ -96,7 +96,7 @@ public class Image_Synthesizer implements PlugIn, ImageListener {
 
 	// constants
     private static final String TITLE = "Image Synthesizer";
-    private static final String VERSION = " v1.0";
+    private static final String VERSION = " v1.1";
 
     // Synthesizer Objects
     private static FunctionImageSynthesizer FIS = new FunctionImageSynthesizer();
