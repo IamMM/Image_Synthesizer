@@ -23,10 +23,14 @@ With Fiji/ImageJ2 you can also add my personal update site to the [ImageJ Update
 
 Find more informations about the project and all available downloads here: https://visual-computing.com/imagej/
 
+## Wiki
+
+You can find the wiki on the offical web site of ImageJ [here](https://imagej.net/Image_Synthesizer).
+
 ## Feedback
 It would be awesome to get some feedback about the user experience or other constructive suggestions.
 
-Please let me know via [mail](mailto:maximilian.maske@student.htw-berlin.de)
+Please let me know via [mail](mailto:m.maske@posteo.de)
 or via the ImageJ Forum directly [here in this thread](http://forum.imagej.net/t/request-for-feedback-of-a-new-plugin-for-image-synthesis/9795)
 
 ## License
