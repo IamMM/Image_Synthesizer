@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-		http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.imagej</groupId>
-        <artifactId>pom-imagej</artifactId>
-        <version>15.4.0</version>
+        <groupId>org.scijava</groupId>
+        <artifactId>pom-scijava</artifactId>
+        <version>28.0.0</version>
         <relativePath/>
     </parent>
 
@@ -17,7 +14,19 @@
     <version>0.1.0-SNAPSHOT</version>
 
     <name>Image_Synthesizer</name>
-    <description>A Maven project implementing an ImageJ 1.x plugin</description>
+    <description>ImageJ Plugin to synthesize images with certain parameters and function input</description>
+    <url>https://github.com/IamMM/Image_Synthesizer</url>
+    <inceptionYear>2017</inceptionYear>
+    <organization>
+        <name>HTW-Berlin</name>
+        <url>https://www.htw-berlin.de/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
 
     <developers>
         <developer>
@@ -25,15 +34,27 @@
             <name>Maximilian Maske</name>
             <email>m.maske@posteo.de</email>
             <organization>HTW-Berlin</organization>
-            <organizationUrl>
-                htw-berlin.de
-            </organizationUrl>
+            <organizationUrl>https://www.htw-berlin.de/</organizationUrl>
             <roles>
                 <role>developer</role>
             </roles>
             <timezone>+1</timezone>
         </developer>
     </developers>
+    <contributors>
+        <contributor>
+            <name>Curtis Rueden</name>
+            <url>https://imagej.net/User:Rueden</url>
+            <properties><id>ctrueden</id></properties>
+        </contributor>
+    </contributors>
+
+    <mailingLists>
+        <mailingList>
+            <name>Image.sc Forum</name>
+            <archive>https://forum.image.sc/tags/image-synthesizer</archive>
+        </mailingList>
+    </mailingLists>
 
     <scm>
         <connection>scm:git:git:github.com/IamMM/Image_Synthesizer</connection>
@@ -41,45 +62,28 @@
         <tag>HEAD</tag>
         <url>https://github.com/IamMM/Image_Synthesizer</url>
     </scm>
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/IamMM/Image_Synthesizer/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>None</system>
+    </ciManagement>
 
     <properties>
         <main-class>Image_Synthesizer</main-class>
+        <license.licenseName>mit</license.licenseName>
+        <license.copyrightOwners>HTW-Berlin.</license.copyrightOwners>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>net.imagej</groupId>
             <artifactId>ij</artifactId>
-            <version>1.51s</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.3</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>${main-class}</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>
